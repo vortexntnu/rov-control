@@ -1,185 +1,262 @@
 #include <ros.h>
 #include <string.h>
 
-#include "std_msgs/String.h"
-
-//includer for IMU og trykksensor
 #include "MS5837.h"
+#include "Adafruit_BNO055.h"
+#include "Adafruit_Sensor.h"
+#include "DallasTemperature.h"
 #include <Wire.h>
+
+#include "std_msgs/String.h"
 #include <geometry_msgs/Vector3.h>
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/MagneticField.h"
 #include "sensor_msgs/Temperature.h"
 #include "sensor_msgs/FluidPressure.h"
 
+
 #define STANDARD_GRAVITY 9.08665      // [m/s^2]
 #define RAD_PER_DEG 0.01745329252     // [1/deg]
 #define PASCAL_PER_MILLIBAR 0.01      // [Pa/mbar]
 #define MICROTESLA_PER_TESLA 0.000001 // [uT/T]
 
+int id = -1;
+
 ros::NodeHandle nh;
 
-// sensor_msgs::Imu imu_raw_msg;
-// sensor_msgs::MagneticField compass_msg;
-// sensor_msgs::Temperature temperature_msg;
-// sensor_msgs::FluidPressure pressure_msg;
+sensor_msgs::Imu imu_raw_msg;
+sensor_msgs::MagneticField compass_msg;
 
-// ros::Publisher pub_imu("imu/data_raw", &imu_raw_msg);
-// ros::Publisher pub_mag("imu/mag", &compass_msg);
-// ros::Publisher pub_pressure("imu/pressure", &pressure_msg);
-// ros::Publisher pub_temperature("imu/temperature", &temperature_msg);
+sensor_msgs::Temperature imu_temperature_msg;
+sensor_msgs::Temperature sensor_temperature_msg;
+sensor_msgs::FluidPressure pressure_msg;
 
-const int SensorReadDelay = 500;
+std_msgs::String calibration;
+
+ros::Publisher pub_imu("imu/data", &imu_raw_msg);
+ros::Publisher pub_mag("imu/mag", &compass_msg);
+
+ros::Publisher pub_pressure("imu/pressure", &pressure_msg);
+ros::Publisher pub_imu_temperature("imu/temperature", &imu_temperature_msg);
+ros::Publisher pub_sensor_temperature("sensor/temperature", &sensor_temperature_msg);
+
+ros::Publisher pub_calibration("imu/calibration", &calibration);
+
+
+const int SensorReadDelay = 40;
 unsigned long PrevoiusSensorReadMillis = 0;
 
 int dbg_count = 0;
 
 MS5837 barometer;
+Adafruit_BNO055 bno055 = Adafruit_BNO055(55);
+
+#define ONE_WIRE_BUS 2
+OneWire oneWire(ONE_WIRE_BUS);
+
+DallasTemperature sensors(&oneWire);
+
 
 // double GyroLsbSens, AccelLsbSens;
-
+void setupIMU();
 
 void setup() {
   
     //start ROS-node
     nh.initNode();
 
-    // nh.advertise(pub_imu);
-    // nh.advertise(pub_mag);
-    // nh.advertise(pub_temperature);
-    // nh.advertise(pub_pressure);
-    
-    nh.spinOnce();
-    
+    // nh.advertise(pub_dbg);
+    nh.advertise(pub_imu_temperature);
+    nh.advertise(pub_sensor_temperature);
+
+    nh.advertise(pub_pressure);
+    nh.advertise(pub_imu);
+    nh.advertise(pub_mag);
+    nh.advertise(pub_calibration);
+
     // Initialize the 'Wire' class for communicating over i2c
     Wire.begin();
     barometer.init();
+    barometer.read();
 
-    DDRB |= _BV(DDB5);
-
-    nh.spinOnce();
+    setupIMU();
+    // nh.advertise(pub_mag);
 }
 
-float killme = 0.0;
+void setupIMU() {
+
+    /* 
+        Sets opmode to NDOF by default
+        
+        From Adafruit_BNO055.h: 
+
+        OPERATION_MODE_CONFIG                                   = 0X00,
+        OPERATION_MODE_ACCONLY                                  = 0X01,
+        OPERATION_MODE_MAGONLY                                  = 0X02,
+        OPERATION_MODE_GYRONLY                                  = 0X03,
+        OPERATION_MODE_ACCMAG                                   = 0X04,
+        OPERATION_MODE_ACCGYRO                                  = 0X05,
+        OPERATION_MODE_MAGGYRO                                  = 0X06,
+        OPERATION_MODE_AMG                                      = 0X07,
+        OPERATION_MODE_IMUPLUS                                  = 0X08,
+        OPERATION_MODE_COMPASS                                  = 0X09,
+        OPERATION_MODE_M4G                                      = 0X0A,
+        OPERATION_MODE_NDOF_FMC_OFF                             = 0X0B,
+        OPERATION_MODE_NDOF                                     = 0X0C
+
+
+                    ACCEL   MAG     GYRO    RELATIVE        ABSOLUTE
+                                            ORIENTATION     ORIENTATION              
+        ---------------------------------------------------------------
+        IMU     |    X    |   -    |   X  |       X        |     -
+        COMPASS |    X    |   X    |   -  |       -        |     X
+        M4G     |    X    |   X    |   -  |       X        |     -
+        NDOF    |    X    |   X    |   X  |       -        |     X
+    */
+
+    id = bno055.begin(bno055.OPERATION_MODE_IMUPLUS);
+
+}
+
 
 void getPressure() {
 
-    // Is this blocking or not? the world may never know!
-    // barometer.read();
-
     // float pressure = barometer.pressure();
-    // pressure_msg.fluid_pressure = killme++;
-
-
-    // pub_pressure.publish(&pressure_msg);
+    float pressure = barometer.pressure();
+    pressure_msg.fluid_pressure = pressure * 100;
+    pub_pressure.publish(&pressure_msg);
 
 }
 
-bool on = false;
+
+#define BARO 10
+int baro_counter = 0;
+void getBarometerTemp() {
+
+    if(baro_counter < BARO){
+        baro_counter++;
+        return;
+    }
+    else{
+        baro_counter = 0;
+    }
+    
+    float temp = barometer.temperature();
+    imu_temperature_msg.temperature = temp;
+
+    pub_imu_temperature.publish(&imu_temperature_msg);
+    
+}
+
+
+#define DALL 10
+int dallas_counter = 50;
+void getDallasTemp() {
+
+    if(dallas_counter < DALL){
+        dallas_counter++;
+        return;
+    }
+    else{
+        dallas_counter = 0;
+    }
+
+    sensors.requestTemperatures();
+    float temp = sensors.getTempCByIndex(0);
+    sensor_temperature_msg.temperature = temp;
+
+    pub_sensor_temperature.publish(&sensor_temperature_msg);
+    
+
+}
+
+void getRawIMU() {
+
+    // sensors_event_t event;
+    // bno055.getEvent(&event);
+
+    imu::Vector<3> gyro = bno055.getVector(bno055.VECTOR_GYROSCOPE);
+    imu_raw_msg.linear_acceleration.x = gyro[0];
+    imu_raw_msg.linear_acceleration.y = gyro[1];
+    imu_raw_msg.linear_acceleration.z = gyro[2];
+                                        
+
+    imu::Vector<3> lin_acc = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+    imu_raw_msg.angular_velocity.x = lin_acc[0];
+    imu_raw_msg.angular_velocity.y = lin_acc[1];
+    imu_raw_msg.angular_velocity.z = lin_acc[2];
+
+
+    imu::Quaternion qs = bno055.getQuat();
+    imu_raw_msg.orientation.x = qs.x();
+    imu_raw_msg.orientation.y = qs.y();
+    imu_raw_msg.orientation.z = qs.z();
+    imu_raw_msg.orientation.w = qs.w();
+
+    imu_raw_msg.header.stamp = ros::Time(millis()/1000.0, 0);
+    pub_imu.publish(&imu_raw_msg);
+
+}
+
+bool calibrated = false;
+
+
+void getCalibrationStatus(){
+
+    // lol
+    uint8_t sys, gyro, accel, mag;
+    sys = gyro = accel = mag = 0;
+    bno055.getCalibration(&sys, &gyro, &accel, &mag);
+    char buffer[128] = { '\0' };
+
+    if (sys == 3 && gyro == 3 && accel == 3 && mag == 3){
+        if(!calibrated){
+            sprintf(buffer, "\n All systems go\n");
+            calibrated = true;
+        }
+        return;
+    }
+
+    calibrated = false;
+    sprintf(buffer, "\nSys: %d, Gyro: %d, Acc: %d, mag: %d\n", sys, gyro, accel, mag);
+    String s = String(buffer);
+    calibration.data = s.c_str();
+    pub_calibration.publish(&calibration);
+
+}
 
 void loop(){
 
     nh.spinOnce();
 
     if( millis() - PrevoiusSensorReadMillis >= SensorReadDelay ) {
+
         PrevoiusSensorReadMillis = millis();
 
-        on = ~on;
-        if(on)
-            PORTB |= _BV(PORTB5);
+        barometer.read();
+        nh.spinOnce();
 
-        if(!on)
-            PORTB &= ~_BV(PORTB5);
 
-        // getPressure();
+        getPressure();
+        nh.spinOnce();
+
+
+        getBarometerTemp();
+        nh.spinOnce();
+
+
+        getDallasTemp();
+        nh.spinOnce();
+
+
+        getRawIMU();
+        nh.spinOnce();
+
+
+        getCalibrationStatus();
+        nh.spinOnce();
 
     }
 }
 
 
-// void getFsRangeAndSetLsbSensisivity() {
-//   
-//     uint8_t GyroFsRange, AccelFsRange;
-//     
-//     GyroFsRange = accelgyro.getFullScaleGyroRange();
-//     /* Gyro
-//      * FS_SEL | Full Scale Range   | LSB Sensitivity
-//      * -------+--------------------+----------------
-//      * 0      | +/- 250 degrees/s  | 131 LSB/deg/s
-//      * 1      | +/- 500 degrees/s  | 65.5 LSB/deg/s
-//      * 2      | +/- 1000 degrees/s | 32.8 LSB/deg/s
-//      * 3      | +/- 2000 degrees/s | 16.4 LSB/deg/s
-//      */
-//     switch(GyroFsRange) {
-//     case 0:
-//         GyroLsbSens = 131.0;
-//         break;
-//     case 1:
-//         GyroLsbSens = 65.5;
-//         break;
-//     case 2:
-//         GyroLsbSens = 32.8;
-//         break;
-//     case 3:
-//         GyroLsbSens = 16.4;
-//         break;  
-//     };
-// 
-//     
-//     AccelFsRange = accelgyro.getFullScaleAccelRange();
-//     /*Accelerometer
-//      * AFS_SEL | Full Scale Range | LSB Sensitivity
-//      * --------+------------------+----------------
-//      * 0       | +/- 2g           | 16384 LSB/g
-//      * 1       | +/- 4g           | 8192 LSB/g
-//      * 2       | +/- 8g           | 4096 LSB/g
-//      * 3       | +/- 16g          | 2048 LSB/g
-//      */
-//     switch(AccelFsRange) {
-//     case 0:
-//         AccelLsbSens = 16384.0;
-//         break;
-//     case 1:
-//         AccelLsbSens = 8192.0;
-//         break;
-//     case 2:
-//         AccelLsbSens = 4096.0;
-//         break;
-//     case 3:
-//         AccelLsbSens = 2048.0;
-//         break;  
-//     };
-// 
-// }
-// 
-// void lesSensorer() {
-// 
-//     int16_t ax, ay, az;
-//     int16_t gx, gy, gz;
-//     int16_t mx, my, mz;
-// 
-//     accelgyro.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
-// 
-//     //Accelerometerdata enhet: [m/s^2]
-//     imu_raw_msg.linear_acceleration.x = (ax * STANDARD_GRAVITY) / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
-//     imu_raw_msg.linear_acceleration.y = (ay * STANDARD_GRAVITY) / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
-//     imu_raw_msg.linear_acceleration.z = (az * STANDARD_GRAVITY) / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
-// 
-//     //Gyrodata: enhet [rad/s]
-//     imu_raw_msg.angular_velocity.x = (gx * RAD_PER_DEG) / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
-//     imu_raw_msg.angular_velocity.y = (gy * RAD_PER_DEG) / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
-//     imu_raw_msg.angular_velocity.z = (gz * RAD_PER_DEG) / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
-// 
-//     // Kompass, enhet [T]
-//     // TODO finn ut om 0.3 er riktig skaleringsfaktor
-//     compass_msg.magnetic_field.x = mx * 0.3 * MICROTESLA_PER_TESLA; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
-//     compass_msg.magnetic_field.y = my * 0.3 * MICROTESLA_PER_TESLA; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
-//     compass_msg.magnetic_field.z = mz * 0.3 * MICROTESLA_PER_TESLA; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
-// 
-//     temperature_msg.temperature = ( (double)accelgyro.getTemperature() + 12412.0) / 340.0;
-// 
-//     depthSensor.read();
-//     pressure_msg.fluid_pressure = depthSensor.getPreassure() * PASCAL_PER_MILLIBAR; // OBS! MÅ VÆRE I PASCAL
-// 
-// }
-// 

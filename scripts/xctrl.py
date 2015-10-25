@@ -1,6 +1,90 @@
 
-from std_msgs.msg import String
-from controller.msg import *
+
+def read_ps3_into_control_msg(device, model):
+
+    for event in device.read_loop():
+        input = ps3_code_map(event.code)
+        if input == 'X1':
+            if event.value != 0:
+                model.strafe_X = deadzone(event.value)
+        elif input == 'Y1':
+            if event.value != 0:
+                model.strafe_Y = deadzone(event.value)
+        elif input == 'X2':
+            if event.value != 0:
+                model.turn_X = deadzone(event.value)
+        elif input == 'Y2':
+            if event.value != 0:
+                model.turn_Y = deadzone(event.value)
+        elif input == 'R1':
+            model.lights_increase = (event.value == 1)
+        elif input == 'L1':
+            model.lights_decrease = (event.value == 1)
+        elif input == 'TRIANGLE':
+            model.lights_on = (event.value == 1)
+        elif input == 'SQUARE':
+            model.lights_off = (event.value == 1)
+
+
+def read_xbox_into_control_msg(device, model):
+
+    for event in device.read_loop():
+        input = ps3_code_map(event.code)
+        if input == 'X1':
+            model.strafe_X = event.value
+        elif input == 'Y1':
+            model.strafe_Y = event.value
+        elif input == 'X2':
+            model.turn_Y = event.value
+        elif input == 'Y2':
+            model.turn_Y = event.value
+        elif input == 'HTrigth':
+            model.lights_increase = event.value
+        elif input == 'HTleft':
+            model.lights_decrease = event.value
+        elif input == 'Y':
+            model.lights_on = event.value
+        elif input == 'X':
+            model.lights_off = event.value
+
+
+def deadzone(value):
+    if abs(value) < 3200:
+        return 0
+    return value
+
+
+def ps3_code_map(code):
+    return {
+            0:'X1',
+            1:'Y1',
+
+            3:'X2',
+            4:'Y2',
+
+            9:'R2',
+            10:'L2',
+
+            16:'DX',
+            17:'DY',
+
+            310:'L1',
+            311:'R1',
+
+            304:'X',
+            305:'CIRCLE',
+            307:'SQUARE',
+            308:'TRIANGLE',
+
+            314:'SELECT',
+            315:'START',
+            316:'PS3',
+
+            317:'L3',
+            318:'R3'
+
+            }.get(code,None)
+
 
 def xbox_code_map(code):
     return {
@@ -34,86 +118,3 @@ def xbox_code_map(code):
 
             }.get(code,None)
 
-
-def deadzone(value):
-    if abs(value) < 3200:
-        return 0
-    return value
-
-
-def read_events(device, model):
-    events = device.read()
-
-    for event in events:
-        input = xbox_code_map(event.code)
-        # print(event.code)
-        if input == 'X1':
-            if event.value != 0:
-                model.control_model['X1'] = event.value
-        elif input == 'DY':
-            if event.value == -1:
-                model.control_model['north'] = 1
-                model.control_model['south'] = 0
-            elif event.value == 1:
-                model.control_model['north'] = 0
-                model.control_model['south'] = 1
-            else:
-                model.control_model['north'] = 0
-                model.control_model['south'] = 0
-        elif input == 'DX':
-            if event.value == -1:
-                model.control_model['west'] = 1
-                model.control_model['east'] = 0
-            elif event.value == 1:
-                model.control_model['west'] = 0
-                model.control_model['east'] = 1
-            else:
-                model.control_model['west'] = 0
-                model.control_model['east'] = 0
-        else: 
-            model.control_model[input] = event.value
-
-
-class xboc_ctrl():
-    def __init__(self):
-        self.control_model = {
-            #LT
-            'X1' : 0,
-            'Y1' : 0,
-
-            #RT
-            'X2' : 0,
-            'Y2' : 0,
-
-            #Dpad
-            'north' : 0,
-            'west' : 0,
-            'east' : 0,
-            'south' : 0,
-
-            'STleft' : 0,
-            'STrigth' : 0,
-
-            'HTleft' : 0.0,
-            'HTrigth' : 0.0,
-
-            'A' : 0,
-            'B' : 0,
-            'X' : 0,
-            'Y' : 0,
-
-            'start' : 0,
-            'back' : 0,
-        }
-
-    def create_msg(self):
-        return control(
-            strafe_X = deadzone(self.control_model['X1']),
-            strafe_Y = deadzone(self.control_model['Y1']),
-
-            turn_X = deadzone(self.control_model['X2']),
-            turn_Y = deadzone(self.control_model['Y2']),
-            
-            ascend=self.control_model['A'],
-            descend=self.control_model['B']
-        )

@@ -1,96 +1,67 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
-import os, glob
-import ctrlmodels
-
-from evdev import InputDevice, ecodes
-import asyncio
-from asyncore import file_dispatcher, loop
-from functools import partial
-
+import glob
+from evdev import InputDevice
 import rospy
-from std_msgs.msg import String
-from controller.msg import *
+import threading
+from controller.msg import control
+import xctrl
+import subprocess
+import os
+import time
 
 
-def init_device():
-    devices = glob.glob('/dev/input/event*')
-    for device in devices:
-        print("trying device named " + device)
-        try:
-            device = InputDevice(device)
-            print(device.name.lower())
-            return('xbox', device)
-            # if 'xbox' in device.name.lower():
-            #     print("Found xbox controller in device " + device)
-            #     return('xbox', device)
-            # elif 'playstation' in device.name.lower():
-            #     print("Found ps3 controller")
-            #     return('ps3', device)
-        except:
-            print("Nope")
-            pass
-    exit("No controller found. Have you remembered running xboxdrv?")
+class ControllerNode:
 
+    def __init__(self):
+        self.model = control()
+        rospy.init_node("controller_node")
+        self.pub = rospy.Publisher('control', control, queue_size=10)
+        self.rate = rospy.Rate(10)
 
+    def start_node(self):
+        device_type, self.device = self.init_device()
+        if device_type == 'xbox':
+            # start reading xbox controller signals into control msg
+            input_thread = threading.Thread(target=xctrl.read_ps3_into_control_msg, args=(self.device, self.model))
+            input_thread.daemon = True
+            input_thread.start()
 
-@asyncio.coroutine
-def reader(pub, model):
-    while not rospy.is_shutdown():
-        yield from asyncio.sleep(0.1)
-        pub.publish(model.create_msg())
+        if device_type == 'ps3':
+            xctrl.read_ps3_into_control_msg(self.device, self.model)
 
+        while not rospy.is_shutdown():
+            rospy.loginfo(self.model)
+            self.pub.publish(self.model)
+            self.rate.sleep()
 
-def dummy_ctrl():
-    return control(
-        strafe_X = 20000,
-        strafe_Y = 20000,
+    def init_device(self):
+        os.system("pkill -f -9 xboxdrv")
+        xboxdrv_process = subprocess.Popen(['xboxdrv', '--detach-kernel-driver', '-s'])
+        time.sleep(1)
+        devices = glob.glob('/dev/input/event*')
+        for device_path in devices:
+            print("trying device named " + device_path)
+            try:
+                device = InputDevice(device_path)
+                print device.name.lower()
+                # TODO device name of ps3 contains xbox. Find a way to separate them
+                if "xbox" in device.name.lower():
+                    print "Found xbox controller"
+                    return 'xbox', device
+                elif 'playstation' in device.name.lower():
+                    print "Found ps3 controller"
+                    return 'ps3', device
+            except:
+                pass
 
-        turn_X = 10000,
-        turn_Y = 0,
-        
-        ascend=1,
-        descend=0
-    )
-
-def test():
-    rospy.init_node('TEST', anonymous=True)
-    pub = rospy.Publisher('Control', control, queue_size=10)
-    rate = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        pub.publish(test())
-        print("I am talking")
-        rate.sleep()
-
-
-def start_node():
-    device = init_device()
-
-    if(device[0] == 'xbox'):
-        import xctrl
-        model = xctrl.xboc_ctrl()
-        read_events = xctrl.read_events
-
-    if(device[0] == 'ps3'):
-        import xctrl
-        model = xctrl.xboc_ctrl()
-        read_events = xctrl.read_events
-
-    rospy.init_node( (device[0] + "controller") )
-    pub = rospy.Publisher('Control', control, queue_size=10)
-
-    loop = asyncio.get_event_loop()
-    loop.add_reader(device[1], partial(read_events, device[1], model))
-    loop.run_until_complete(reader(pub, model))
-
+        xboxdrv_process.kill()
+        exit("No controller found.")
 
 
 if __name__ == '__main__':
     try:
-        start_node()
+        controller_node = ControllerNode()
+        controller_node.start_node()
     except rospy.ROSInterruptException:
         pass
-
-
-
-

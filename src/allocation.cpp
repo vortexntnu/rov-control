@@ -10,7 +10,7 @@
 //  f = K*u are the forces of each actuator in Newtons
 //  tau = T*f are the forces on the ROV in Newtons and Newton meters
 
-// #include "ros/ros.h"
+#include "ros/ros.h"
 #include <iostream>
 #include <Eigen/Dense> // Require Eigen library for matrix operations
 
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "allocation");
     ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("forces", 1, );
+    ros::Subscriber sub = n.subscribe("forces", 1 );
 
     // K and T should probably be given by a ROS parameter server.
     // For now, temporary values are hard-coded here.

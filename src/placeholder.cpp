@@ -1,6 +1,6 @@
 #include "ros/ros.h"
-#include "std_msgs/Joystick.h"
-#include "std_msgs/ThrusterForces.h"
+#include "uranus_dp/Joystick.h"
+#include "uranus_dp/ThrusterForces.h"
 
 class ConvertJoystickToThruster
 {

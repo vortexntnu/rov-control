@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    control.msg
+   pwm_placeholder.msg
 )
 
 generate_messages(

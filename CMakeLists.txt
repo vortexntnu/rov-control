@@ -11,6 +11,11 @@ find_package(
   message_generation
 )
 
+find_package(
+  Eigen
+  REQUIRED
+)
+
 add_message_files(
   FILES
   JoystickUranus.msg
@@ -32,8 +37,8 @@ add_executable(placeholder src/placeholder.cpp)
 target_link_libraries(placeholder ${catkin_LIBRARIES})
 # add_dependencies(placeholder uranus_dp_generate_messages_cpp)
 
-# add_executable(allocation src/allocation.cpp)
-# target_link_libraries(allocation ${catkin_LIBRARIES})
+add_executable(allocation src/allocation.cpp)
+target_link_libraries(allocation ${catkin_LIBRARIES})
 # add_dependencies(allocation uranus_dp_generate_messages_cpp)
 
 add_message_files(

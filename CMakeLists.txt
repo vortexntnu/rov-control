@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  uranus_dp
 )
 
 add_message_files(

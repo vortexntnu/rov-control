@@ -3,7 +3,6 @@ project(uranus_dp)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   std_msgs
   genmsg
 )
@@ -48,22 +47,19 @@ include_directories(
 
 add_definitions(${EIGEN_DEFINITIONS})
 
+add_message_files(DIRECTORY msg FILES Joystick.msg ThrusterForces.msg)
+generate_messages( DEPENDENCIES )
+
+catkin_package(
+    CATKIN_DEPENDS std_msgs message_runtime
+    DEPENDS Eigen
+)
+
 add_executable(allocation src/allocation.cpp)
 target_link_libraries(allocation ${catkin_LIBRARIES})
 
 add_executable(placeholder src/placeholder.cpp)
 target_link_libraries(placeholder ${catkin_LIBRARIES})
 
-add_message_files(DIRECTORY msg FILES Joystick.msg ThrusterForces.msg)
 
-generate_messages(
-    DEPENDENCIES
-    std_msgs
-)
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES uranus_dp
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-    DEPENDS Eigen
-)

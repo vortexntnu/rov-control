@@ -5,7 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  genmsg
+  message_generation
 )
 
 find_package(catkin REQUIRED cmake_modules)
@@ -13,7 +13,7 @@ find_package(Eigen REQUIRED)
 
 add_message_files(
     FILES
-    Joystick.msg
+    JoystickUranus.msg
     ThrusterForces.msg
     VelocitySetpoints.msg
 )
@@ -54,7 +54,13 @@ target_link_libraries(allocation ${catkin_LIBRARIES})
 add_executable(placeholder src/placeholder.cpp)
 target_link_libraries(placeholder ${catkin_LIBRARIES})
 
-add_message_files(DIRECTORY msg FILES Joystick.msg ThrusterForces.msg)
+add_message_files(
+  DIRECTORY
+  msg
+  FILES
+  JoystickUranus.msg
+  ThrusterForces.msg
+)
 
 generate_messages(
     DEPENDENCIES
@@ -64,6 +70,6 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES uranus_dp
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-    DEPENDS Eigen
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+  DEPENDS Eigen
 )

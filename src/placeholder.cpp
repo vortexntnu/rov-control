@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "uranus_dp/Joystick.h"
+#include "uranus_dp/JoystickUranus.h"
 #include "uranus_dp/ThrusterForces.h"
 
 class ConvertJoystickToThruster
@@ -7,11 +7,11 @@ class ConvertJoystickToThruster
 public:
     ConvertJoystickToThruster()
     {
-        pub = n.advertise<std_msgs::ThrusterForces>("thruster", 1)
+        pub = n.advertise<uranus_dp::ThrusterForces>("thruster", 1)
         sub = n.subscribe("joystick", 1, &ConvertJoystickToThruster::callback, this)
     }
 
-    void callback(const std_msgs::Joystick& input)
+    void callback(const uranus_dp::JoystickUranus& input)
     {
         // Make sure all inputs are in range (-100, 100)
         // Is it possible to iterate over the Joystick message without losing the names? This is hardly elegant.
@@ -31,7 +31,7 @@ public:
         // Blue Robotics T100 thrusters can give max 17.8 Newton thrust both ways
         // (slightly more forward but who cares)
         // Scaling factor from (-100, 100) to (-17.8, 17.8) is 500/89
-        std_msgs::ThrusterForces output;
+        uranus_dp::ThrusterForces output;
 
         output.forceInNewton_1 = input.surge * (500/89);
         output.forceInNewton_2 = input.sway  * (500/89);

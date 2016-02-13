@@ -6,16 +6,15 @@
 //  T   - thrust configuration matrix (6x6?)
 //  tau - vector of forces on the ROV (6)
 //
-// Explanation of relationships:
+// Mathematical relationships:
 //  f = K*u are the forces of each actuator in Newtons
 //  tau = T*f are the forces on the ROV in Newtons and Newton meters
 
 #include "ros/ros.h"
 #include <iostream>
-#include <Eigen/Dense> // Require Eigen library for matrix operations
-// #include "placeholder.cpp"
+#include <Eigen/Dense> // Library for matrix operations
 
-using namespace std;
+// using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 

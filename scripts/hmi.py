@@ -2,8 +2,8 @@
 
 import rospy
 from std_msgs.msg import Int32
-from controller.msg import control
-from controller.msg import pwm_placeholder
+from joystick.msg import joystick
+from joystick.msg import pwm_requests
 
     
 
@@ -11,8 +11,8 @@ from controller.msg import pwm_placeholder
 class HmiNode:
 
     def __init__(self):
-        self.pwm_signals = pwm_placeholder()
-        self.pwm_publisher = rospy.Publisher('pwm_requests', pwm_placeholder, queue_size=10)
+        self.pwm_signals = pwm_requests()
+        self.pwm_publisher = rospy.Publisher('pwm_requests', pwm_requests, queue_size=10)
         rospy.Subscriber('control', control, self.controller_callback)
 
         rospy.init_node("hmi_node", anonymous=True)

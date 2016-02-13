@@ -11,7 +11,7 @@ include_directories(${ROS_LIB_DIR})
 generate_arduino_firmware(ros_arduino
   SRCS ros_arduino.cpp ${ROS_LIB_DIR}/time.cpp
   
-  BOARD mega2560
+  BOARD uno
   
-  PORT /dev/ttyS0
+  PORT /dev/ttyACM0
 )

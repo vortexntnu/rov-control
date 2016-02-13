@@ -41,6 +41,7 @@ void pwm_update( const joystick::pwm_requests& pwm_input ){
     pwm_status_msg.pwm5 = internal_pwm_out[4];
     pwm_status_msg.pwm6 = internal_pwm_out[5];
 
+    dbg_count = 0;
 
     pwm_status_pub.publish( &pwm_status_msg );
 
@@ -48,7 +49,7 @@ void pwm_update( const joystick::pwm_requests& pwm_input ){
     
 }
 
-ros::Subscriber<joystick::pwm_requests> pwm_input_sub("pwm_signal_input", &pwm_update );
+ros::Subscriber<joystick::pwm_requests> pwm_input_sub("pwm_requests", &pwm_update );
 
 
 

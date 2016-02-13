@@ -44,13 +44,13 @@
   <build_depend>rosserial_client</build_depend>
   <build_depend>std_msgs</build_depend>
 
-  <build_depend>controller</build_depend>
+  <build_depend>joystick</build_depend>
 
   <run_depend>rosserial_arduino</run_depend>
   <run_depend>rosserial_client</run_depend>
   <run_depend>std_msgs</run_depend>
 
-  <run_depend>controller</run_depend>
+  <run_depend>joystick</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

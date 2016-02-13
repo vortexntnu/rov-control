@@ -3,7 +3,7 @@
 #include <ros.h>
 
 #include <std_msgs/String.h>
-#include <controller/pwm_requests.h>
+#include <joystick/pwm_requests.h>
 
 
 ros::NodeHandle nh;
@@ -15,7 +15,7 @@ int internal_pwm_out[pwm_count];
 
 
 
-controller::pwm_placeholder  pwm_status_msg;
+joystick::pwm_requests  pwm_status_msg;
 ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
 
 std_msgs::String arduino_dbg_msg;
@@ -23,7 +23,7 @@ ros::Publisher arduino_dbg_pub("arduino_dbg", &arduino_dbg_msg);
 
 
 
-void pwm_update( const controller::pwm_placeholder& pwm_input ){
+void pwm_update( const joystick::pwm_requests& pwm_input ){
   
     internal_pwm_out[0] = (pwm_input.pwm1 >> 8) + 128;
     internal_pwm_out[1] = (pwm_input.pwm2 >> 8) + 128;
@@ -48,7 +48,7 @@ void pwm_update( const controller::pwm_placeholder& pwm_input ){
     
 }
 
-ros::Subscriber<controller::pwm_placeholder> pwm_input_sub("pwm_signal_input", &pwm_update );
+ros::Subscriber<joystick::pwm_requests> pwm_input_sub("pwm_signal_input", &pwm_update );
 
 
 

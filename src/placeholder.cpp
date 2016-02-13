@@ -7,38 +7,36 @@ class ConvertJoystickToThruster
 public:
     ConvertJoystickToThruster()
     {
-        pub = n.advertise<uranus_dp::ThrusterForces>("thruster", 1)
-        sub = n.subscribe("joystick", 1, &ConvertJoystickToThruster::callback, this)
+        pub = n.advertise<uranus_dp::ThrusterForces>("thruster", 1);
+        sub = n.subscribe("joystick", 1, &ConvertJoystickToThruster::callback, this);
     }
 
     void callback(const uranus_dp::JoystickUranus& input)
     {
-        // Make sure all inputs are in range (-100, 100)
-        // Is it possible to iterate over the Joystick message without losing the names? This is hardly elegant.
-        if (input.surge >  100) {input.surge =  100;}
-        if (input.surge < -100) {input.surge = -100;}
-        if (input.sway  >  100) {input.sway  =  100;}
-        if (input.sway  < -100) {input.sway  = -100;}
-        if (input.heave >  100) {input.heave =  100;}
-        if (input.heave < -100) {input.heave = -100;}
-        if (input.roll  >  100) {input.roll  =  100;}
-        if (input.roll  < -100) {input.roll  = -100;}
-        if (input.pitch >  100) {input.pitch =  100;}
-        if (input.pitch < -100) {input.pitch = -100;}
-        if (input.yaw   >  100) {input.yaw   =  100;}
-        if (input.yaw   < -100) {input.yaw   = -100;}
-
         // Blue Robotics T100 thrusters can give max 17.8 Newton thrust both ways
         // (slightly more forward but who cares)
         // Scaling factor from (-100, 100) to (-17.8, 17.8) is 500/89
         uranus_dp::ThrusterForces output;
+        output.forceInNewton_1 = input.surge;
+        output.forceInNewton_2 = input.sway;
+        output.forceInNewton_3 = input.heave;
+        output.forceInNewton_4 = input.roll;
+        output.forceInNewton_5 = input.pitch;
+        output.forceInNewton_6 = input.yaw;
 
-        output.forceInNewton_1 = input.surge * (500/89);
-        output.forceInNewton_2 = input.sway  * (500/89);
-        output.forceInNewton_3 = input.heave * (500/89);
-        output.forceInNewton_4 = input.roll  * (500/89);
-        output.forceInNewton_5 = input.pitch * (500/89);
-        output.forceInNewton_6 = input.yaw   * (500/89);
+        const double maxThrusterForce = 17.8;
+        if (output.forceInNewton_1 >  maxThrusterForce) {output.forceInNewton_1 =  maxThrusterForce;}
+        if (output.forceInNewton_1 < -maxThrusterForce) {output.forceInNewton_1 = -maxThrusterForce;}
+        if (output.forceInNewton_2 >  maxThrusterForce) {output.forceInNewton_2 =  maxThrusterForce;}
+        if (output.forceInNewton_2 < -maxThrusterForce) {output.forceInNewton_2 = -maxThrusterForce;}
+        if (output.forceInNewton_3 >  maxThrusterForce) {output.forceInNewton_3 =  maxThrusterForce;}
+        if (output.forceInNewton_3 < -maxThrusterForce) {output.forceInNewton_3 = -maxThrusterForce;}
+        if (output.forceInNewton_4 >  maxThrusterForce) {output.forceInNewton_4 =  maxThrusterForce;}
+        if (output.forceInNewton_4 < -maxThrusterForce) {output.forceInNewton_4 = -maxThrusterForce;}
+        if (output.forceInNewton_5 >  maxThrusterForce) {output.forceInNewton_5 =  maxThrusterForce;}
+        if (output.forceInNewton_5 < -maxThrusterForce) {output.forceInNewton_5 = -maxThrusterForce;}
+        if (output.forceInNewton_6 >  maxThrusterForce) {output.forceInNewton_6 =  maxThrusterForce;}
+        if (output.forceInNewton_6 < -maxThrusterForce) {output.forceInNewton_6 = -maxThrusterForce;}
 
         pub.publish(output);
     }
@@ -47,7 +45,7 @@ private:
     ros::NodeHandle n;
     ros::Publisher  pub;
     ros::Subscriber sub;
-} // End of class ConvertJoystickToThruster
+}; // End of class ConvertJoystickToThruster
 
 int main(int argc, char **argv)
 {

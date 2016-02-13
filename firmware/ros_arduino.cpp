@@ -3,7 +3,7 @@
 #include <ros.h>
 
 #include <std_msgs/String.h>
-#include <controller/pwm_placeholder.h>
+#include <controller/pwm_requests.h>
 
 
 ros::NodeHandle nh;

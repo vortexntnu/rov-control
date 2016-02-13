@@ -4,19 +4,19 @@ import glob
 from evdev import InputDevice
 import rospy
 import threading
-from controller.msg import control
+from joystick.msg import joystick
 import xctrl
 import subprocess
 import os
 import time
 
 
-class ControllerNode:
+class JoystickNode:
 
     def __init__(self):
-        self.model = control()
-        rospy.init_node("controller_node")
-        self.pub = rospy.Publisher('control', control, queue_size=10)
+        self.model = joystick()
+        rospy.init_node("joystick_node")
+        self.pub = rospy.Publisher('joystick', joystick, queue_size=10)
         self.rate = rospy.Rate(10)
 
     def start_node(self):
@@ -61,7 +61,7 @@ class ControllerNode:
 
 if __name__ == '__main__':
     try:
-        controller_node = ControllerNode()
-        controller_node.start_node()
+        joystick_node = JoystickNode()
+        joystick_node.start_node()
     except rospy.ROSInterruptException:
         pass

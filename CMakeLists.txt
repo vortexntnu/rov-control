@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(controller)
+project(joystick)
 
 find_package(catkin REQUIRED)
 
@@ -7,12 +7,13 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  uranus_dp
 )
 
 add_message_files(
    FILES
-   control.msg
-   pwm_placeholder.msg
+   joystick.msg
+   pwm_requests.msg
 )
 
 generate_messages(

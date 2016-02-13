@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>controller</name>
-  <version>0.0.0</version>
-  <description>The controller package</description>
+  <name>joystick</name>
+  <version>0.1.0</version>
+  <description>Get joystick signals from topside, multiplex to channels.</description>
 
   <maintainer email="peter@gmail.com">peter</maintainer>
   <maintainer email="hakongimse@gmail.com">Haakon Gimse</maintainer>

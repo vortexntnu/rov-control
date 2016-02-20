@@ -5,6 +5,7 @@ from evdev import InputDevice
 import rospy
 import threading
 from joystick.msg import joystick
+from uranus_dp.msg import JoystickUranus
 import xctrl
 import subprocess
 import os

@@ -20,3 +20,10 @@ rosserial_configure_client(
 
 rosserial_add_client_target(firmware ros_arduino ALL)
 rosserial_add_client_target(firmware ros_arduino-upload)
+
+
+findPackage(message_generation)
+catkin_package(CATKIN_DEPENDS message_runtime)
+add_message_files(FILES pwm_requests.msg)
+
+

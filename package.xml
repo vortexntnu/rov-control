@@ -45,12 +45,15 @@
   <build_depend>std_msgs</build_depend>
 
   <build_depend>joystick</build_depend>
+  <build_depend>message_generation</build_depend>
 
   <run_depend>rosserial_arduino</run_depend>
   <run_depend>rosserial_client</run_depend>
   <run_depend>std_msgs</run_depend>
 
   <run_depend>joystick</run_depend>
+
+  <build_depend>roscpp</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

@@ -4,9 +4,12 @@ project(ros_arduino)
 find_package(catkin REQUIRED COMPONENTS
   rosserial_arduino
   rosserial_client
+  message_generation
 )
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS message_runtime)
+
+
 
 rosserial_generate_ros_lib(
   PACKAGE rosserial_arduino
@@ -20,3 +23,5 @@ rosserial_configure_client(
 
 rosserial_add_client_target(firmware ros_arduino ALL)
 rosserial_add_client_target(firmware ros_arduino-upload)
+
+

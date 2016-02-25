@@ -14,28 +14,28 @@ public:
     void callback(const uranus_dp::JoystickUranus& input)
     {
         uranus_dp::ThrusterForces output;
-        output.forceInNewton_1 = input.surge;
-        output.forceInNewton_2 = input.sway;
-        output.forceInNewton_3 = input.heave;
-        output.forceInNewton_4 = input.roll;
-        output.forceInNewton_5 = input.pitch;
-        output.forceInNewton_6 = input.yaw;
+        output.F1 = input.surge;
+        output.F2 = input.sway;
+        output.F3 = input.heave;
+        output.F4 = input.roll;
+        output.F5 = input.pitch;
+        output.F6 = input.yaw;
 
         // Blue Robotics T100 thrusters can give max 17.8 Newton thrust both ways
         // (slightly more forward but who cares)
         const double maxThrusterForce = 17.8;
-        if (output.forceInNewton_1 >  maxThrusterForce) {output.forceInNewton_1 =  maxThrusterForce;}
-        if (output.forceInNewton_1 < -maxThrusterForce) {output.forceInNewton_1 = -maxThrusterForce;}
-        if (output.forceInNewton_2 >  maxThrusterForce) {output.forceInNewton_2 =  maxThrusterForce;}
-        if (output.forceInNewton_2 < -maxThrusterForce) {output.forceInNewton_2 = -maxThrusterForce;}
-        if (output.forceInNewton_3 >  maxThrusterForce) {output.forceInNewton_3 =  maxThrusterForce;}
-        if (output.forceInNewton_3 < -maxThrusterForce) {output.forceInNewton_3 = -maxThrusterForce;}
-        if (output.forceInNewton_4 >  maxThrusterForce) {output.forceInNewton_4 =  maxThrusterForce;}
-        if (output.forceInNewton_4 < -maxThrusterForce) {output.forceInNewton_4 = -maxThrusterForce;}
-        if (output.forceInNewton_5 >  maxThrusterForce) {output.forceInNewton_5 =  maxThrusterForce;}
-        if (output.forceInNewton_5 < -maxThrusterForce) {output.forceInNewton_5 = -maxThrusterForce;}
-        if (output.forceInNewton_6 >  maxThrusterForce) {output.forceInNewton_6 =  maxThrusterForce;}
-        if (output.forceInNewton_6 < -maxThrusterForce) {output.forceInNewton_6 = -maxThrusterForce;}
+        if (output.F1 >  maxThrusterForce) {output.F1 =  maxThrusterForce;}
+        if (output.F1 < -maxThrusterForce) {output.F1 = -maxThrusterForce;}
+        if (output.F2 >  maxThrusterForce) {output.F2 =  maxThrusterForce;}
+        if (output.F2 < -maxThrusterForce) {output.F2 = -maxThrusterForce;}
+        if (output.F3 >  maxThrusterForce) {output.F3 =  maxThrusterForce;}
+        if (output.F3 < -maxThrusterForce) {output.F3 = -maxThrusterForce;}
+        if (output.F4 >  maxThrusterForce) {output.F4 =  maxThrusterForce;}
+        if (output.F4 < -maxThrusterForce) {output.F4 = -maxThrusterForce;}
+        if (output.F5 >  maxThrusterForce) {output.F5 =  maxThrusterForce;}
+        if (output.F5 < -maxThrusterForce) {output.F5 = -maxThrusterForce;}
+        if (output.F6 >  maxThrusterForce) {output.F6 =  maxThrusterForce;}
+        if (output.F6 < -maxThrusterForce) {output.F6 = -maxThrusterForce;}
 
         pub.publish(output);
     }

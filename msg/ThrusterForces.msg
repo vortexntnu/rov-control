@@ -1,6 +1,8 @@
-float32 forceInNewton_1
-float32 forceInNewton_2
-float32 forceInNewton_3
-float32 forceInNewton_4
-float32 forceInNewton_5
-float32 forceInNewton_6
+# Desired force in newtons for each of the six thrusters.
+
+float64 F1
+float64 F2
+float64 F3
+float64 F4
+float64 F5
+float64 F6

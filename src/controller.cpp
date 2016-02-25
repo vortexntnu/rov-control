@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Wrench.h"
+#include "uranus_dp/State.h"
 
 // NOTE: For now, I juse use Pose messages for state and setpoints, which is probably insufficient.
 

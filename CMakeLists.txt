@@ -23,9 +23,13 @@ add_message_files(
   FILES
   JoystickUranus.msg
   ThrusterForces.msg
+  State.msg
 )
 
-generate_messages()
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+)
 
 
 include_directories(

@@ -13,9 +13,6 @@ public:
 
     void callback(const uranus_dp::JoystickUranus& input)
     {
-        // Blue Robotics T100 thrusters can give max 17.8 Newton thrust both ways
-        // (slightly more forward but who cares)
-        // Scaling factor from (-100, 100) to (-17.8, 17.8) is 500/89
         uranus_dp::ThrusterForces output;
         output.forceInNewton_1 = input.surge;
         output.forceInNewton_2 = input.sway;
@@ -24,6 +21,8 @@ public:
         output.forceInNewton_5 = input.pitch;
         output.forceInNewton_6 = input.yaw;
 
+        // Blue Robotics T100 thrusters can give max 17.8 Newton thrust both ways
+        // (slightly more forward but who cares)
         const double maxThrusterForce = 17.8;
         if (output.forceInNewton_1 >  maxThrusterForce) {output.forceInNewton_1 =  maxThrusterForce;}
         if (output.forceInNewton_1 < -maxThrusterForce) {output.forceInNewton_1 = -maxThrusterForce;}

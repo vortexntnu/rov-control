@@ -30,39 +30,39 @@ public:
     void stateCallback(const uranus_dp::State &state_msg)
     {
         // Copy position values
-        p[0] = state_msg.pose.position.x;
-        p[1] = state_msg.pose.position.y;
-        p[2] = state_msg.pose.position.z;
+        p(0) = state_msg.pose.position.x;
+        p(1) = state_msg.pose.position.y;
+        p(2) = state_msg.pose.position.z;
 
         // Copy orientation values (quaternion)
-        q.w()      = state_msg.pose.orientation.x;
-        q.x() = state_msg.pose.orientation.y;
-        q.y() = state_msg.pose.orientation.z;
-        q.z() = state_msg.pose.orientation.w;
+        q(0) = state_msg.pose.orientation.x;
+        q(1) = state_msg.pose.orientation.y;
+        q(2) = state_msg.pose.orientation.z;
+        q(3) = state_msg.pose.orientation.w;
 
         // Copy linear velocity values
-        v[0] = state_msg.twist.linear.x;
-        v[1] = state_msg.twist.linear.y;
-        v[2] = state_msg.twist.linear.z;
+        v(0) = state_msg.twist.linear.x;
+        v(1) = state_msg.twist.linear.y;
+        v(2) = state_msg.twist.linear.z;
 
         // Copy angular velocity values
-        omega[0] = state_msg.twist.angular.x;
-        omega[1] = state_msg.twist.angular.y;
-        omega[2] = state_msg.twist.angular.z;
+        omega(0) = state_msg.twist.angular.x;
+        omega(1) = state_msg.twist.angular.y;
+        omega(2) = state_msg.twist.angular.z;
     }
 
     // setpointCallback updates the private setpoint variable when a new setpoint message arrives.
     void setpointCallback(const geometry_msgs::Twist &setpoint_msg)
     {
         // Copy linear velocity setpoint values
-        v_sp[0] = setpoint_msg.linear.x;
-        v_sp[1] = setpoint_msg.linear.y;
-        v_sp[2] = setpoint_msg.linear.z;
+        v_sp(0) = setpoint_msg.linear.x;
+        v_sp(1) = setpoint_msg.linear.y;
+        v_sp(2) = setpoint_msg.linear.z;
 
         // Copy angular velocity setpoint values
-        omega_sp[0] = setpoint_msg.angular.x;
-        omega_sp[1] = setpoint_msg.angular.y;
-        omega_sp[2] = setpoint_msg.angular.z;
+        omega_sp(0) = setpoint_msg.angular.x;
+        omega_sp(1) = setpoint_msg.angular.y;
+        omega_sp(2) = setpoint_msg.angular.z;
     }
 
     // calculate contains the control algorithm, and calculates the control output based on the
@@ -72,14 +72,11 @@ public:
         // Only orientation control for now.
 
         // Orientation error
-        // q_err.x() = q_sp.x() - q.x();
-
-        updateTransformationMatrices();
+        q_err = q_sp - q;
 
         // Control output
-        // tau = - K_d * omega - K_p * T.transpose() * q_err;
-        // tau = K_p * T.transpose() * q_err;
-        // Eigen::Vector3d temp = T.transpose() * q_err;
+        updateTransformationMatrices();
+        tau = - K_d * omega - K_p * T.transpose() * q_err;
 
         // Build output message
         geometry_msgs::Wrench output;
@@ -95,34 +92,34 @@ public:
     void updateTransformationMatrices(void)
     {
         // Linear velocity transformation matrix
-        R(0,0) = 1 - 2*(pow(q.y(),2) + pow(q.z(),2));
-        R(0,1) = 2*(q.x()*q.y() - q.z()*q.w());
-        R(0,2) = 2*(q.x()*q.z() - q.y()*q.w());
+        R(0,0) = 1 - 2*(pow(q(2),2) + pow(q(3),2));
+        R(0,1) = 2*(q(1)*q(2) - q(3)*q(0));
+        R(0,2) = 2*(q(1)*q(3) - q(2)*q(0));
         
-        R(1,0) = 2*(q.x()*q.y() + q.z()*q.w());
-        R(1,1) = 1 - 2*(pow(q.x(),2) + pow(q.w(),2));
-        R(1,2) = 2*(q.y()*q.z() + q.x()*q.w());
+        R(1,0) = 2*(q(1)*q(2) + q(3)*q(0));
+        R(1,1) = 1 - 2*(pow(q(1),2) + pow(q(0),2));
+        R(1,2) = 2*(q(2)*q(3) + q(1)*q(0));
         
-        R(2,0) = 2*(q.x()*q.z() + q.y()*q.w());
-        R(2,1) = 2*(q.y()*q.z() + q.x()*q.w());
-        R(2,2) = 1 - 2*(pow(q.x(),2) + pow(q.y(),2));
+        R(2,0) = 2*(q(1)*q(3) + q(2)*q(0));
+        R(2,1) = 2*(q(2)*q(3) + q(1)*q(0));
+        R(2,2) = 1 - 2*(pow(q(1),2) + pow(q(2),2));
 
         // Angular velocity transformation matrix
-        T(0,0) = -q.x();
-        T(0,1) = -q.y();
-        T(0,2) = -q.z();
+        T(0,0) = -q(1);
+        T(0,1) = -q(2);
+        T(0,2) = -q(3);
 
-        T(1,0) =  q.w();
-        T(1,1) = -q.z();
-        T(1,2) =  q.y();
+        T(1,0) =  q(0);
+        T(1,1) = -q(3);
+        T(1,2) =  q(2);
 
-        T(2,0) =  q.z();
-        T(2,1) =  q.z();
-        T(2,2) = -q.x();
+        T(2,0) =  q(3);
+        T(2,1) =  q(3);
+        T(2,2) = -q(1);
 
-        T(3,0) = -q.y();
-        T(3,1) =  q.x();
-        T(3,2) =  q.w();
+        T(3,0) = -q(2);
+        T(3,1) =  q(1);
+        T(3,2) =  q(0);
 
         T *= 0.5;
     } 
@@ -135,19 +132,19 @@ private:
 
     // State
     Eigen::Vector3d p;     // Position
-    Eigen::Quaterniond q;  // Orientation
+    Eigen::Vector4d q;     // Orientation
     Eigen::Vector3d v;     // Linear velocity
     Eigen::Vector3d omega; // Angular velocity
 
     // Setpoints
     Eigen::Vector3d p_sp;     // Position
-    Eigen::Quaterniond q_sp;  // Orientation
+    Eigen::Vector4d q_sp;     // Orientation
     Eigen::Vector3d v_sp;     // Linear velocity
     Eigen::Vector3d omega_sp; // Angular velocity
 
     // Errors
     Eigen::Vector3d p_err;     // Position
-    Eigen::Quaterniond q_err;  // Orientation
+    Eigen::Vector4d q_err;     // Orientation
     Eigen::Vector3d v_err;     // Linear velocity
     Eigen::Vector3d omega_err; // Angular velocity
 

@@ -4,7 +4,7 @@
 #include "geometry_msgs/Wrench.h"
 #include "uranus_dp/State.h"
 #include <Eigen/Dense>
-#include <cmath>
+#include <cmath> // For pow()
 
 class Controller
 {
@@ -78,7 +78,7 @@ public:
         updateTransformationMatrices();
         tau = - K_d * omega - K_p * T.transpose() * q_err;
 
-        // Build output message
+        // Create and send output message
         geometry_msgs::Wrench output;
         output.force.x = 0;
         output.force.y = 0;

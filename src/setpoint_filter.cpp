@@ -3,6 +3,7 @@
 #include <uranus_dp/JoystickUranus.h>
 #include <iostream>
 #include <string.h>
+#include "geometry_msgs/Twist.h"
 
 
 class SetpointFilter{
@@ -14,6 +15,13 @@ public:
 
     void callback(const uranus_dp::JoystickUranus& input)
     {
+        geometry_msgs::Twist output;
+        output.linear.x = input.surge;
+        output.linear.y = input.sway;
+        output.linear.z = input.heave;
+        output.angular.x = input.roll;
+        output.angular.y = input.pitch;
+        output.angular.z = input.yaw;
     }
 
 private:
@@ -23,7 +31,6 @@ private:
 };
 
 int main(int argc, char** argv){
-
     ros::init(argc, argv, "setpoint_filter");
 
     SetpointFilter f;
@@ -31,5 +38,4 @@ int main(int argc, char** argv){
     ros::spin();
 
     return 0;
-
 }

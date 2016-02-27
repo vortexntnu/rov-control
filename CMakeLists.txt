@@ -41,9 +41,9 @@ add_definitions(
   ${EIGEN_DEFINITIONS}
 )
 
-add_executable(placeholder src/placeholder.cpp)
-target_link_libraries(placeholder ${catkin_LIBRARIES})
-add_dependencies(placeholder uranus_dp_generate_messages_cpp)
+# add_executable(placeholder src/placeholder.cpp)
+# target_link_libraries(placeholder ${catkin_LIBRARIES})
+# add_dependencies(placeholder uranus_dp_generate_messages_cpp)
 
 add_executable(allocation src/allocation.cpp)
 target_link_libraries(allocation ${catkin_LIBRARIES})

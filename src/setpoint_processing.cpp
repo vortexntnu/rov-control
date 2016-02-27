@@ -1,6 +1,5 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include <uranus_dp/JoystickUranus.h>
 #include <iostream>
 #include <string.h>
 #include "geometry_msgs/Twist.h"
@@ -27,6 +26,7 @@ public:
         output.angular.z = (input.turn_X/TURN_RANGE)*MAX_ANGULAR_Z;
 
         pub.publish(output);
+        // printf("aa");
     }
 
 private:
@@ -41,9 +41,13 @@ private:
     static const double MAX_ANGULAR_Y = 1.0;
     static const double MAX_ANGULAR_Z = 1.0;
 
-    static const int STRAFE_RANGE = (2 << 16);
-    static const int TURN_RANGE   = (2 << 16);
-    static const int ASCEND_RANGE = (2 << 16);
+    static const int STRAFE_RANGE = 10;
+    static const int TURN_RANGE   = 10;
+    static const int ASCEND_RANGE = 10;
+
+    // static const int STRAFE_RANGE = (2 << 16);
+    // static const int TURN_RANGE   = (2 << 16);
+    // static const int ASCEND_RANGE = (2 << 16);
 };
 
 int main(int argc, char** argv){

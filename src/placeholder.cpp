@@ -1,5 +1,4 @@
 #include "ros/ros.h"
-#include "uranus_dp/JoystickUranus.h"
 #include "uranus_dp/ThrusterForces.h"
 
 class ConvertJoystickToThruster
@@ -8,7 +7,7 @@ public:
     ConvertJoystickToThruster()
     {
         pub = n.advertise<uranus_dp::ThrusterForces>("thruster", 1);
-        sub = n.subscribe("joystick", 1, &ConvertJoystickToThruster::callback, this);
+        // sub = n.subscribe("joystick", 1, &ConvertJoystickToThruster::callback, this);
     }
 
     void callback(const uranus_dp::JoystickUranus& input)

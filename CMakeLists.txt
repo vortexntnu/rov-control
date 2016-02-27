@@ -21,7 +21,6 @@ add_message_files(
   DIRECTORY
   msg
   FILES
-  JoystickUranus.msg
   ThrusterForces.msg
   State.msg
 )

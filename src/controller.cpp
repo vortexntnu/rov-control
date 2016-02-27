@@ -11,11 +11,12 @@ class Controller
 public:
     Controller()
     {
-        outputPub = n.advertise<geometry_msgs::Wrench>("outputTopic", 1);
-
-        // I don't know why, but 'this' is necessary here
-        stateSub = n.subscribe("stateTopic", 1, &Controller::stateCallback, this);
+        outputPub   = n.advertise<geometry_msgs::Wrench>("outputTopic", 1);
+        stateSub    = n.subscribe("stateTopic", 1, &Controller::stateCallback, this);
         setpointSub = n.subscribe("setpointTopic", 1, &Controller::setpointCallback, this);
+
+        // Set default frequency
+        frequency = 10;
 
         // Allocate dynamic member variables
         T   = Eigen::MatrixXd(4,3);
@@ -67,9 +68,9 @@ public:
         omega_sp(2) = setpoint_msg.angular.z;
     }
 
-    // calculate contains the control algorithm, and calculates the control output based on the
+    // compute contains the control algorithm, and computes the control output based on the
     // current state and setpoint.
-    void calculate(void)
+    void compute(void)
     {
         // Only pose control for now
 
@@ -93,12 +94,20 @@ public:
         output.torque.z = tau(5);
         outputPub.publish(output);
     }
+
+    // setFrequency tells the controller which frequency in Hz compute() is called with.
+    void setFrequency(uint16_t newFrequency)
+    {
+        frequency = newFrequency;
+    }
 private:
     ros::NodeHandle n;
-
     ros::Publisher  outputPub;
     ros::Subscriber stateSub;
     ros::Subscriber setpointSub;
+
+    // Controller frequency
+    uint16_t frequency;
 
     // State
     Eigen::Vector3d p;     // Position
@@ -173,13 +182,15 @@ int main(int argc, char **argv)
 
     Controller controllerObject;
 
-    // Run the controller at 10 Hz
-    ros::Rate loop_rate(10);
+    uint16_t frequency = 10; // Get from parameter server sometime in the future
+    controllerObject.setFrequency(frequency);
+
+    ros::Rate loop_rate(frequency);
     while (ros::ok())
     {
         ros::spinOnce();
 
-        controllerObject.calculate();
+        controllerObject.compute();
 
         loop_rate.sleep();
     }

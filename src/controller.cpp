@@ -88,41 +88,6 @@ public:
         output.torque.z = tau(2);
         outputPub.publish(output);
     }
-
-    void updateTransformationMatrices(void)
-    {
-        // Linear velocity transformation matrix
-        R(0,0) = 1 - 2*(pow(q(2),2) + pow(q(3),2));
-        R(0,1) = 2*(q(1)*q(2) - q(3)*q(0));
-        R(0,2) = 2*(q(1)*q(3) - q(2)*q(0));
-        
-        R(1,0) = 2*(q(1)*q(2) + q(3)*q(0));
-        R(1,1) = 1 - 2*(pow(q(1),2) + pow(q(0),2));
-        R(1,2) = 2*(q(2)*q(3) + q(1)*q(0));
-        
-        R(2,0) = 2*(q(1)*q(3) + q(2)*q(0));
-        R(2,1) = 2*(q(2)*q(3) + q(1)*q(0));
-        R(2,2) = 1 - 2*(pow(q(1),2) + pow(q(2),2));
-
-        // Angular velocity transformation matrix
-        T(0,0) = -q(1);
-        T(0,1) = -q(2);
-        T(0,2) = -q(3);
-
-        T(1,0) =  q(0);
-        T(1,1) = -q(3);
-        T(1,2) =  q(2);
-
-        T(2,0) =  q(3);
-        T(2,1) =  q(3);
-        T(2,2) = -q(1);
-
-        T(3,0) = -q(2);
-        T(3,1) =  q(1);
-        T(3,2) =  q(0);
-
-        T *= 0.5;
-    } 
 private:
     ros::NodeHandle n;
 
@@ -158,6 +123,41 @@ private:
     // Controller gains
     Eigen::Matrix3d K_d;
     Eigen::Matrix3d K_p;
+
+    void updateTransformationMatrices(void)
+    {
+        // Linear velocity transformation matrix
+        R(0,0) = 1 - 2*(pow(q(2),2) + pow(q(3),2));
+        R(0,1) = 2*(q(1)*q(2) - q(3)*q(0));
+        R(0,2) = 2*(q(1)*q(3) - q(2)*q(0));
+        
+        R(1,0) = 2*(q(1)*q(2) + q(3)*q(0));
+        R(1,1) = 1 - 2*(pow(q(1),2) + pow(q(0),2));
+        R(1,2) = 2*(q(2)*q(3) + q(1)*q(0));
+        
+        R(2,0) = 2*(q(1)*q(3) + q(2)*q(0));
+        R(2,1) = 2*(q(2)*q(3) + q(1)*q(0));
+        R(2,2) = 1 - 2*(pow(q(1),2) + pow(q(2),2));
+
+        // Angular velocity transformation matrix
+        T(0,0) = -q(1);
+        T(0,1) = -q(2);
+        T(0,2) = -q(3);
+
+        T(1,0) =  q(0);
+        T(1,1) = -q(3);
+        T(1,2) =  q(2);
+
+        T(2,0) =  q(3);
+        T(2,1) =  q(3);
+        T(2,2) = -q(1);
+
+        T(3,0) = -q(2);
+        T(3,1) =  q(1);
+        T(3,2) =  q(0);
+
+        T *= 0.5;
+    }
 }; // End of class Controller
 
 int main(int argc, char **argv)

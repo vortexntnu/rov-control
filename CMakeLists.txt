@@ -7,13 +7,13 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  uranus_dp
 )
 
 add_message_files(
    FILES
    joystick.msg
    pwm_requests.msg
+   directional_input.msg
 )
 
 generate_messages(

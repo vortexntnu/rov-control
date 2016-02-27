@@ -6,11 +6,11 @@
 #include "geometry_msgs/Twist.h"
 
 
-class SetpointFilter{
+class SetpointProcessing{
 public:
-    SetpointFilter(){
+    SetpointProcessing(){
         pub = n.advertise<std_msgs::String>("s1", 1);
-        sub = n.subscribe("joy_input", 1, &SetpointFilter::callback, this);
+        sub = n.subscribe("joy_input", 1, &SetpointProcessing::callback, this);
     }
 
     void callback(const uranus_dp::JoystickUranus& input)
@@ -31,9 +31,9 @@ private:
 };
 
 int main(int argc, char** argv){
-    ros::init(argc, argv, "setpoint_filter");
+    ros::init(argc, argv, "setpoint_processing");
 
-    SetpointFilter f;
+    SetpointProcessing f;
 
     ros::spin();
 

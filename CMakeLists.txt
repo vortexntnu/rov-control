@@ -54,7 +54,6 @@ add_executable(controller src/controller.cpp)
 target_link_libraries(controller ${catkin_LIBRARIES})
 add_dependencies(controller uranus_dp_generate_messages_cpp)
 
-# add_executable(setpoint_filter src/setpoint_filter.cpp)
-# target_link_libraries(setpoint_filter ${catkin_LIBRARIES})
-# add_dependencies(allocation uranus_dp_generate_messages_cpp)
-
+add_executable(setpoint_processing src/setpoint_processing.cpp)
+target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
+add_dependencies(allocation uranus_dp_generate_messages_cpp)

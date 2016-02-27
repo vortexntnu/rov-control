@@ -4,7 +4,7 @@
 #include "geometry_msgs/Wrench.h"
 #include "uranus_dp/State.h"
 #include <Eigen/Dense>
-#include <cmath> // For pow()
+#include <cmath>
 
 class Controller
 {
@@ -18,12 +18,14 @@ public:
         setpointSub = n.subscribe("setpointTopic", 1, &Controller::setpointCallback, this);
 
         // Allocate dynamic member variables
-        T = Eigen::MatrixXd(4,3);
-        tau = Eigen::VectorXd(3);
+        T   = Eigen::MatrixXd(4,3);
+        tau = Eigen::VectorXd(6);
 
         // Initialize controller gains
-        K_p = Eigen::Matrix3d::Identity();
-        K_d = Eigen::Matrix3d::Identity();
+        K_lin_p = Eigen::Matrix3d::Identity();
+        K_lin_d = Eigen::Matrix3d::Identity();
+        K_ang_p = Eigen::Matrix3d::Identity();
+        K_ang_d = Eigen::Matrix3d::Identity();
     }
 
     // stateCallback updates the private state variables when a new state message arrives.
@@ -69,23 +71,26 @@ public:
     // current state and setpoint.
     void calculate(void)
     {
-        // Only orientation control for now.
+        // Only pose control for now
 
-        // Orientation error
+        // Position and orientation errors
+        p_err = p_sp - p;
         q_err = q_sp - q;
 
         // Control output
         updateTransformationMatrices();
-        tau = - K_d * omega - K_p * T.transpose() * q_err;
+        Eigen::Vector3d tau_lin = K_lin_p * p_err + K_lin_d * v;
+        Eigen::Vector3d tau_ang = - K_ang_p * T.transpose() * q_err - K_ang_d * omega;
+        tau << tau_lin, tau_ang;
 
         // Create and send output message
         geometry_msgs::Wrench output;
-        output.force.x = 0;
-        output.force.y = 0;
-        output.force.z = 0;
-        output.torque.x = tau(0);
-        output.torque.y = tau(1);
-        output.torque.z = tau(2);
+        output.force.x  = tau(0);
+        output.force.y  = tau(1);
+        output.force.z  = tau(2);
+        output.torque.x = tau(3);
+        output.torque.y = tau(4);
+        output.torque.z = tau(5);
         outputPub.publish(output);
     }
 private:
@@ -121,8 +126,10 @@ private:
     Eigen::VectorXd tau;
 
     // Controller gains
-    Eigen::Matrix3d K_d;
-    Eigen::Matrix3d K_p;
+    Eigen::Matrix3d K_lin_d;
+    Eigen::Matrix3d K_lin_p;
+    Eigen::Matrix3d K_ang_d;
+    Eigen::Matrix3d K_ang_p;
 
     void updateTransformationMatrices(void)
     {

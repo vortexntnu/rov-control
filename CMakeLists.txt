@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
-    imu_raw.msg
+    SensorRaw.msg
 )
 
 generate_messages(

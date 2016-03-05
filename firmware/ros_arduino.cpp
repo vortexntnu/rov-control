@@ -9,14 +9,14 @@
 //incleder for IMUen
 #include "MPU9150.h"
 #include <Wire.h>
-#include <ros_arduino/imu_raw.h>
+#include <ros_arduino/SensorRaw.h>
 #include <geometry_msgs/Vector3.h>
 
 ros::NodeHandle nh;
 
 IMU imu;
-ros_arduino::imu_raw imu_msg;
-ros::Publisher pub_imu( "imu_raw", &imu_msg);
+ros_arduino::SensorRaw sensor_raw_msg;
+ros::Publisher pub_imu( "SensorRaw", &sensor_raw_msg);
 
 //PWM-variable:
 int dbg_count = 0;
@@ -32,7 +32,7 @@ ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
 std_msgs::String arduino_dbg_msg;
 ros::Publisher arduino_dbg_pub("arduino_dbg", &arduino_dbg_msg);
 
-/*
+
 
 void pwm_update( const joystick::pwm_requests& pwm_input ){
 
@@ -63,7 +63,7 @@ void pwm_update( const joystick::pwm_requests& pwm_input ){
 
 ros::Subscriber<joystick::pwm_requests> pwm_input_sub("pwm_requests", &pwm_update );
 
-*/
+
 
 void setup() {
   //start ROS-node
@@ -79,51 +79,65 @@ void setup() {
   
   nh.advertise(pub_imu);
   
-  //nh.subscribe(pwm_input_sub);
+  nh.subscribe(pwm_input_sub);
 
 }
 
 
 void lesIMU() {
+
   
-  //imu.readAcceleration( &imu_msg.acceleration  );
-  //imu.readGyro( &imu_msg.gyro );
-  //imu.readCompas( &imu_msg.compas );
+  imu.readAcceleration( &sensor_raw_msg.acceleration  );
+  imu.readGyro( &sensor_raw_msg.gyro );
+  imu.readCompas( &sensor_raw_msg.compas );
+
+  sensor_raw_msg.temperature = imu.readTemperature();
+
+  /*
+  sensor_raw_msg.acceleration.x  = 0;
+  sensor_raw_msg.acceleration.y  = 1;
+  sensor_raw_msg.acceleration.z  = 2;
+  */
   
 }
 
 void loop(){
 
+
   nh.spinOnce();
   lesIMU();
   nh.spinOnce();
-  //pub_imu.publish(&imu_msg);
+  pub_imu.publish(&sensor_raw_msg);
   
   nh.spinOnce();
   dbg_count++;
   nh.spinOnce();
 
   
-  /*  
-  String dbg_msg = "pwm updated after " + String(dbg_count) + " cycles";
+    
+  //String dbg_msg = "pwm updated after " + String(dbg_count) + " cycles";
+  String dbg_msg = "accelX = " + String(imu.read(MPU9150_ACCEL_XOUT_L, MPU9150_ACCEL_XOUT_H));
   nh.spinOnce();
   arduino_dbg_msg.data = dbg_msg.c_str();
   nh.spinOnce();
-*/
+
   
   arduino_dbg_pub.publish( &arduino_dbg_msg );
   nh.spinOnce();
   
   
   
-  //delay(1000/60);
-
-  delay(1000);
+  //delay(1000/60); //kanksje 100 Hz
   
+
+  delay(500);
+
+
   for(int i = 0; i < pwm_count; i++) {
     nh.spinOnce();
     analogWrite(pwm_pins[i], internal_pwm_out[i]);
   }
+
 
   
 }

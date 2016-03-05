@@ -135,7 +135,7 @@ IMU::IMU(){
   int acceleration[3] = { 0 , 0 , 0 };
   int gyro[3] = { 0 , 0 , 0 };
   double temp = 0;
-  //int I2C_address = MPU9150_I2C_ADDRESS;
+  int I2C_address = MPU9150_I2C_ADDRESS;
   //Serial.print("end setup \n");
   
 }

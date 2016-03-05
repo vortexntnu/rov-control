@@ -96,7 +96,7 @@ public:
     }
 
     // setFrequency tells the controller which frequency in Hz compute() is called with.
-    void setFrequency(uint16_t newFrequency)
+    void setFrequency(unsigned int newFrequency)
     {
         frequency = newFrequency;
     }
@@ -107,7 +107,7 @@ private:
     ros::Subscriber setpointSub;
 
     // Controller frequency
-    uint16_t frequency;
+    unsigned int frequency;
 
     // State
     Eigen::Vector3d p;     // Position
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 
     Controller controllerObject;
 
-    uint16_t frequency = 10; // Get from parameter server sometime in the future
+    unsigned int frequency = 10; // Get from parameter server sometime in the future
     controllerObject.setFrequency(frequency);
 
     ros::Rate loop_rate(frequency);

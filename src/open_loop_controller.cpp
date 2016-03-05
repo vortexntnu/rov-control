@@ -1,6 +1,6 @@
 #include "ros/ros.h"
-#include "uranus_dp/ThrusterForces.h"
 #include "geometry_msgs/Wrench.h"
+#include "joystick/Joystick.h"
 
 class OpenLoopController
 {
@@ -11,7 +11,7 @@ public:
         tauPub = n.advertise<geometry_msgs::Wrench>("tau", 1);
     }
 
-    void joyCallback(const joystick::joystick &joy_msg)
+    void joyCallback(const joystick::Joystick &joy_msg)
     {
         geometry_msgs::Wrench tau;
         tau.force.x  = joy_msg.strafe_X;

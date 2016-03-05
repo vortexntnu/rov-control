@@ -1,55 +1,54 @@
 #include "ros/ros.h"
 #include "uranus_dp/ThrusterForces.h"
+#include "geometry_msgs/Wrench.h"
 
-class ConvertJoystickToThruster
+class OpenLoopController
 {
 public:
-    ConvertJoystickToThruster()
+    OpenLoopController()
     {
-        pub = n.advertise<uranus_dp::ThrusterForces>("thruster", 1);
-        // sub = n.subscribe("joystick", 1, &ConvertJoystickToThruster::callback, this);
+        joySub = n.subscribe("joystick", 1, &OpenLoopController::joyCallback, this);
+        tauPub = n.advertise<geometry_msgs::Wrench>("tau", 1);
     }
 
-    void callback(const uranus_dp::JoystickUranus& input)
+    void joyCallback(const joystick::joystick &joy_msg)
     {
-        uranus_dp::ThrusterForces output;
-        output.F1 = input.surge;
-        output.F2 = input.sway;
-        output.F3 = input.heave;
-        output.F4 = input.roll;
-        output.F5 = input.pitch;
-        output.F6 = input.yaw;
+        geometry_msgs::Wrench tau;
+        tau.force.x  = joy_msg.strafe_X;
+        tau.force.y  = joy_msg.strafe_X;
+        tau.force.z  = joy_msg.ascend;
+        tau.torque.x = joy_msg.turn_X;
+        tau.torque.y = joy_msg.turn_Y;
+        tau.torque.z = 0;
 
-        // Blue Robotics T100 thrusters can give max 17.8 Newton thrust both ways
-        // (slightly more forward but who cares)
-        const double maxThrusterForce = 17.8;
-        if (output.F1 >  maxThrusterForce) {output.F1 =  maxThrusterForce;}
-        if (output.F1 < -maxThrusterForce) {output.F1 = -maxThrusterForce;}
-        if (output.F2 >  maxThrusterForce) {output.F2 =  maxThrusterForce;}
-        if (output.F2 < -maxThrusterForce) {output.F2 = -maxThrusterForce;}
-        if (output.F3 >  maxThrusterForce) {output.F3 =  maxThrusterForce;}
-        if (output.F3 < -maxThrusterForce) {output.F3 = -maxThrusterForce;}
-        if (output.F4 >  maxThrusterForce) {output.F4 =  maxThrusterForce;}
-        if (output.F4 < -maxThrusterForce) {output.F4 = -maxThrusterForce;}
-        if (output.F5 >  maxThrusterForce) {output.F5 =  maxThrusterForce;}
-        if (output.F5 < -maxThrusterForce) {output.F5 = -maxThrusterForce;}
-        if (output.F6 >  maxThrusterForce) {output.F6 =  maxThrusterForce;}
-        if (output.F6 < -maxThrusterForce) {output.F6 = -maxThrusterForce;}
+        // Let's limit these values
+        const double max = 10;
+        if (tau.force.x  >  max) {tau.force.x  =  max;}
+        if (tau.force.y  >  max) {tau.force.y  =  max;}
+        if (tau.force.z  >  max) {tau.force.z  =  max;}
+        if (tau.torque.x >  max) {tau.torque.x =  max;}
+        if (tau.torque.y >  max) {tau.torque.y =  max;}
+        if (tau.torque.z >  max) {tau.torque.z =  max;}
+        if (tau.force.x  < -max) {tau.force.x  = -max;}
+        if (tau.force.y  < -max) {tau.force.y  = -max;}
+        if (tau.force.z  < -max) {tau.force.z  = -max;}
+        if (tau.torque.x < -max) {tau.torque.x = -max;}
+        if (tau.torque.y < -max) {tau.torque.y = -max;}
+        if (tau.torque.z < -max) {tau.torque.z = -max;}
 
-        pub.publish(output);
+        tauPub.publish(tau);
     }
-
 private:
     ros::NodeHandle n;
-    ros::Publisher  pub;
-    ros::Subscriber sub;
-}; // End of class ConvertJoystickToThruster
+    ros::Publisher  tauPub;
+    ros::Subscriber joySub;
+}; // End of class OpenLoopController
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "placeholder");
+    ros::init(argc, argv, "controller_openloop");
 
-    ConvertJoystickToThruster ConversionObject;
+    OpenLoopController openLoopController;
 
     ros::spin();
 

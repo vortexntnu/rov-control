@@ -25,22 +25,22 @@ include_directories(
   ${EIGEN_INCLUDE_DIRS}
 )
 
-# add_definitions(
-#   ${EIGEN_DEFINITIONS}
-# )
-
 # add_executable(placeholder src/placeholder.cpp)
 # target_link_libraries(placeholder ${catkin_LIBRARIES})
 # add_dependencies(placeholder uranus_dp_generate_messages_cpp)
 
 add_executable(allocation src/allocation.cpp)
 target_link_libraries(allocation ${catkin_LIBRARIES})
-# add_dependencies(allocation uranus_dp_generate_messages_cpp)
+add_dependencies(allocation uranus_dp_generate_messages_cpp)
 
 add_executable(controller src/controller.cpp)
 target_link_libraries(controller ${catkin_LIBRARIES})
-# add_dependencies(controller uranus_dp_generate_messages_cpp)
+add_dependencies(controller uranus_dp_generate_messages_cpp)
+
+# add_executable(integration_filter src/integration_filter.cpp)
+# target_link_libraries(integration_filter ${catkin_LIBRARIES})
+# add_dependencies(integration_filter uranus_dp_generate_messages_cpp)
 
 add_executable(setpoint_processing src/setpoint_processing.cpp)
 target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
-# add_dependencies(allocation uranus_dp_generate_messages_cpp)
+add_dependencies(setpoint_processing uranus_dp_generate_messages_cpp)

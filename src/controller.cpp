@@ -6,14 +6,14 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-class Controller
+class NonlinearQuaternionPidController
 {
 public:
-    Controller()
+    NonlinearQuaternionPidController()
     {
         outputPub   = n.advertise<geometry_msgs::Wrench>("outputTopic", 1);
-        stateSub    = n.subscribe("stateTopic", 1, &Controller::stateCallback, this);
-        setpointSub = n.subscribe("setpointTopic", 1, &Controller::setpointCallback, this);
+        stateSub    = n.subscribe("stateTopic", 1, &NonlinearQuaternionPidController::stateCallback, this);
+        setpointSub = n.subscribe("setpointTopic", 1, &NonlinearQuaternionPidController::setpointCallback, this);
 
         // Set default frequency
         frequency = 10;
@@ -174,23 +174,23 @@ private:
 
         T *= 0.5;
     }
-}; // End of class Controller
+}; // End of class NonlinearQuaternionPidController
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "controller");
 
-    Controller controllerObject;
+    NonlinearQuaternionPidController controller;
 
     unsigned int frequency = 10; // Get from parameter server sometime in the future
-    controllerObject.setFrequency(frequency);
+    controller.setFrequency(frequency);
 
     ros::Rate loop_rate(frequency);
     while (ros::ok())
     {
         ros::spinOnce();
 
-        controllerObject.compute();
+        controller.compute();
 
         loop_rate.sleep();
     }

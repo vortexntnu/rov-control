@@ -9,18 +9,12 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-add_message_files(
-   FILES
-   joystick.msg
-   pwm_requests.msg
-   directional_input.msg
+add_message_files(DIRECTORY msg FILES
+   Joystick.msg
+   PwmRequests.msg
+   DirectionalInput.msg
 )
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+generate_messages(DEPENDENCIES std_msgs)
 
-catkin_package(
-  CATKIN_DEPENDS rospy std_msgs message_runtime
-)
+catkin_package(CATKIN_DEPENDS rospy std_msgs message_runtime)

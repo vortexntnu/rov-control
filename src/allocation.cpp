@@ -12,39 +12,64 @@
 
 #include "ros/ros.h"
 #include <iostream>
-#include <Eigen/Dense> // Library for matrix operations
+#include <Eigen/Dense>
+#include "geometry_msgs/Wrench.h"
+#include "uranus_dp/ThrusterForces.h"
 
-// using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-const int nActuators = 6; // Move to parameter server
+const int nThrusters = 6; // Move to parameter server
+const double thrustCoeff = 5; // Ditto
+
+class Allocator
+{
+public:
+    Allocator()
+    {
+        tauSub = n.subscribe("forces", 1, &Allocator::tauCallBack, this);
+        uPub   = n.advertise<uranus_dp::ThrusterForces>("U", 1);
+        tau = VectorXd(6);
+    }
+
+    void tauCallBack(const geometry_msgs::Wrench& tauMsg){
+        tau(0) = tauMsg.force.x;
+        tau(1) = tauMsg.force.y;
+        tau(2) = tauMsg.force.z;
+        tau(3) = tauMsg.torque.x;
+        tau(4) = tauMsg.torque.y;
+        tau(5) = tauMsg.torque.z;
+
+        K = thrustCoeff * MatrixXd::Identity(nThrusters, nThrusters);
+        T = MatrixXd::Random(6,6);
+        T_pseudoinverse = T.transpose() * (T * T.transpose()).inverse();
+        u = K.inverse() * T_pseudoinverse * tau;
+
+        uranus_dp::ThrusterForces uMsg;
+        uMsg.F1 = u(0);
+        uMsg.F2 = u(1);
+        uMsg.F3 = u(2);
+        uMsg.F4 = u(3);
+        uMsg.F5 = u(4);
+        uMsg.F6 = u(5);
+        uPub.publish(uMsg);
+    }
+private:
+    ros::NodeHandle n;
+    ros::Subscriber tauSub;
+    ros::Publisher uPub;
+
+    VectorXd u;
+    VectorXd tau;
+    MatrixXd K;
+    MatrixXd T;
+    MatrixXd T_pseudoinverse;
+}; // End of class Allocator
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "allocation");
-    ros::NodeHandle n;
-    // ros::Subscriber sub = n.subscribe("forces", 1 );
-
-    // K and T should probably be given by a ROS parameter server.
-    // For now, temporary values are hard-coded here.
-    double thrustCoeff = 5; // Use same value for all actuators as they are the same.
-    MatrixXd K = (thrustCoeff * VectorXd::Ones(nActuators)).asDiagonal();
-    MatrixXd T = MatrixXd::Random(6,6);
-
-    //
-    // Place inside a callback function:
-    //
-
-    // read tau from topic (or just hardcode one for now)
-    VectorXd tau(6);
-    tau << 1,2,3,4,5,6;
-
-    // then calculate the control inputs with Moore-Penrose pseudoinverse
-    MatrixXd T_pseudoinverse = T.transpose() * (T * T.transpose()).inverse();
-    VectorXd u = K.inverse() * T_pseudoinverse * tau;
-
-    // send u on some topic
-
+    Allocator allocator;
+    ros::spin();
     return 0;
 }

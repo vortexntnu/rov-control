@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   geometry_msgs
+  joystick
 )
 
 find_package(Eigen REQUIRED)
@@ -18,16 +19,25 @@ add_message_files(DIRECTORY msg FILES
 
 generate_messages(DEPENDENCIES geometry_msgs)
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS
+  cmake_modules
+  roscpp
+  std_msgs
+  message_generation
+  geometry_msgs
+  joystick
+)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN_INCLUDE_DIRS}
 )
 
-# add_executable(placeholder src/placeholder.cpp)
-# target_link_libraries(placeholder ${catkin_LIBRARIES})
-# add_dependencies(placeholder uranus_dp_generate_messages_cpp)
+add_executable(open_loop_controller src/open_loop_controller.cpp)
+target_link_libraries(open_loop_controller ${catkin_LIBRARIES})
+add_dependencies(open_loop_controller uranus_dp_generate_messages_cpp)
+# Not sure if the next line is needed
+add_dependencies(open_loop_controller ${joystick_EXPORTED_TARGETS})
 
 add_executable(allocation src/allocation.cpp)
 target_link_libraries(allocation ${catkin_LIBRARIES})
@@ -36,10 +46,6 @@ add_dependencies(allocation uranus_dp_generate_messages_cpp)
 add_executable(controller src/controller.cpp)
 target_link_libraries(controller ${catkin_LIBRARIES})
 add_dependencies(controller uranus_dp_generate_messages_cpp)
-
-# add_executable(integration_filter src/integration_filter.cpp)
-# target_link_libraries(integration_filter ${catkin_LIBRARIES})
-# add_dependencies(integration_filter uranus_dp_generate_messages_cpp)
 
 add_executable(setpoint_processing src/setpoint_processing.cpp)
 target_link_libraries(setpoint_processing ${catkin_LIBRARIES})

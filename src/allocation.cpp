@@ -11,32 +11,27 @@
 //  tau = T*f are the forces on the ROV in Newtons and Newton meters
 
 #include "ros/ros.h"
-#include <iostream>
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
 #include "uranus_dp/ThrusterForces.h"
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-
-const int nThrusters = 6; // Move to parameter server
-const double thrustCoeff = 5; // Ditto
-
-class Allocator
+class LagrangeAllocatorUnweighted
 {
 public:
-    Allocator()
+    LagrangeAllocatorUnweighted()
     {
-        tauSub = n.subscribe("forces", 1, &Allocator::tauCallBack, this);
+        nThrusters = 6;
+        thrustCoeff = 5;
+        tauSub = n.subscribe("forces", 1, &LagrangeAllocatorUnweighted::tauCallback, this);
         uPub   = n.advertise<uranus_dp::ThrusterForces>("U", 1);
-        tau = VectorXd(6);
-        K = thrustCoeff * MatrixXd::Identity(nThrusters, nThrusters);
+        tau = Eigen::VectorXd(6);
+        K = thrustCoeff * Eigen::MatrixXd::Identity(nThrusters, nThrusters);
         K_inverse = K.inverse();
-        T = MatrixXd::Random(6,6);
+        T = Eigen::MatrixXd::Random(6,6);
         T_pseudoinverse = T.transpose() * (T * T.transpose()).inverse();
     }
-
-    void tauCallBack(const geometry_msgs::Wrench& tauMsg){
+    void tauCallback(const geometry_msgs::Wrench& tauMsg)
+    {
         tau(0) = tauMsg.force.x;
         tau(1) = tauMsg.force.y;
         tau(2) = tauMsg.force.z;
@@ -58,20 +53,23 @@ public:
 private:
     ros::NodeHandle n;
     ros::Subscriber tauSub;
-    ros::Publisher uPub;
+    ros::Publisher  uPub;
 
-    VectorXd u;
-    VectorXd tau;
-    MatrixXd K;
-    MatrixXd K_inverse;
-    MatrixXd T;
-    MatrixXd T_pseudoinverse;
-}; // End of class Allocator
+    int nThrusters; // Param server
+    double thrustCoeff; // Ditto
+
+    Eigen::VectorXd u;
+    Eigen::VectorXd tau;
+    Eigen::MatrixXd K;
+    Eigen::MatrixXd K_inverse;
+    Eigen::MatrixXd T;
+    Eigen::MatrixXd T_pseudoinverse;
+};
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "allocation");
-    Allocator allocator;
+    LagrangeAllocatorUnweighted allocator;
     ros::spin();
     return 0;
 }

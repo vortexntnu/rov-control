@@ -30,6 +30,10 @@ public:
         tauSub = n.subscribe("forces", 1, &Allocator::tauCallBack, this);
         uPub   = n.advertise<uranus_dp::ThrusterForces>("U", 1);
         tau = VectorXd(6);
+        K = thrustCoeff * MatrixXd::Identity(nThrusters, nThrusters);
+        K_inverse = K.inverse();
+        T = MatrixXd::Random(6,6);
+        T_pseudoinverse = T.transpose() * (T * T.transpose()).inverse();
     }
 
     void tauCallBack(const geometry_msgs::Wrench& tauMsg){
@@ -40,10 +44,7 @@ public:
         tau(4) = tauMsg.torque.y;
         tau(5) = tauMsg.torque.z;
 
-        K = thrustCoeff * MatrixXd::Identity(nThrusters, nThrusters);
-        T = MatrixXd::Random(6,6);
-        T_pseudoinverse = T.transpose() * (T * T.transpose()).inverse();
-        u = K.inverse() * T_pseudoinverse * tau;
+        u = K_inverse * T_pseudoinverse * tau;
 
         uranus_dp::ThrusterForces uMsg;
         uMsg.F1 = u(0);
@@ -62,6 +63,7 @@ private:
     VectorXd u;
     VectorXd tau;
     MatrixXd K;
+    MatrixXd K_inverse;
     MatrixXd T;
     MatrixXd T_pseudoinverse;
 }; // End of class Allocator

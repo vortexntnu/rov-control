@@ -1,15 +1,15 @@
-#ifndef LAGRANGE_ALLOCATOR_WEIGHTED_H
-#define LAGRANGE_ALLOCATOR_WEIGHTED_H
+#ifndef LAGRANGE_ALLOCATOR_H
+#define LAGRANGE_ALLOCATOR_H
 
 #include "ros/ros.h"
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
 #include "uranus_dp/ThrusterForces.h"
 
-class LagrangeAllocatorWeighted
+class LagrangeAllocator
 {
 public:
-    LagrangeAllocatorWeighted();
+    LagrangeAllocator();
     void tauCallback(const geometry_msgs::Wrench& tauMsg);
 private:
     ros::NodeHandle nh;

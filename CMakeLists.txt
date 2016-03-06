@@ -39,8 +39,7 @@ include_directories(
 # Control allocation node:
 add_executable(allocation
   src/allocation.cpp
-  src/lagrange_allocator_unweighted.cpp
-  src/lagrange_allocator_weighted.cpp)
+  src/lagrange_allocator.cpp)
 target_link_libraries(allocation ${catkin_LIBRARIES})
 add_dependencies(allocation uranus_dp_generate_messages_cpp)
 

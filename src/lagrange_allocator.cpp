@@ -1,11 +1,13 @@
-#include "lagrange_allocator_weighted.h"
+// See Fossen 2011, chapter 12.3.2
 
-LagrangeAllocatorWeighted::LagrangeAllocatorWeighted()
+#include "lagrange_allocator.h"
+
+LagrangeAllocator::LagrangeAllocator()
 {
     n = 6;
     r = 6;
 
-    tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocatorWeighted::tauCallback, this);
+    tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
     uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
 
     tau = Eigen::VectorXd(n);
@@ -18,7 +20,7 @@ LagrangeAllocatorWeighted::LagrangeAllocatorWeighted()
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
 }
 
-void LagrangeAllocatorWeighted::tauCallback(const geometry_msgs::Wrench& tauMsg)
+void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 {
     tau << tauMsg.force.x,
            tauMsg.force.y,

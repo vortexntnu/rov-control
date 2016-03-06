@@ -50,3 +50,7 @@ add_dependencies(controller uranus_dp_generate_messages_cpp)
 add_executable(setpoint_processing src/setpoint_processing.cpp)
 target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
 add_dependencies(setpoint_processing uranus_dp_generate_messages_cpp)
+
+add_executable(state_estimator src/state_estimator.cpp)
+target_link_libraries(state_estimator ${catkin_LIBRARIES})
+add_dependencies(state_estimator uranus_dp_generate_messages_cpp)

@@ -12,11 +12,13 @@
 
 #include "ros/ros.h"
 #include "lagrange_allocator_unweighted.h"
+#include "lagrange_allocator_weighted.h"
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "allocation");
     LagrangeAllocatorUnweighted allocator;
+    LagrangeAllocatorWeighted allocator2;
     ros::spin();
     return 0;
 }

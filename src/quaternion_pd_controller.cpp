@@ -4,10 +4,18 @@
 
 QuaternionPdController::QuaternionPdController()
 {
-    // Constructor goes here
     stateSub        = nh.subscribe("state", 1, &QuaternionPdController::stateCallback, this);
     setpointSub     = nh.subscribe("setpoint", 1, &QuaternionPdController::setpointCallback, this);
     controlInputPub = nh.advertise<geometry_msgs::Wrench>("controlInput", 1);
+
+    // Values from paper, only temporary
+    K_D = Eigen::MatrixXd::Identity(6,6);
+    K_p = 30*Eigen::MatrixXd::Identity(3,3);
+    c = 200;
+    r_g.setZero();
+    r_b.setZero();
+    W = 185*9.8;
+    B = 185*9.8;
 }
 
 void QuaternionPdController::compute()
@@ -16,7 +24,7 @@ void QuaternionPdController::compute()
     updateErrorVector();
     updateRestoringForceVector();
 
-    tau = - K_D * nu - K_P * z + g;
+    Eigen::VectorXd tau = - K_D * nu - K_P * z + g;
 
     // Publish tau
     geometry_msgs::Wrench tauMsg;

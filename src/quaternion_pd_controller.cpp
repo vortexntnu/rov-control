@@ -49,18 +49,10 @@ void QuaternionPdController::updateErrorVector()
     Eigen::Vector3d p_tilde = p - p_d;
 
     // Calculate q_tilde
-    Eigen::Matrix4d Q_d; // Matrix representation of quaternion q_d
-    Q_d << q_d.w(),   q_d.vec().transpose(),
-          -q_d.vec(), q_d.w()*Eigen::Matrix3d::Identity() - skew(q_d.vec());
-
-    Eigen::Vector4d q_vector(q.w(), q.x(), q.y(), q.z());
-    Eigen::Vector4d q_tilde_vector = Q_d*q_vector;
-
-    double eta_tilde = q_tilde_vector(0);
-    Eigen::Vector3d epsilon_tilde = q_tilde_vector.tail(3);
+    Eigen::Quaterniond q_tilde = q_d.conjugate() * q;
 
     // Calculate z
-    z << p_tilde, sgn(eta_tilde)*epsilon_tilde;
+    z << p_tilde, sgn(q_tilde.w())*q_tilde.vec();
 }
 
 void QuaternionPdController::updateRestoringForceVector()

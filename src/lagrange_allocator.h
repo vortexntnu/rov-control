@@ -11,6 +11,7 @@ class LagrangeAllocator
 public:
     LagrangeAllocator();
     void tauCallback(const geometry_msgs::Wrench& tauMsg);
+    void setWeights(const Eigen::MatrixXd &W_new);
 private:
     ros::NodeHandle nh;
     ros::Subscriber tauSub;
@@ -20,13 +21,13 @@ private:
     unsigned int n; // Number of control forces (length of tau)
     unsigned int r; // Number of control inputs (length of u)
 
-    Eigen::VectorXd tau;          // Desired control forces
-    Eigen::VectorXd u;            // Desired control inputs
-    Eigen::MatrixXd W;            // Control force weight matrix
-    Eigen::MatrixXd K;            // Thrust coefficient matrix
-    Eigen::MatrixXd K_inverse;    // Inverse of K
-    Eigen::MatrixXd T;            // Thrust configuration matrix
-    Eigen::MatrixXd T_geninverse; // Generalized inverse of T
+    Eigen::MatrixXd W;            // (r*r) Control force weight matrix
+    Eigen::MatrixXd K;            // (r*r) Thrust coefficient matrix
+    Eigen::MatrixXd K_inverse;    // (r*r) Inverse of K
+    Eigen::MatrixXd T;            // (n*r) Thrust configuration matrix
+    Eigen::MatrixXd T_geninverse; // (r*n) Generalized inverse of T
+
+    void computeGeneralizedInverse();
 };
 
 #endif

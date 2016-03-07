@@ -10,18 +10,19 @@ LagrangeAllocator::LagrangeAllocator()
     tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
     uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
 
-    tau = Eigen::VectorXd(n);
-
     W.setIdentity(n,n);
     K = Eigen::MatrixXd::Identity(r,r); // Set to identity because it's not yet known
-    T = Eigen::MatrixXd::Ones(n,r);
+    T = Eigen::MatrixXd::Ones(n,r);     // Set to ones for same reason
 
     K_inverse = K.inverse();
-    T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
+    computeGeneralizedInverse();
 }
 
 void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 {
+    // Is it better/faster to preallocate tau and u?
+
+    Eigen::VectorXd tau(n);
     tau << tauMsg.force.x,
            tauMsg.force.y,
            tauMsg.force.z,
@@ -29,6 +30,7 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
            tauMsg.torque.y,
            tauMsg.torque.z;
 
+    Eigen::VectorXd u(r);
     u = K_inverse * T_geninverse * tau;
 
     uranus_dp::ThrusterForces uMsg;
@@ -39,4 +41,24 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
     uMsg.F5 = u(4);
     uMsg.F6 = u(5);
     uPub.publish(uMsg);
+}
+
+void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
+{
+    bool correctDimensions = ( W_new.rows() == r && W_new.cols() == r );
+    if (!correctDimensions)
+    {
+        // Notify ros about wrong dimensions
+        return;
+    }
+
+    W = W_new; // I think Eigen does a full deep copy here
+
+    // New weights mean we must recompute T_geninverse
+    computeGeneralizedInverse();
+}
+
+void LagrangeAllocator::computeGeneralizedInverse()
+{
+    T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
 }

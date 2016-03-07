@@ -5,6 +5,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "allocation");
     LagrangeAllocator allocator;
+    allocator.setWeights(Eigen::MatrixXd::Identity(6,6));
     ros::spin();
     return 0;
 }

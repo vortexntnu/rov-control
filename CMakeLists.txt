@@ -57,7 +57,10 @@ target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
 add_dependencies(setpoint_processing uranus_dp_generate_messages_cpp)
 
 # State estimator node:
-add_executable(state_estimator src/state_estimator.cpp)
+add_executable(state_estimator
+  src/state_estimator.cpp
+  src/extended_kalman_filter.cpp
+)
 target_link_libraries(state_estimator ${catkin_LIBRARIES})
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
 

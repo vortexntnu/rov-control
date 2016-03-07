@@ -1,15 +1,13 @@
 #include "ros/ros.h"
-#include "funkycontroller.h"
+#include "quaternion_pd_controller.h"
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "controller");
 
-    NonlinearQuaternionPidController controller;
+    QuaternionPdController controller;
 
-    unsigned int frequency = 10; // Get from parameter server sometime in the future
-    controller.setFrequency(frequency);
-
+    unsigned int frequency = 10; // Param server
     ros::Rate loop_rate(frequency);
     while (ros::ok())
     {

@@ -46,7 +46,7 @@ add_dependencies(allocation uranus_dp_generate_messages_cpp)
 # Controller node:
 add_executable(controller
   src/controller.cpp
-  src/funkycontroller.cpp
+  src/quaternion_pd_controller.cpp
 )
 target_link_libraries(controller ${catkin_LIBRARIES})
 add_dependencies(controller uranus_dp_generate_messages_cpp)

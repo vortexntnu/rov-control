@@ -32,16 +32,15 @@ private:
     // Error variables
     Eigen::VectorXd z; // (6) Pose error vector
 
+    // Other stuff
+    Eigen::VectorXd g;   // (6)   Restoring force vector
+    Eigen::Matrix3d R;   // (3*3) Rotation matrix from {n} to {b}
+
     // Controller gains
     Eigen::MatrixXd K_P; // (6*6) Proportional gain matrix
     Eigen::MatrixXd K_D; // (6*6) Derivative gain matrix
     Eigen::Matrix3d K_p; // (3*3) Position error gain matrix (part of K_P)
     double c;            //       Attitude error gain scalar
-
-    // Other stuff
-    Eigen::VectorXd tau; // (6)   Control input vector
-    Eigen::VectorXd g;   // (6)   Restoring force vector
-    Eigen::Matrix3d R;   // (3*3) Rotation matrix from {n} to {b}
 
     // Constants
     Eigen::Vector3d r_g; // (3) Center of gravity, expressed in {b}

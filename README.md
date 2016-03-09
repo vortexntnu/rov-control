@@ -1,5 +1,5 @@
 # Uranus DP
-The ROV control system. Reads a joystick topic as input, outputs the "control inputs" u.
+The Uranus dynamic positioning system, a complete control system for our ROV.
 
 ### Future ideas
 - Would be cool to implement an adaptive controller.

@@ -2,8 +2,12 @@ int32 strafe_X
 int32 strafe_Y
 int32 turn_X
 int32 turn_Y
-int32 ascend
+bool descend
+bool ascend
 bool lights_on
 bool lights_off
 bool lights_increase
 bool lights_decrease
+int32 arm_base
+int32 arm_rot
+int32 arm_grip

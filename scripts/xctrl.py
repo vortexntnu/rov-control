@@ -24,6 +24,12 @@ def read_ps3_into_control_msg(device, model):
             model.lights_on = (event.value == 1)
         elif input == 'SQUARE':
             model.lights_off = (event.value == 1)
+        elif input == 'DY':
+            model.arm_base = event.value
+        elif input == 'DX':
+            model.arm_rot = event.value
+        elif input == 'R2':
+            model.arm_grip = event.value
 
 
 def read_xbox_into_control_msg(device, model):
@@ -46,6 +52,12 @@ def read_xbox_into_control_msg(device, model):
             model.lights_on = event.value
         elif input == 'X':
             model.lights_off = event.value
+        elif input == 'DY':
+            model.arm_base = event.value
+        elif input == 'DX':
+            model.arm_rot = event.value
+        elif input == 'STright':
+            model.arm_grip = event.value
 
 
 def deadzone(value):

@@ -4,7 +4,7 @@ import glob
 from evdev import InputDevice
 import rospy
 import threading
-from joystick.msg import joystick
+from joystick.msg import Joystick
 # from uranus_dp.msg import JoystickUranus
 import xctrl
 import subprocess
@@ -16,10 +16,16 @@ import time
 class JoystickNode:
 
     def __init__(self):
-        self.model = joystick()
-        rospy.init_node("joystick_node")
-        self.pub = rospy.Publisher('joystick', joystick, queue_size=10)
+        self.model = Joystick()
+        rospy.init_node('joystick_node')
+        self.pub = rospy.Publisher('joystick', Joystick, queue_size=10)
         self.rate = rospy.Rate(10)
+    '''
+        # to test the arduino
+        while not rospy.is_shutdown():
+            self.pub.publish("dadada")
+            self.rate.sleep()
+    '''
 
     def start_node(self):
         device_type, self.device = self.init_device()

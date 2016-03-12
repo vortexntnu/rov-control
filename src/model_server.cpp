@@ -7,20 +7,21 @@
 #include "uranus_dp/GetG.h"
 #include "uranus_dp/GetR.h"
 #include "uranus_dp/GetT.h"
+#include "uranus_dp/GetJ.h"
 #include <eigen_conversions/eigen_msg.h>
 
-Eigen::Matrix3d skew(const Eigen::Vector3d &v);
+Eigen::Matrix3d           skew(const Eigen::Vector3d &v);
+Eigen::Matrix<double,4,3> angularTransformationMatrix(const Eigen::Quaterniond &q);
 
-bool getM(uranus_dp::GetM::Request  &req,
-          uranus_dp::GetM::Response &resp)
+bool getM(uranus_dp::GetM::Request &req, uranus_dp::GetM::Response &resp)
 {
     // 1st row
-    resp.M[0] = 1;
-    resp.M[1] = 1;
-    resp.M[2] = 1;
-    resp.M[3] = 1;
-    resp.M[4] = 1;
-    resp.M[5] = 1;
+    resp.M[0]  = 1;
+    resp.M[1]  = 1;
+    resp.M[2]  = 1;
+    resp.M[3]  = 1;
+    resp.M[4]  = 1;
+    resp.M[5]  = 1;
 
     // 2nd row
     resp.M[6]  = 1;
@@ -65,16 +66,15 @@ bool getM(uranus_dp::GetM::Request  &req,
     return true;
 }
 
-bool getC(uranus_dp::GetC::Request  &req,
-          uranus_dp::GetC::Response &resp)
+bool getC(uranus_dp::GetC::Request &req, uranus_dp::GetC::Response &resp)
 {
     // 1st row
-    resp.C[0] = 1;
-    resp.C[1] = 1;
-    resp.C[2] = 1;
-    resp.C[3] = 1;
-    resp.C[4] = 1;
-    resp.C[5] = 1;
+    resp.C[0]  = 1;
+    resp.C[1]  = 1;
+    resp.C[2]  = 1;
+    resp.C[3]  = 1;
+    resp.C[4]  = 1;
+    resp.C[5]  = 1;
 
     // 2nd row
     resp.C[6]  = 1;
@@ -119,16 +119,15 @@ bool getC(uranus_dp::GetC::Request  &req,
     return true;
 }
 
-bool getD(uranus_dp::GetD::Request  &req,
-          uranus_dp::GetD::Response &resp)
+bool getD(uranus_dp::GetD::Request &req, uranus_dp::GetD::Response &resp)
 {
     // 1st row
-    resp.D[0] = 1;
-    resp.D[1] = 1;
-    resp.D[2] = 1;
-    resp.D[3] = 1;
-    resp.D[4] = 1;
-    resp.D[5] = 1;
+    resp.D[0]  = 1;
+    resp.D[1]  = 1;
+    resp.D[2]  = 1;
+    resp.D[3]  = 1;
+    resp.D[4]  = 1;
+    resp.D[5]  = 1;
 
     // 2nd row
     resp.D[6]  = 1;
@@ -173,8 +172,7 @@ bool getD(uranus_dp::GetD::Request  &req,
     return true;
 }
 
-bool getG(uranus_dp::GetG::Request  &req,
-          uranus_dp::GetG::Response &resp)
+bool getG(uranus_dp::GetG::Request &req, uranus_dp::GetG::Response &resp)
 {
     resp.g[0] = 1;
     resp.g[1] = 1;
@@ -186,62 +184,49 @@ bool getG(uranus_dp::GetG::Request  &req,
     return true;
 }
 
-bool getR(uranus_dp::GetR::Request  &req,
-          uranus_dp::GetR::Response &resp)
+bool getR(uranus_dp::GetR::Request &req, uranus_dp::GetR::Response &resp)
 {
     Eigen::Quaterniond q;
     tf::quaternionMsgToEigen(req.q, q);
 
     Eigen::Matrix3d R = q.matrix();
 
-    // 1st row
-    resp.R[0] = R(0);
-    resp.R[1] = R(1);
-    resp.R[2] = R(2);
-
-    // 2nd row
-    resp.R[3] = R(3);
-    resp.R[4] = R(4);
-    resp.R[5] = R(5);
-
-    // 3rd row
-    resp.R[6] = R(6);
-    resp.R[7] = R(7);
-    resp.R[8] = R(8);
+    for (int i = 0; i < 9; i++)
+    {
+        resp.R[i] = R(i);
+    }
 
     return true;
 }
 
-bool getT(uranus_dp::GetT::Request  &req,
-          uranus_dp::GetT::Response &resp)
+bool getT(uranus_dp::GetT::Request &req, uranus_dp::GetT::Response &resp)
 {
     Eigen::Quaterniond q;
     tf::quaternionMsgToEigen(req.q, q);
+    Eigen::Matrix<double,4,3> T = angularTransformationMatrix(q);
 
-    Eigen::Matrix<double,4,3> T;
+    for (int i = 0; i < 12; i++)
+    {
+        resp.T[i] = T(i);
+    }
 
-    T << -q.vec().transpose(),
-         q.w()*Eigen::MatrixXd::Identity(3,3) + skew(q.vec());
+    return true;
+}
 
-    // 1st row
-    resp.T[0] = T(0);
-    resp.T[1] = T(1);
-    resp.T[2] = T(2);
+bool getJ(uranus_dp::GetJ::Request &req, uranus_dp::GetJ::Response &resp)
+{
+    Eigen::Quaterniond q;
+    tf::quaternionMsgToEigen(req.q, q);
+    Eigen::Matrix3d R = q.matrix();
+    Eigen::Matrix<double,4,3> T = angularTransformationMatrix(q);
+    Eigen::Matrix<double,7,6> J;
+    J << R, Eigen::MatrixXd::Zero(3,3),
+         Eigen::MatrixXd::Zero(4,3), T;
 
-    // 2nd row
-    resp.T[3] = T(3);
-    resp.T[4] = T(4);
-    resp.T[5] = T(5);
-
-    // 3rd row
-    resp.T[6] = T(6);
-    resp.T[7] = T(7);
-    resp.T[8] = T(8);
-
-    // 4th row
-    resp.T[9]  = T(9);
-    resp.T[10] = T(10);
-    resp.T[11] = T(11);
+    for (int i = 0; i < 42; i++)
+    {
+        resp.J[i] = J(i);
+    }
 
     return true;
 }
@@ -253,6 +238,16 @@ Eigen::Matrix3d skew(const Eigen::Vector3d &v)
          v(2), 0, -v(0),
          -v(1), v(0), 0;
     return S;
+}
+
+Eigen::Matrix<double,4,3> angularTransformationMatrix(const Eigen::Quaterniond &q)
+{
+    Eigen::Matrix<double,4,3> T;
+
+    T << -q.vec().transpose(),
+         q.w()*Eigen::MatrixXd::Identity(3,3) + skew(q.vec());
+
+    return T;
 }
 
 int main(int argc, char **argv)

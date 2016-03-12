@@ -25,6 +25,7 @@ add_service_files(DIRECTORY srv FILES
   GetG.srv
   GetR.srv
   GetT.srv
+  GetJ.srv
 )
 
 generate_messages(DEPENDENCIES geometry_msgs)

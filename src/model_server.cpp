@@ -5,6 +5,11 @@
 #include "uranus_dp/GetC.h"
 #include "uranus_dp/GetD.h"
 #include "uranus_dp/GetG.h"
+#include "uranus_dp/GetR.h"
+#include "uranus_dp/GetT.h"
+#include <eigen_conversions/eigen_msg.h>
+
+Eigen::Matrix3d skew(const Eigen::Vector3d &v);
 
 bool getM(uranus_dp::GetM::Request  &req,
           uranus_dp::GetM::Response &resp)
@@ -181,6 +186,75 @@ bool getG(uranus_dp::GetG::Request  &req,
     return true;
 }
 
+bool getR(uranus_dp::GetR::Request  &req,
+          uranus_dp::GetR::Response &resp)
+{
+    Eigen::Quaterniond q;
+    tf::quaternionMsgToEigen(req.q, q);
+
+    Eigen::Matrix3d R = q.matrix();
+
+    // 1st row
+    resp.R[0] = R(0);
+    resp.R[1] = R(1);
+    resp.R[2] = R(2);
+
+    // 2nd row
+    resp.R[3] = R(3);
+    resp.R[4] = R(4);
+    resp.R[5] = R(5);
+
+    // 3rd row
+    resp.R[6] = R(6);
+    resp.R[7] = R(7);
+    resp.R[8] = R(8);
+
+    return true;
+}
+
+bool getT(uranus_dp::GetT::Request  &req,
+          uranus_dp::GetT::Response &resp)
+{
+    Eigen::Quaterniond q;
+    tf::quaternionMsgToEigen(req.q, q);
+
+    Eigen::Matrix<double,4,3> T;
+
+    T << -q.vec().transpose(),
+         q.w()*Eigen::MatrixXd::Identity(3,3) + skew(q.vec());
+
+    // 1st row
+    resp.T[0] = T(0);
+    resp.T[1] = T(1);
+    resp.T[2] = T(2);
+
+    // 2nd row
+    resp.T[3] = T(3);
+    resp.T[4] = T(4);
+    resp.T[5] = T(5);
+
+    // 3rd row
+    resp.T[6] = T(6);
+    resp.T[7] = T(7);
+    resp.T[8] = T(8);
+
+    // 4th row
+    resp.T[9]  = T(9);
+    resp.T[10] = T(10);
+    resp.T[11] = T(11);
+
+    return true;
+}
+
+Eigen::Matrix3d skew(const Eigen::Vector3d &v)
+{
+    Eigen::Matrix3d S;
+    S << 0, -v(2), v(1),
+         v(2), 0, -v(0),
+         -v(1), v(0), 0;
+    return S;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "model_server");
@@ -190,6 +264,7 @@ int main(int argc, char **argv)
     ros::ServiceServer serviceC = nh.advertiseService("get_c", getC);
     ros::ServiceServer serviceD = nh.advertiseService("get_d", getD);
     ros::ServiceServer serviceG = nh.advertiseService("get_g", getG);
+    ros::ServiceServer serviceR = nh.advertiseService("get_r", getR);
     ros::spin();
 
     return 0;

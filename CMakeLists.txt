@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   geometry_msgs
   joystick
+  eigen_conversions
 )
 
 find_package(Eigen REQUIRED)
@@ -22,6 +23,8 @@ add_service_files(DIRECTORY srv FILES
   GetC.srv
   GetD.srv
   GetG.srv
+  GetR.srv
+  GetT.srv
 )
 
 generate_messages(DEPENDENCIES geometry_msgs)

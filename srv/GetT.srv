@@ -1,0 +1,5 @@
+# Return angular velocity transformation matrix
+
+geometry_msgs/Quaternion q
+---
+float64[12] T

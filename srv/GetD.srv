@@ -1,0 +1,5 @@
+# Return damping matrix
+
+geometry_msgs/Twist nu
+---
+float64[36] D

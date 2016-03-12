@@ -17,6 +17,13 @@ add_message_files(DIRECTORY msg FILES
   State.msg
 )
 
+add_service_files(DIRECTORY srv FILES
+  GetM.srv
+  GetC.srv
+  GetD.srv
+  GetG.srv
+)
+
 generate_messages(DEPENDENCIES geometry_msgs)
 
 catkin_package(CATKIN_DEPENDS
@@ -63,6 +70,12 @@ add_executable(state_estimator
 )
 target_link_libraries(state_estimator ${catkin_LIBRARIES})
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
+
+# Model server node:
+add_executable(model_server
+  src/model_server.cpp)
+target_link_libraries(model_server ${catkin_LIBRARIES})
+add_dependencies(model_server uranus_dp_generate_messages_cpp)
 
 # Open loop controller, used only for testing:
 add_executable(open_loop_controller src/open_loop_controller.cpp)

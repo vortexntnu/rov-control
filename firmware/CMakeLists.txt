@@ -12,7 +12,8 @@ generate_arduino_firmware(ros_arduino
   SRCS
 	ros_arduino.cpp
 	${ROS_LIB_DIR}/time.cpp
-	MPU9150.cpp
+	MPU6050/MPU6050.cpp
+	I2Cdev/I2Cdev.cpp
 	MS5803_14BA.cpp
   
   BOARD mega2560

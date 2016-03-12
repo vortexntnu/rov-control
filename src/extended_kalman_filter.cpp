@@ -7,6 +7,8 @@
 
 ExtendedKalmanFilter::ExtendedKalmanFilter(double sampleTime)
 {
+    clientJ = nh.serviceClient<uranus_dp::GetJ>("get_j");
+
     h = sampleTime;
 
     Q.setIdentity();
@@ -61,12 +63,24 @@ void ExtendedKalmanFilter::update()
 
 void ExtendedKalmanFilter::updateSystemDynamics()
 {
-    // These need to actually get some values later:
-    Eigen::Matrix<double,7,6> J;
-    Eigen::Matrix<double,6,6> M;
-    Eigen::Matrix<double,6,6> C;
-    Eigen::Matrix<double,6,6> D;
-    Eigen::Matrix<double,6,1> g;
+    uranus_dp::GetJ srv;
+    srv.request.q.x = x_hat(0);
+    srv.request.q.y = x_hat(1);
+    srv.request.q.z = x_hat(2);
+    srv.request.q.w = x_hat(3);
+    
+    if (clientJ.call(srv))
+    {
+        for (int i = 0; i < 42; i++)
+        {
+            J(i) = srv.response.J[i];
+        }
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service get_j");
+        return;
+    }
 
     f << J*nu,
          -M.inverse() * (C*nu + D*nu + g);

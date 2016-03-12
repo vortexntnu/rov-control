@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include "uranus_dp/State.h"
 #include "geometry_msgs/Wrench.h"
+#include "uranus_dp/GetJ.h"
 
 class ExtendedKalmanFilter
 {
@@ -14,16 +15,17 @@ public:
     // void sensorCallback(const uranus_dp::Sensor &yMsg);
     void update();
 private:
-    ros::NodeHandle nh;
-    ros::Subscriber controlSub;
-    ros::Subscriber sensorSub;
-    ros::Publisher  statePub;
+    ros::NodeHandle    nh;
+    ros::Subscriber    controlSub;
+    ros::Subscriber    sensorSub;
+    ros::Publisher     statePub;
+    ros::ServiceClient clientJ;
 
     // Sampling time
     double h;
 
     // System variables
-    Eigen::Matrix<double,13, 1> x; // State
+    // Eigen::Matrix<double,13, 1> x; // State
     Eigen::Matrix<double,13, 1> f; // System dynamics
     Eigen::Matrix<double,13, 6> B; // Input dynamics
     Eigen::Matrix<double, 6, 1> u; // Input
@@ -43,6 +45,13 @@ private:
     Eigen::Matrix<double,13,13> P_bar; // Covariance projection (or something)
     Eigen::Matrix<double,13,13> Phi;   // 
     Eigen::Matrix<double,13,13> Gamma; // 
+
+    // Unmodified system variables
+    Eigen::Matrix<double,7,6> J; // 
+    Eigen::Matrix<double,6,6> M; // 
+    Eigen::Matrix<double,6,6> C; // 
+    Eigen::Matrix<double,6,6> D; // 
+    Eigen::Matrix<double,6,1> g; // 
 
     // Helpful extra shit
     Eigen::Matrix<double,13,13> I;     // 13*13 identity

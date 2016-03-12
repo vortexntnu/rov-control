@@ -7,6 +7,10 @@
 
 ExtendedKalmanFilter::ExtendedKalmanFilter(double sampleTime)
 {
+    clientM = nh.serviceClient<uranus_dp::GetM>("get_m");
+    clientC = nh.serviceClient<uranus_dp::GetC>("get_c");
+    clientD = nh.serviceClient<uranus_dp::GetD>("get_d");
+    clientG = nh.serviceClient<uranus_dp::GetG>("get_g");
     clientJ = nh.serviceClient<uranus_dp::GetJ>("get_j");
 
     h = sampleTime;
@@ -33,7 +37,7 @@ void ExtendedKalmanFilter::update()
     // Correction equations
     K = P_bar*H_transpose * (H*P_bar*H_transpose + R).inverse();
     x_hat = x_bar + K*(y - H*x_bar);
-    P_hat = (I - K*H)*P_bar*(I - K*H).transpose() + K*R*K.transpose();
+    P_hat = (I_13 - K*H)*P_bar*(I_13 - K*H).transpose() + K*R*K.transpose();
 
     // Update f and Phi
     updateSystemDynamics();
@@ -63,22 +67,98 @@ void ExtendedKalmanFilter::update()
 
 void ExtendedKalmanFilter::updateSystemDynamics()
 {
-    uranus_dp::GetJ srv;
-    srv.request.q.x = x_hat(0);
-    srv.request.q.y = x_hat(1);
-    srv.request.q.z = x_hat(2);
-    srv.request.q.w = x_hat(3);
-    
-    if (clientJ.call(srv))
+    // Copy attitude vector from current estimate
+    Eigen::Quaterniond q;
+    q.w() = x_hat(3);
+    q.x() = x_hat(4);
+    q.y() = x_hat(5);
+    q.z() = x_hat(6);
+
+    // Copy velocity vector from current estimate
+    Eigen::Matrix<double,6,1> nu;
+    nu << x_hat(7),
+          x_hat(8),
+          x_hat(9),
+          x_hat(10),
+          x_hat(11),
+          x_hat(12);
+
+    // Update J matrix
+    uranus_dp::GetJ srvJ;
+    tf::quaternionEigenToMsg(q, srvJ.request.q);
+    if (clientJ.call(srvJ))
     {
         for (int i = 0; i < 42; i++)
         {
-            J(i) = srv.response.J[i];
+            J(i) = srvJ.response.J[i];
         }
     }
     else
     {
         ROS_ERROR("Failed to call service get_j");
+        return;
+    }
+
+    // Update M matrix
+    uranus_dp::GetM srvM;
+    if (clientM.call(srvM))
+    {
+        for (int i = 0; i < 36; i++)
+        {
+            M(i) = srvM.response.M[i];
+        }
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service get_m");
+        return;
+    }
+
+    // Update C matrix
+    uranus_dp::GetC srvC;
+    tf::twistEigenToMsg(nu, srvC.request.nu);
+    if (clientC.call(srvC))
+    {
+        for (int i = 0; i < 36; i++)
+        {
+            C(i) = srvC.response.C[i];
+        }
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service get_c");
+        return;
+    }
+
+    // Update D matrix
+    uranus_dp::GetD srvD;
+    tf::twistEigenToMsg(nu, srvD.request.nu);
+    if (clientD.call(srvD))
+    {
+        for (int i = 0; i < 36; i++)
+        {
+            D(i) = srvD.response.D[i];
+        }
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service get_d");
+        return;
+    }
+
+    // Update g vector
+    uranus_dp::GetG srvG;
+    tf::quaternionEigenToMsg(q, srvG.request.q);
+    if (clientG.call(srvG))
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            g(i) = srvG.response.g[i];
+        }
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service get_g");
         return;
     }
 
@@ -90,5 +170,5 @@ void ExtendedKalmanFilter::updatePhi()
 {
     Eigen::Matrix<double,13,13> del_f_del_x;
     // Evalute del_f_del_x at current x_hat
-    Phi = I + h*del_f_del_x;
+    Phi = I_13 + h*del_f_del_x;
 }

@@ -1,5 +1,5 @@
 # Return restoring force vector
 
-geometry_msgs/Pose eta
+geometry_msgs/Quaternion q
 ---
 float64[6] g

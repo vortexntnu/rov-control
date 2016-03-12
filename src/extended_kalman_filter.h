@@ -5,7 +5,12 @@
 #include <Eigen/Dense>
 #include "uranus_dp/State.h"
 #include "geometry_msgs/Wrench.h"
+#include "uranus_dp/GetM.h"
+#include "uranus_dp/GetC.h"
+#include "uranus_dp/GetD.h"
+#include "uranus_dp/GetG.h"
 #include "uranus_dp/GetJ.h"
+#include <eigen_conversions/eigen_msg.h>
 
 class ExtendedKalmanFilter
 {
@@ -19,6 +24,10 @@ private:
     ros::Subscriber    controlSub;
     ros::Subscriber    sensorSub;
     ros::Publisher     statePub;
+    ros::ServiceClient clientM;
+    ros::ServiceClient clientC;
+    ros::ServiceClient clientD;
+    ros::ServiceClient clientG;
     ros::ServiceClient clientJ;
 
     // Sampling time
@@ -47,17 +56,15 @@ private:
     Eigen::Matrix<double,13,13> Gamma; // 
 
     // Unmodified system variables
-    Eigen::Matrix<double,7,6> J; // 
     Eigen::Matrix<double,6,6> M; // 
     Eigen::Matrix<double,6,6> C; // 
     Eigen::Matrix<double,6,6> D; // 
     Eigen::Matrix<double,6,1> g; // 
+    Eigen::Matrix<double,7,6> J; // 
 
     // Helpful extra shit
-    Eigen::Matrix<double,13,13> I;     // 13*13 identity
+    Eigen::Matrix<double,13,13> I_13;     // 13*13 identity
     Eigen::Matrix<double,13,10> H_transpose;
-    Eigen::Matrix<double,7,1> eta; // Pose (first seven elements of state)
-    Eigen::Matrix<double,6,1> nu;  // Velocity (last six elements of state)
 
     void updateSystemDynamics();
     void updatePhi();

@@ -47,6 +47,8 @@ private:
     // Helpful extra shit
     Eigen::Matrix<double,13,13> I;     // 13*13 identity
     Eigen::Matrix<double,13,10> H_transpose;
+    Eigen::Matrix<double,7,1> eta; // Pose (first seven elements of state)
+    Eigen::Matrix<double,6,1> nu;  // Velocity (last six elements of state)
 
     void updateSystemDynamics();
     void updatePhi();

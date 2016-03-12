@@ -28,7 +28,7 @@ void ExtendedKalmanFilter::controlCallback(const geometry_msgs::Wrench &tauMsg)
 
 void ExtendedKalmanFilter::update()
 {
-    // Correct
+    // Correction equations
     K = P_bar*H_transpose * (H*P_bar*H_transpose + R).inverse();
     x_hat = x_bar + K*(y - H*x_bar);
     P_hat = (I - K*H)*P_bar*(I - K*H).transpose() + K*R*K.transpose();
@@ -37,7 +37,7 @@ void ExtendedKalmanFilter::update()
     updateSystemDynamics();
     updatePhi();
 
-    // Predict
+    // Prediction equation
     x_bar = x_hat + h*(f + B*u);
     P_bar = Phi*P_hat*Phi.transpose() + Gamma*Q*Gamma.transpose();
 
@@ -63,8 +63,6 @@ void ExtendedKalmanFilter::updateSystemDynamics()
 {
     // These need to actually get some values later:
     Eigen::Matrix<double,7,6> J;
-    Eigen::Matrix<double,7,1> eta;
-    Eigen::Matrix<double,6,1> nu;
     Eigen::Matrix<double,6,6> M;
     Eigen::Matrix<double,6,6> C;
     Eigen::Matrix<double,6,6> D;

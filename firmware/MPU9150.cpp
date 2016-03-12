@@ -5,10 +5,10 @@
 #include "MPU9150.h"
 #include <Wire.h>
 
-void IMU::CompasSetup(){
+void IMU::CompassSetup(){
 
   IMU::setI2C_address(COMPAS_I2C_ADDRESS);      //change Address to Compass
-  Serial.print(this->I2C_address);
+  //Serial.print(this->I2C_address);
   IMU::write(0x0A, 0x00); //PowerDownMode
   IMU::write(0x0A, 0x0F); //SelfTest
   IMU::write(0x0A, 0x00); //PowerDownMode
@@ -81,7 +81,7 @@ void IMU::readGyro( geometry_msgs::Vector3 *retur ) {
   retur->z = read(MPU9150_GYRO_ZOUT_L, MPU9150_GYRO_ZOUT_H);
 }
 
-void IMU::readCompas( geometry_msgs::Vector3 *retur ) {
+void IMU::readCompass( geometry_msgs::Vector3 *retur ) {
   retur->x = read(MPU9150_CMPS_XOUT_L, MPU9150_CMPS_XOUT_H);
   retur->y = read(MPU9150_CMPS_YOUT_L, MPU9150_CMPS_YOUT_H);
   retur->z = read(MPU9150_CMPS_ZOUT_L, MPU9150_CMPS_ZOUT_H);
@@ -94,6 +94,8 @@ double IMU::readTemperature() {
 
 
 /*
+Denne koden er klar til å fjernes ... men lar den ligge litt lengre i tilfelle vi får bruk for den
+
 
 String IMU::readAll(){
 
@@ -126,8 +128,21 @@ int IMU::write(int address , int data){
   return 1;
 }
 
+void IMU::start() {
+  
+  // Clear the 'sleep' bit to  the sensor.
+  write(MPU9150_PWR_MGMT_1, 0);
+  CompassSetup();
+  int I2C_address = MPU9150_I2C_ADDRESS;
+}
+
+
+/*
+Denne koden er klar til å fjernes ... men lar den ligge litt lengre i tilfelle vi får bruk for den
 
 IMU::IMU(){
+
+  
   //Serial.print("start setup: \n");
   //write(MPU9150_PWR_MGMT_1, 0);
   //CompasSetup();
@@ -135,7 +150,7 @@ IMU::IMU(){
   int acceleration[3] = { 0 , 0 , 0 };
   int gyro[3] = { 0 , 0 , 0 };
   double temp = 0;
-  int I2C_address = MPU9150_I2C_ADDRESS;
+  //int I2C_address = MPU9150_I2C_ADDRESS;
   //Serial.print("end setup \n");
   
 }
@@ -145,3 +160,5 @@ IMU::IMU(){
 IMU::~IMU(){}
 
 //IMU IMU;
+
+*/

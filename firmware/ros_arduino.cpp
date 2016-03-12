@@ -6,15 +6,18 @@
 #include <joystick/pwm_requests.h>
 
 
-//incleder for IMUen
+//incleder for IMU og trykksensor
 #include "MPU9150.h"
+#include "MS5803_14BA.h"
 #include <Wire.h>
 #include <ros_arduino/SensorRaw.h>
 #include <geometry_msgs/Vector3.h>
 
+IMU imu;
+MS5803_14BA depthSensor;
+
 ros::NodeHandle nh;
 
-IMU imu;
 ros_arduino::SensorRaw sensor_raw_msg;
 ros::Publisher pub_imu( "SensorRaw", &sensor_raw_msg);
 
@@ -68,10 +71,11 @@ ros::Subscriber<joystick::pwm_requests> pwm_input_sub("pwm_requests", &pwm_updat
 void setup() {
   //start ROS-node
   nh.initNode();
-
-
-  //start wire for IMUen
+  
+  // Initialize the 'Wire' class for the I2C-bus.
   Wire.begin();
+  imu.start();
+  depthSensor.initialize(false);
 
   
   nh.advertise(pwm_status_pub);
@@ -84,20 +88,19 @@ void setup() {
 }
 
 
-void lesIMU() {
+void lesSensorer() {
 
   
   imu.readAcceleration( &sensor_raw_msg.acceleration  );
   imu.readGyro( &sensor_raw_msg.gyro );
-  imu.readCompas( &sensor_raw_msg.compas );
+  imu.readCompass( &sensor_raw_msg.compass );
 
   sensor_raw_msg.temperature = imu.readTemperature();
+  //sensor_raw_msg.temperature = depthSensor.getPreassure();
 
-  /*
-  sensor_raw_msg.acceleration.x  = 0;
-  sensor_raw_msg.acceleration.y  = 1;
-  sensor_raw_msg.acceleration.z  = 2;
-  */
+  depthSensor.read();
+  sensor_raw_msg.pressure = depthSensor.getPreassure();
+
   
 }
 
@@ -105,7 +108,7 @@ void loop(){
 
 
   nh.spinOnce();
-  lesIMU();
+  lesSensorer();
   nh.spinOnce();
   pub_imu.publish(&sensor_raw_msg);
   
@@ -126,11 +129,12 @@ void loop(){
   nh.spinOnce();
   
   
+  //oppateringsfekvens på 100Hz
+  delay(10);
   
-  //delay(1000/60); //kanksje 100 Hz
   
 
-  delay(500);
+  //delay(500);
 
 
   for(int i = 0; i < pwm_count; i++) {

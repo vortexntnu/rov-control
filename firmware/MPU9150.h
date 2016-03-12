@@ -18,27 +18,30 @@
 class IMU
 {
  private:
+  /*
 	int compas[3];
 	int acceleration[3];
 	int gyro[3];
 	double temp;
+  */
 	int I2C_address;
 
  public:
-	void CompasSetup();
+	void start();
+	void CompassSetup();
 	void setI2C_address(int address);
 	void init();
 	int read(int address);
 	int read(int addressL , int addressH);
 	int write(int address , int data);
-	String readAll();
-	IMU();
-	~IMU();
+	//String readAll();
+	//IMU();
+	//~IMU();
 
 	double readTemperature();
 	void readAcceleration(geometry_msgs::Vector3 *retur);
 	void readGyro(geometry_msgs::Vector3 *retur);
-	void readCompas(geometry_msgs::Vector3 *retur);
+	void readCompass(geometry_msgs::Vector3 *retur);
 };
 
 //extern IMU IMU;

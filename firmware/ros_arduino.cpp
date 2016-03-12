@@ -3,7 +3,7 @@
 #include <ros.h>
 
 #include <std_msgs/String.h>
-#include <joystick/pwm_requests.h>
+#include <joystick/PwmRequests.h>
 
 
 //incleder for IMU og trykksensor
@@ -28,7 +28,7 @@ int internal_pwm_out[pwm_count];
 const int pwm_pins[] = { 3, 5, 6, 9, 10, 11 };
 
 
-joystick::pwm_requests  pwm_status_msg;
+joystick::PwmRequests  pwm_status_msg;
 ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
 
 
@@ -37,7 +37,7 @@ ros::Publisher arduino_dbg_pub("arduino_dbg", &arduino_dbg_msg);
 
 
 
-void pwm_update( const joystick::pwm_requests& pwm_input ){
+void pwm_update( const joystick::PwmRequests& pwm_input ){
 
 
     internal_pwm_out[0] = (pwm_input.pwm1 >> 8) + 128;
@@ -64,7 +64,7 @@ void pwm_update( const joystick::pwm_requests& pwm_input ){
     
 }
 
-ros::Subscriber<joystick::pwm_requests> pwm_input_sub("pwm_requests", &pwm_update );
+ros::Subscriber<joystick::PwmRequests> pwm_input_sub("pwm_requests", &pwm_update );
 
 
 

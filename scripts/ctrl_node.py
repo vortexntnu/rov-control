@@ -18,7 +18,7 @@ class JoystickNode:
     def __init__(self):
         self.model = Joystick()
         rospy.init_node('joystick_node')
-        self.pub = rospy.Publisher('joystick', Joystick, queue_size=10)
+        self.pub = rospy.Publisher('Joystick', Joystick, queue_size=10)
         self.rate = rospy.Rate(10)
     '''
         # to test the arduino

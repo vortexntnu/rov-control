@@ -25,4 +25,5 @@ Make sure you specify your arduino board and serial port in 'ros_arduino/firmwar
 relevant tutorials: 
 
 http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup
+
 http://wiki.ros.org/rosserial_arduino/Tutorials/CMake

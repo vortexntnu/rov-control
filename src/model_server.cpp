@@ -260,6 +260,9 @@ int main(int argc, char **argv)
     ros::ServiceServer serviceD = nh.advertiseService("get_d", getD);
     ros::ServiceServer serviceG = nh.advertiseService("get_g", getG);
     ros::ServiceServer serviceR = nh.advertiseService("get_r", getR);
+
+    ros::ServiceServer serviceT = nh.advertiseService("get_t", getT);
+    ros::ServiceServer serviceJ = nh.advertiseService("get_j", getJ);
     ros::spin();
 
     return 0;

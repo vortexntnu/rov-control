@@ -189,7 +189,7 @@ bool getR(uranus_dp::GetR::Request &req, uranus_dp::GetR::Response &resp)
     Eigen::Quaterniond q;
     tf::quaternionMsgToEigen(req.q, q);
 
-    Eigen::Matrix3d R = q.matrix();
+    Eigen::Matrix3d R = q.toRotationMatrix();
 
     for (int i = 0; i < 9; i++)
     {
@@ -217,7 +217,7 @@ bool getJ(uranus_dp::GetJ::Request &req, uranus_dp::GetJ::Response &resp)
 {
     Eigen::Quaterniond q;
     tf::quaternionMsgToEigen(req.q, q);
-    Eigen::Matrix3d R = q.matrix();
+    Eigen::Matrix3d R = q.toRotationMatrix();
     Eigen::Matrix<double,4,3> T = angularTransformationMatrix(q);
     Eigen::Matrix<double,7,6> J;
     J << R, Eigen::MatrixXd::Zero(3,3),

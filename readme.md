@@ -8,6 +8,7 @@ The translator node is found in the rosserial package which can be installed wit
 To run the translator node it must also be supplied with an argument which tells it where to look for the arduino.
 For an arduino located at /dev/ttyACM0 we will run the following to bring up the 
 translator node:
+
  $rosrun rosserial_python serial_node.py /dev/ttyACM0
 
 Build instructions:

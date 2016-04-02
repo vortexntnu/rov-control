@@ -4,15 +4,12 @@
 
 LagrangeAllocator::LagrangeAllocator()
 {
-    n = 6;
-    r = 6;
-
     tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
     uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
 
-    W.setIdentity(n,n);
-    K = Eigen::MatrixXd::Identity(r,r); // Set to identity because it's not yet known
-    T = Eigen::MatrixXd::Ones(n,r);     // Set to ones for same reason
+    W.setIdentity(6,6);                 // Default to identity (i.e. no weights)
+    K = Eigen::MatrixXd::Identity(6,6); // Set to identity because it's not yet known
+    T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();
@@ -49,12 +46,13 @@ void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
     if (!correctDimensions)
     {
         // Notify ros about wrong dimensions
+        ROS_WARN("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions.");
         return;
     }
 
-    W = W_new; // I think Eigen does a full deep copy here
+    W = W_new; // I have checked that Eigen does a deep copy here
 
-    // New weights mean we must recompute T_geninverse
+    // New weights mean we must recompute the generalized inverse of the T matrix
     computeGeneralizedInverse();
 }
 

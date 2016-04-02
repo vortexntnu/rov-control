@@ -21,11 +21,11 @@ private:
     unsigned int n; // Number of control forces (length of tau)
     unsigned int r; // Number of control inputs (length of u)
 
-    Eigen::MatrixXd W;            // (r*r) Control force weight matrix
-    Eigen::MatrixXd K;            // (r*r) Thrust coefficient matrix
-    Eigen::MatrixXd K_inverse;    // (r*r) Inverse of K
-    Eigen::MatrixXd T;            // (n*r) Thrust configuration matrix
-    Eigen::MatrixXd T_geninverse; // (r*n) Generalized inverse of T
+    Eigen::Matrix<double,6,6> W;            // (r*r) Control force weight matrix
+    Eigen::Matrix<double,6,6> K;            // (r*r) Thrust coefficient matrix
+    Eigen::Matrix<double,6,6> K_inverse;    // (r*r) Inverse of K
+    Eigen::Matrix<double,6,6> T;            // (n*r) Thrust configuration matrix
+    Eigen::Matrix<double,6,6> T_geninverse; // (r*n) Generalized inverse of T
 
     void computeGeneralizedInverse();
 };

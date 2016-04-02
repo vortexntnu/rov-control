@@ -17,19 +17,20 @@ void OpenLoopController::joyCallback(const joystick::Joystick &joy_msg)
     tau.torque.z = 0;
 
     // Let's limit these values
-    const double max = 10;
-    if (tau.force.x  >  max) {tau.force.x  =  max;}
-    if (tau.force.y  >  max) {tau.force.y  =  max;}
-    if (tau.force.z  >  max) {tau.force.z  =  max;}
-    if (tau.torque.x >  max) {tau.torque.x =  max;}
-    if (tau.torque.y >  max) {tau.torque.y =  max;}
-    if (tau.torque.z >  max) {tau.torque.z =  max;}
-    if (tau.force.x  < -max) {tau.force.x  = -max;}
-    if (tau.force.y  < -max) {tau.force.y  = -max;}
-    if (tau.force.z  < -max) {tau.force.z  = -max;}
-    if (tau.torque.x < -max) {tau.torque.x = -max;}
-    if (tau.torque.y < -max) {tau.torque.y = -max;}
-    if (tau.torque.z < -max) {tau.torque.z = -max;}
+    const double maxForce  = 10; // [N]  Max force in given direction
+    const double maxTorque = 2;  // [Nm] Max torque around given axis
+    if (tau.force.x  >  maxForce)  {tau.force.x  =  maxForce;}
+    if (tau.force.y  >  maxForce)  {tau.force.y  =  maxForce;}
+    if (tau.force.z  >  maxForce)  {tau.force.z  =  maxForce;}
+    if (tau.torque.x >  maxTorque) {tau.torque.x =  maxTorque;}
+    if (tau.torque.y >  maxTorque) {tau.torque.y =  maxTorque;}
+    if (tau.torque.z >  maxTorque) {tau.torque.z =  maxTorque;}
+    if (tau.force.x  < -maxForce)  {tau.force.x  = -maxForce;}
+    if (tau.force.y  < -maxForce)  {tau.force.y  = -maxForce;}
+    if (tau.force.z  < -maxForce)  {tau.force.z  = -maxForce;}
+    if (tau.torque.x < -maxTorque) {tau.torque.x = -maxTorque;}
+    if (tau.torque.y < -maxTorque) {tau.torque.y = -maxTorque;}
+    if (tau.torque.z < -maxTorque) {tau.torque.z = -maxTorque;}
 
     tauPub.publish(tau);
 }
@@ -37,10 +38,7 @@ void OpenLoopController::joyCallback(const joystick::Joystick &joy_msg)
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "controller_openloop");
-
     OpenLoopController openLoopController;
-
     ros::spin();
-
     return 0;
 }

@@ -3,6 +3,9 @@
 
 LagrangeAllocator::LagrangeAllocator()
 {
+    n = 6;
+    r = 6;
+
     tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
     uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
 
@@ -38,10 +41,10 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 {
     bool correctDimensions = ( W_new.rows() == r && W_new.cols() == r );
+    // ROS_INFO("correctDimensions = %d\n", correctDimensions);
     if (!correctDimensions)
     {
-        // Notify ros about wrong dimensions
-        ROS_WARN("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions.");
+        ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".\n");
         return;
     }
 

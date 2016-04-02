@@ -21,6 +21,9 @@ private:
     unsigned int n; // Number of control forces (length of tau)
     unsigned int r; // Number of control inputs (length of u)
 
+    Eigen::Matrix<double,6,1> tau; // (n) Control forces (forces and moments on the ROV)
+    Eigen::Matrix<double,6,1> u;   // (r) Control inputs (forces for each thruster)
+
     Eigen::Matrix<double,6,6> W;            // (r*r) Control force weight matrix
     Eigen::Matrix<double,6,6> K;            // (r*r) Thrust coefficient matrix
     Eigen::Matrix<double,6,6> K_inverse;    // (r*r) Inverse of K

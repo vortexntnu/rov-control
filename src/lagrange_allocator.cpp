@@ -1,5 +1,4 @@
 // See Fossen 2011, chapter 12.3.2
-
 #include "lagrange_allocator.h"
 
 LagrangeAllocator::LagrangeAllocator()
@@ -17,9 +16,6 @@ LagrangeAllocator::LagrangeAllocator()
 
 void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 {
-    // Is it better/faster to preallocate tau and u?
-
-    Eigen::VectorXd tau(n);
     tau << tauMsg.force.x,
            tauMsg.force.y,
            tauMsg.force.z,
@@ -27,7 +23,6 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
            tauMsg.torque.y,
            tauMsg.torque.z;
 
-    Eigen::VectorXd u(r);
     u = K_inverse * T_geninverse * tau;
 
     uranus_dp::ThrusterForces uMsg;

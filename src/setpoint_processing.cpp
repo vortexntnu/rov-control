@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string.h>
 #include "geometry_msgs/Twist.h"
-#include <joystick/DirectionInput.h>
+#include <joystick/DirectionalInput.h>
 
 // Delivers twist.msg
 
@@ -14,7 +14,7 @@ public:
         sub = n.subscribe("joy_input", 1, &SetpointProcessing::callback, this);
     }
 
-    void callback(const joystick::directional_input& input)
+    void callback(const joystick::DirectionalInput& input)
     {
         geometry_msgs::Twist output;
 

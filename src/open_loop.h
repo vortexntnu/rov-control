@@ -1,14 +1,14 @@
-#ifndef OPEN_LOOP_CONTROLLER_H
-#define OPEN_LOOP_CONTROLLER_H
+#ifndef OPEN_LOOP_H
+#define OPEN_LOOP_H
 
 #include "ros/ros.h"
 #include "geometry_msgs/Wrench.h"
 #include "joystick/Joystick.h"
 
-class OpenLoopController
+class OpenLoop
 {
 public:
-    OpenLoopController();
+    OpenLoop();
     void joyCallback(const joystick::Joystick &joy_msg);
 private:
     ros::NodeHandle n;

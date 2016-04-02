@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string.h>
 #include "geometry_msgs/Twist.h"
-#include <joystick/directional_input.h>
+#include <joystick/DirectionInput.h>
 
 // Delivers twist.msg
 

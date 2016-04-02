@@ -74,6 +74,7 @@ add_executable(state_estimator
 )
 target_link_libraries(state_estimator ${catkin_LIBRARIES})
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
+add_dependencies(state_estimator ${joystick_EXPORTED_TARGETS} ${ros_arduino_EXPORTED_TARGETS})
 
 # Model server node:
 add_executable(model_server

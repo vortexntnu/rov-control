@@ -11,13 +11,14 @@
 #include "uranus_dp/GetG.h"
 #include "uranus_dp/GetJ.h"
 #include <eigen_conversions/eigen_msg.h>
+#include "ros_arduino/SensorRaw.h"
 
 class ExtendedKalmanFilter
 {
 public:
     ExtendedKalmanFilter(double sampleTime);
     void controlCallback(const geometry_msgs::Wrench &uMsg);
-    // void sensorCallback(const uranus_dp::Sensor &yMsg);
+    void sensorCallback(const ros_arduino::SensorRaw &yMsg);
     void update();
 private:
     ros::NodeHandle    nh;
@@ -40,7 +41,7 @@ private:
     Eigen::Matrix<double, 6, 1> u; // Input
     Eigen::Matrix<double,13,13> E; // System noise dynamics
     Eigen::Matrix<double,13, 1> w; // System noise
-    Eigen::Matrix<double,10, 1> y; // Measurements
+    Eigen::Matrix<double,10, 1> y; // Measurements (see bottom of file)
     Eigen::Matrix<double,10,13> H; // Sensor dynamics
     Eigen::Matrix<double,10, 1> v; // Sensor noise
 
@@ -71,3 +72,10 @@ private:
 };
 
 #endif
+
+// y = [a, g, c, p]
+// where
+// a (length 3) is a vector of accelerations
+// g (length 3) is a vector of gyro measurements
+// c (length 3) is a vector of compass measurements
+// p (scalar) is the pressure

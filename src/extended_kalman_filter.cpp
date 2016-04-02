@@ -32,6 +32,20 @@ void ExtendedKalmanFilter::controlCallback(const geometry_msgs::Wrench &tauMsg)
          tauMsg.torque.z;
 }
 
+void ExtendedKalmanFilter::sensorCallback(const ros_arduino::SensorRaw &yMsg)
+{
+    y << yMsg.acceleration.x,
+         yMsg.acceleration.y,
+         yMsg.acceleration.z,
+         yMsg.compass.x,
+         yMsg.compass.y,
+         yMsg.compass.z,
+         yMsg.gyro.x,
+         yMsg.gyro.y,
+         yMsg.gyro.z,
+         yMsg.pressure;
+}
+
 void ExtendedKalmanFilter::update()
 {
     // Correction equations

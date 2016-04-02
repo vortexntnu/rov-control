@@ -4,6 +4,9 @@
 
 #include <std_msgs/String.h>
 #include <joystick/PwmRequests.h>
+#include <uranus_dp/ThrusterForces.h>
+
+#include "ForceToPwmLookup.h"
 
 
 //incleder for IMU og trykksensor
@@ -20,14 +23,22 @@ MS5803_14BA depthSensor;
 
 ros::NodeHandle nh;
 
+
 ros_arduino::SensorRaw sensor_raw_msg;
 ros::Publisher pub_imu( "SensorRaw", &sensor_raw_msg);
 
+const int SensorReadDelay = 83;
+unsigned long PrevoiusSensorReadMillis = 0;
+
 //PWM-variable:
 int dbg_count = 0;
-const int pwm_count = 6;
-int internal_pwm_out[pwm_count];
-const int pwm_pins[] = { 3, 5, 6, 9, 10, 11 };
+const int PwmCount = 6;
+int PwmOnTime[PwmCount];
+const int PwmPins[PwmCount] = { 3, 5, 6, 9, 10, 11 };
+const int PwmTotalTime = 3600;
+int PwmPinState[PwmCount] = { LOW, LOW, LOW, LOW, LOW, LOW };
+unsigned long PreviousToggleMicros[PwmCount] = { 0, 0, 0, 0, 0, 0 };
+
 
 
 joystick::PwmRequests  pwm_status_msg;
@@ -39,35 +50,33 @@ ros::Publisher arduino_dbg_pub("ArduinoDbg", &arduino_dbg_msg);
 
 
 
-void pwm_update( const joystick::PwmRequests& pwm_input ){
-
-
-    internal_pwm_out[0] = (pwm_input.pwm1 >> 8) + 128;
-    internal_pwm_out[1] = (pwm_input.pwm2 >> 8) + 128;
-    internal_pwm_out[2] = (pwm_input.pwm3 >> 8) + 128;
-    internal_pwm_out[3] = (pwm_input.pwm4 >> 8) + 128;
-    internal_pwm_out[4] = (pwm_input.pwm5 >> 8) + 128;
-    internal_pwm_out[5] = (pwm_input.pwm6 >> 8) + 128;
-    
-
-    //Send PWM-verdiene tilbake som debugoutput
-    pwm_status_msg.pwm1 = internal_pwm_out[0];
-    pwm_status_msg.pwm2 = internal_pwm_out[1];
-    pwm_status_msg.pwm3 = internal_pwm_out[2];
-    pwm_status_msg.pwm4 = internal_pwm_out[3];
-    pwm_status_msg.pwm5 = internal_pwm_out[4];
-    pwm_status_msg.pwm6 = internal_pwm_out[5];
-
-    dbg_count = 0;
-
-    pwm_status_pub.publish( &pwm_status_msg );
-
-
-    
+void pwm_update( const uranus_dp::ThrusterForces& force_input ){
+  
+  PwmOnTime[0] = ForceToPwm(force_input.F1);
+  PwmOnTime[1] = ForceToPwm(force_input.F2);
+  PwmOnTime[2] = ForceToPwm(force_input.F3);
+  PwmOnTime[3] = ForceToPwm(force_input.F4);
+  PwmOnTime[4] = ForceToPwm(force_input.F5);
+  PwmOnTime[5] = ForceToPwm(force_input.F6);
+  
+  
+  //Send PWM-verdiene tilbake som debugoutput
+  pwm_status_msg.pwm1 = PwmOnTime[0];
+  pwm_status_msg.pwm2 = PwmOnTime[1];
+  pwm_status_msg.pwm3 = PwmOnTime[2];
+  pwm_status_msg.pwm4 = PwmOnTime[3];
+  pwm_status_msg.pwm5 = PwmOnTime[4];
+  pwm_status_msg.pwm6 = PwmOnTime[5];
+  
+  dbg_count = 0;
+  
+  pwm_status_pub.publish( &pwm_status_msg );
+  
+  
+  
 }
 
-//TODO: fiks navn på topic "pwm_requests"
-ros::Subscriber<joystick::PwmRequests> pwm_input_sub("pwm_requests", &pwm_update );
+ros::Subscriber<uranus_dp::ThrusterForces> pwm_input_sub("controlInput", &pwm_update );
 
 
 double GyroLsbSens, AccelLsbSens;
@@ -154,6 +163,13 @@ void setup() {
 
   nh.spinOnce();
 
+
+  //sett alle motorer til 0 Newton
+  for(int i = 0; i < PwmCount; i++) {
+    PwmOnTime[i] = ForceToPwm(0);
+  }
+  
+
 }
 
 
@@ -193,37 +209,64 @@ void loop(){
 
 
   nh.spinOnce();
-  lesSensorer();
-  nh.spinOnce();
-  pub_imu.publish(&sensor_raw_msg);
-  
-  nh.spinOnce();
-  dbg_count++;
-  nh.spinOnce();
 
+  /*
+    //komenterte vekk IMU for å kunne bruke software-PWM uten forstyrrelser
+
+  if( millis() - PrevoiusSensorReadMillis >= SensorReadDelay ) {
+    PrevoiusSensorReadMillis = millis();
+  
+    lesSensorer();
+    //nh.spinOnce();
+    pub_imu.publish(&sensor_raw_msg);
+    
+    //nh.spinOnce();
+    //dbg_count++;
+    //nh.spinOnce();
+
+    
+    
+    
+  }
+  */
+  
   
   /*
   //String dbg_msg = "pwm updated after " + String(dbg_count) + " cycles";
   //String dbg_msg = "accelX = " ;//+ String(imu.read(MPU9150_ACCEL_XOUT_L, MPU9150_ACCEL_XOUT_H));
   String dbg_msg = String("GyroFsRange = ") + String(GyroFsRange) +
-    String("\nAccelFsRange = ") + String(AccelFsRange);
+  String("\nAccelFsRange = ") + String(AccelFsRange);
   arduino_dbg_msg.data = dbg_msg.c_str();
   arduino_dbg_pub.publish( &arduino_dbg_msg );  
   nh.spinOnce();
   */
-  
-  
-  //oppateringsfekvens på 100Hz
-  delay(10);
-  
-  
-
-  //delay(500);
 
 
-  for(int i = 0; i < pwm_count; i++) {
-    nh.spinOnce();
-    analogWrite(pwm_pins[i], internal_pwm_out[i]);
+  //Software-PWM
+  for(int i = 0; i < PwmCount; i++) {
+     nh.spinOnce();
+    
+    unsigned long CurrentMicros = micros();
+    if(PwmPinState[i] == HIGH) {
+      if(CurrentMicros - PreviousToggleMicros[i] >= PwmOnTime[i]) {
+	PwmPinState[i] = LOW;
+	digitalWrite(PwmPins[i], PwmPinState[i]);
+	PreviousToggleMicros[i] = CurrentMicros;
+
+	
+      }
+    } else { // (PwmPinState[i] == LOW)
+      if(CurrentMicros - PreviousToggleMicros[i] >= PwmTotalTime - PwmOnTime[i] ) {
+	PwmPinState[i] = HIGH;
+	digitalWrite(PwmPins[i], PwmPinState[i]);
+	PreviousToggleMicros[i] = CurrentMicros;
+      }
+      
+    }
+
+    
+    //analogWrite(pwm_pins[i], PwmOnTime[i]);
+    
   }
 
 

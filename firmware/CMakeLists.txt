@@ -11,6 +11,7 @@ include_directories(${ROS_LIB_DIR})
 generate_arduino_firmware(ros_arduino
   SRCS
 	ros_arduino.cpp
+	ForceToPwmLookup.cpp
 	${ROS_LIB_DIR}/time.cpp
 	MPU6050/MPU6050.cpp
 	I2Cdev/I2Cdev.cpp

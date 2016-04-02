@@ -32,7 +32,7 @@ rosserial_generate_ros_lib(
 )
 
 add_dependencies(ros_arduino_ros_lib
-	#uranus_dp_generate_messages
+	uranus_dp_generate_messages
 	ros_arduino_generate_messages
 	joystick_generate_messages
 )

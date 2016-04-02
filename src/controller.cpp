@@ -4,8 +4,9 @@
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "controller");
-
     QuaternionPdController controller;
+
+    // ROS_INFO("good");
 
     unsigned int frequency = 10; // Param server
     ros::Rate loop_rate(frequency);

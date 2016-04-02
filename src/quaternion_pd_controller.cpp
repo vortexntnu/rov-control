@@ -39,6 +39,7 @@ void QuaternionPdController::compute()
 
 void QuaternionPdController::updateProportionalGainMatrix()
 {
+
     K_P << R.transpose() * K_p,        Eigen::MatrixXd::Zero(3,3),
            Eigen::MatrixXd::Zero(3,3), c*Eigen::MatrixXd::Identity(3,3);
 }

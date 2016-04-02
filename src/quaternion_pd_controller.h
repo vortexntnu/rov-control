@@ -23,23 +23,23 @@ private:
     // State
     Eigen::Vector3d    p;  // Position
     Eigen::Quaterniond q;  // Attitude
-    Eigen::VectorXd    nu; // Velocity (linear and angular)
+    Eigen::Matrix<double, 6, 1> nu; // Velocity (linear and angular)
 
     // Desired state
     Eigen::Vector3d    p_d; // Desired position
     Eigen::Quaterniond q_d; // Desired attitude
 
     // Error variables
-    Eigen::VectorXd z; // (6) Pose error vector
+    Eigen::Matrix<double, 6, 1> z; // (6) Pose error vector
 
     // Other stuff
-    Eigen::VectorXd g;   // (6)   Restoring force vector
-    Eigen::Matrix3d R;   // (3*3) Rotation matrix from {n} to {b}
+    Eigen::Matrix<double, 6, 1> g;     // (6)   Restoring force vector
+    Eigen::Matrix<double, 3, 3> R;   // (3*3) Rotation matrix from {n} to {b}
 
     // Controller gains
-    Eigen::MatrixXd K_P; // (6*6) Proportional gain matrix
-    Eigen::MatrixXd K_D; // (6*6) Derivative gain matrix
-    Eigen::Matrix3d K_p; // (3*3) Position error gain matrix (part of K_P)
+    Eigen::Matrix<double, 6, 6> K_P; // (6*6) Proportional gain matrix
+    Eigen::Matrix<double, 6, 6> K_D; // (6*6) Derivative gain matrix
+    Eigen::Matrix<double, 3, 3> K_p; // (3*3) Position error gain matrix (part of K_P)
     double c;            //       Attitude error gain scalar
 
     // Constants

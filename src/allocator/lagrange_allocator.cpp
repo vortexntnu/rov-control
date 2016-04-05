@@ -10,8 +10,14 @@ LagrangeAllocator::LagrangeAllocator()
     uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
 
     W.setIdentity(6,6);                 // Default to identity (i.e. no weights)
-    K = Eigen::MatrixXd::Identity(6,6); // Set to identity because it's not yet known
-    T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
+    K = Eigen::MatrixXd::Identity(6,6); // Scaling is done on Arduino, so this can be identity
+    
+    T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    ,
+         -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    ,
+          0      ,  0      ,  0      ,  0      ,  0    ,  0    ,
+          0.06718, -0.06718,  0.06718, -0.06718,  0    ,  0    ,
+          0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210,
+          0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165;
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();

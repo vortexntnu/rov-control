@@ -11,7 +11,8 @@ LagrangeAllocator::LagrangeAllocator()
 
     W.setIdentity(6,6);                 // Default to identity (i.e. no weights)
     K = Eigen::MatrixXd::Identity(6,6); // Set to identity because it's not yet known
-    T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
+    // T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
+    T = Eigen::MatrixXd::Identity(6,6);     // Set to ones for same reason
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();

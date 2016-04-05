@@ -30,12 +30,12 @@ LagrangeAllocator::LagrangeAllocator()
     tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
     uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
 
-    W.setIdentity(6,6);                 // Default to identity (i.e. no weights)
-    K = Eigen::MatrixXd::Identity(6,6); // Scaling is done on Arduino, so this can be identity
+    W.setIdentity(6,6); // Default to identity (i.e. no weights)
+    K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity
     
     T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    ,
          -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    ,
-          0      ,  0      ,  0      ,  0      ,  0    ,  0    ,
+          0      ,  0      ,  0      ,  0      ,  0.1  , -0.1  , // Nonzero elements added to make matrix nonsingular
           0.06718, -0.06718,  0.06718, -0.06718,  0    ,  0    ,
           0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210,
           0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165;

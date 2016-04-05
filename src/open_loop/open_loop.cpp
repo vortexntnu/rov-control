@@ -14,7 +14,8 @@ void OpenLoop::joyCallback(const joystick::Joystick &joy_msg)
     geometry_msgs::Wrench tau;
     tau.force.x  = joy_msg.strafe_X * scalingLinear;
     tau.force.y  = joy_msg.strafe_Y * scalingLinear;
-    tau.force.z  = joy_msg.ascend   * scalingLinear;
+    // tau.force.z  = joy_msg.ascend   * scalingLinear;
+    tau.force.z = 0; // Cannot control heave on test ROV
     tau.torque.x = joy_msg.turn_X   * scalingAngular;
     tau.torque.y = joy_msg.turn_Y   * scalingAngular;
     tau.torque.z = 0;

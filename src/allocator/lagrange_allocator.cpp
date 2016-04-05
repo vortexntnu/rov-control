@@ -18,12 +18,8 @@ LagrangeAllocator::LagrangeAllocator()
 
     W.setIdentity(6,6);                 // Default to identity (i.e. no weights)
     K = Eigen::MatrixXd::Identity(6,6); // Set to identity because it's not yet known
-    T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
-    // T = Eigen::MatrixXd::Identity(6,6);     // Set to ones for same reason
-
-    if( is_fucked(T.inverse() ) ){
-        ROS_WARN("It's fucked");
-    }
+    // T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
+    T = Eigen::MatrixXd::Identity(6,6);     // Set to ones for same reason
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();
@@ -39,6 +35,10 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
            tauMsg.torque.z;
 
     u = K_inverse * T_geninverse * tau;
+
+    if(is_fucked(K_inverse)){
+        ROS_WARN("K is not invertible");
+    }
 
     uranus_dp::ThrusterForces uMsg;
     uMsg.F1 = u(0);
@@ -81,6 +81,4 @@ void LagrangeAllocator::computeGeneralizedInverse()
     if(is_fucked( (T*W.inverse()*T.transpose()).inverse() ) ){
         ROS_WARN("T * W_inv * T transposed is not invertible");
     }
-
-
 } 

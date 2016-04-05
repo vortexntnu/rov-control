@@ -1,6 +1,13 @@
 // See Fossen 2011, chapter 12.3.2
 #include "lagrange_allocator.h"
 
+template<typename Derived>
+inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
+{
+    return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
+}
+
+
 LagrangeAllocator::LagrangeAllocator()
 {
     n = 6;
@@ -11,8 +18,12 @@ LagrangeAllocator::LagrangeAllocator()
 
     W.setIdentity(6,6);                 // Default to identity (i.e. no weights)
     K = Eigen::MatrixXd::Identity(6,6); // Set to identity because it's not yet known
-    // T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
-    T = Eigen::MatrixXd::Identity(6,6);     // Set to ones for same reason
+    T = Eigen::MatrixXd::Ones(6,6);     // Set to ones for same reason
+    // T = Eigen::MatrixXd::Identity(6,6);     // Set to ones for same reason
+
+    if( is_fucked(T.inverse() ) ){
+        ROS_WARN("It's fucked");
+    }
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();
@@ -58,4 +69,18 @@ void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 void LagrangeAllocator::computeGeneralizedInverse()
 {
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
-}
+
+    if(is_fucked(T_geninverse)){
+        ROS_WARN("T_geninverse NAN");
+    }
+
+    if(is_fucked( W.inverse() )){
+        ROS_WARN("W is not invertible");
+    }
+
+    if(is_fucked( (T*W.inverse()*T.transpose()).inverse() ) ){
+        ROS_WARN("T * W_inv * T transposed is not invertible");
+    }
+
+
+} 

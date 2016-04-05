@@ -1,6 +1,14 @@
 // See Fossen 2011, chapter 12.3.2
 #include "lagrange_allocator.h"
 
+template<typename Derived>
+inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
+{
+    return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
+}
+
+
+
 LagrangeAllocator::LagrangeAllocator()
 {
     n = 6;
@@ -34,6 +42,11 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 
     u = K_inverse * T_geninverse * tau;
 
+    if(is_fucked(K_inverse))
+    {
+        ROS_WARN("K is not invertible");
+    }
+
     uranus_dp::ThrusterForces uMsg;
     uMsg.F1 = u(0);
     uMsg.F2 = u(1);
@@ -63,4 +76,19 @@ void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 void LagrangeAllocator::computeGeneralizedInverse()
 {
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
-}
+
+    if(is_fucked(T_geninverse))
+    {
+        ROS_WARN("T_geninverse NAN");
+    }
+
+    if(is_fucked( W.inverse() ))
+    {
+        ROS_WARN("W is not invertible");
+    }
+
+    if(is_fucked( (T*W.inverse()*T.transpose()).inverse() ) )
+    {
+        ROS_WARN("T * W_inv * T transposed is not invertible");
+    }
+} 

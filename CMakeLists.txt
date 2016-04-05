@@ -48,16 +48,16 @@ include_directories(
 
 
 # Control allocation node:
-add_executable(allocation
-  src/allocation.cpp
-  src/lagrange_allocator.cpp)
-target_link_libraries(allocation ${catkin_LIBRARIES})
-add_dependencies(allocation uranus_dp_generate_messages_cpp)
+add_executable(allocator
+  src/allocator/allocator.cpp
+  src/allocator/lagrange_allocator.cpp)
+target_link_libraries(allocator ${catkin_LIBRARIES})
+add_dependencies(allocator uranus_dp_generate_messages_cpp)
 
 # Controller node:
 add_executable(controller
-  src/controller.cpp
-  src/quaternion_pd_controller.cpp
+  src/controller/controller.cpp
+  src/controller/quaternion_pd_controller.cpp
 )
 target_link_libraries(controller ${catkin_LIBRARIES})
 add_dependencies(controller uranus_dp_generate_messages_cpp)
@@ -69,8 +69,8 @@ add_dependencies(setpoint_processing uranus_dp_generate_messages_cpp)
 
 # State estimator node:
 add_executable(state_estimator
-  src/state_estimator.cpp
-  src/extended_kalman_filter.cpp
+  src/state_estimator/state_estimator.cpp
+  src/state_estimator/extended_kalman_filter.cpp
 )
 target_link_libraries(state_estimator ${catkin_LIBRARIES})
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
@@ -83,7 +83,8 @@ target_link_libraries(model_server ${catkin_LIBRARIES})
 add_dependencies(model_server uranus_dp_generate_messages_cpp)
 
 # Open loop mode, used only for testing:
-add_executable(open_loop src/open_loop.cpp)
+add_executable(open_loop
+  src/open_loop/open_loop.cpp)
 target_link_libraries(open_loop ${catkin_LIBRARIES})
 add_dependencies(open_loop uranus_dp_generate_messages_cpp)
 add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})

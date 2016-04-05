@@ -8,12 +8,15 @@ OpenLoop::OpenLoop()
 
 void OpenLoop::joyCallback(const joystick::Joystick &joy_msg)
 {
+    double scalingLinear  = 0.0003052;  // Max 10 Newton
+    double scalingAngular = 0.00006104; // Max 2 Newton meters
+
     geometry_msgs::Wrench tau;
-    tau.force.x  = joy_msg.strafe_X;
-    tau.force.y  = joy_msg.strafe_X;
-    tau.force.z  = joy_msg.ascend;
-    tau.torque.x = joy_msg.turn_X;
-    tau.torque.y = joy_msg.turn_Y;
+    tau.force.x  = joy_msg.strafe_X * scalingLinear;
+    tau.force.y  = joy_msg.strafe_Y * scalingLinear;
+    tau.force.z  = joy_msg.ascend   * scalingLinear;
+    tau.torque.x = joy_msg.turn_X   * scalingAngular;
+    tau.torque.y = joy_msg.turn_Y   * scalingAngular;
     tau.torque.z = 0;
 
     // Let's limit these values

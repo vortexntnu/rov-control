@@ -10,6 +10,7 @@ inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
 
 // Worlds worst print function :DDD
 void printMatrix(Eigen::MatrixXd m){
+    ROS_INFO("----------------------------------");
     for(int col = 0; col < 6; col++){
 
         char buffer[512];
@@ -19,6 +20,7 @@ void printMatrix(Eigen::MatrixXd m){
         }
         ROS_INFO("%s", buffer);
     }
+    ROS_INFO("----------------------------------\n");
 }
 
 
@@ -91,6 +93,11 @@ void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 void LagrangeAllocator::computeGeneralizedInverse()
 {
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
+
+    printMatrix(T_geninverse);
+    printMatrix(W);
+    printMatrix(T);
+    printMatrix(K_inverse);
 
     if(is_fucked(T_geninverse))
     {

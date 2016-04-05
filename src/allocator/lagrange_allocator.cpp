@@ -1,5 +1,6 @@
 // See Fossen 2011, chapter 12.3.2
 #include "lagrange_allocator.h"
+#include <iostream>
 
 template<typename Derived>
 inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
@@ -7,6 +8,18 @@ inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
     return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
 
+// Worlds worst print function :DDD
+void printMatrix(Eigen::MatrixXd m){
+    for(int col = 0; col < 6; col++){
+
+        char buffer[512];
+
+        for(int row = 0; row < 6; row++){
+            snprintf( (buffer + (row*8) ), sizeof(buffer), "  %f  ", m(col, row));
+        }
+        ROS_INFO("%s", buffer);
+    }
+}
 
 
 LagrangeAllocator::LagrangeAllocator()
@@ -26,6 +39,8 @@ LagrangeAllocator::LagrangeAllocator()
           0.06718, -0.06718,  0.06718, -0.06718,  0    ,  0    ,
           0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210,
           0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165;
+
+    printMatrix(T);
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();

@@ -9,7 +9,7 @@ inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
 }
 
 // Worlds worst print function :DDD
-void printMatrix(Eigen::MatrixXd m){
+void printMatrix6x6(Eigen::MatrixXd m){
     for(int col = 0; col < 6; col++){
 
         char buffer[512];
@@ -24,7 +24,7 @@ void printMatrix(Eigen::MatrixXd m){
 
 LagrangeAllocator::LagrangeAllocator()
 {
-    n = 6;
+    n = 4;
     r = 6;
 
     tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
@@ -33,14 +33,11 @@ LagrangeAllocator::LagrangeAllocator()
     W.setIdentity(6,6); // Default to identity (i.e. no weights)
     K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity
 
-    T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    ,
-         -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    ,
-         -0.01   ,  0.01   ,  0.01   , -0.01   ,  0    ,  0    , // Nonzero elements added to make matrix nonsingular
-          0.06718, -0.06718,  0.06718, -0.06718,  0    ,  0    ,
-          0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210,
-          0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165;
-
-    printMatrix(T);
+    // Our test ROV cannot control heave and roll, so they are removed from the control objective
+    T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    , // Surge
+         -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    , // Sway
+          0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210, // Pitch
+          0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165; // Yaw
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();
@@ -50,8 +47,8 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 {
     tau << tauMsg.force.x,
            tauMsg.force.y,
-           tauMsg.force.z,
-           tauMsg.torque.x,
+           // tauMsg.force.z,  // Not part of control objective for test rov
+           // tauMsg.torque.x, // Ditto
            tauMsg.torque.y,
            tauMsg.torque.z;
 
@@ -70,12 +67,13 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
     uMsg.F5 = u(4);
     uMsg.F6 = u(5);
     uPub.publish(uMsg);
+
+    ROS_INFO_STREAM("Published: " <<u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
 }
 
 void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 {
     bool correctDimensions = ( W_new.rows() == r && W_new.cols() == r );
-    // ROS_INFO("correctDimensions = %d\n", correctDimensions);
     if (!correctDimensions)
     {
         ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".\n");
@@ -84,7 +82,7 @@ void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 
     W = W_new; // I have checked that Eigen does a deep copy here
 
-    // New weights mean we must recompute the generalized inverse of the T matrix
+    // New weights mean we must recompute the generalized inverse of the  matrix
     computeGeneralizedInverse();
 }
 

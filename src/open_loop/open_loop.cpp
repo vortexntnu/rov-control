@@ -9,12 +9,12 @@ OpenLoop::OpenLoop()
 void OpenLoop::joyCallback(const joystick::Joystick &joy_msg)
 {
     geometry_msgs::Wrench tau;
-    tau.force.x  = joy_msg.strafe_X * normalization * scalingLinear;
-    tau.force.y  = joy_msg.strafe_Y * normalization * scalingLinear;
-    tau.force.z  = joy_msg.ascend   * normalization * scalingLinear;
+    tau.force.x  = joy_msg.strafe_X * NORMALIZATION * SCALING_LIN;
+    tau.force.y  = joy_msg.strafe_Y * NORMALIZATION * SCALING_LIN;
+    tau.force.z  = joy_msg.ascend   * NORMALIZATION * SCALING_LIN;
     tau.torque.x = 0;
-    tau.torque.y = joy_msg.turn_X   * normalization * scalingAngular;
-    tau.torque.z = joy_msg.turn_Y   * normalization * scalingAngular;
+    tau.torque.y = joy_msg.turn_X   * NORMALIZATION * SCALING_ANG;
+    tau.torque.z = joy_msg.turn_Y   * NORMALIZATION * SCALING_ANG;
 
     tauPub.publish(tau);
 }

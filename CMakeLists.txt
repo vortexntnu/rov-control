@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Eigen REQUIRED)
+find_package(GTest REQUIRED)
 
 add_message_files(DIRECTORY msg FILES
   ThrusterForces.msg
@@ -43,6 +44,7 @@ include_directories(
   include
   ${roscpp_INCLUDE_DIRS}
   ${EIGEN_INCLUDE_DIRS}
+  ${GTEST_INCLUDE_DIRS}
 )
 
 
@@ -94,3 +96,9 @@ add_executable(dummy_joystick
   src/dummy_joystick.cpp)
 target_link_libraries(dummy_joystick ${catkin_LIBRARIES})
 add_dependencies(dummy_joystick uranus_dp_generate_messages_cpp)
+
+
+
+# Test file stuff
+catkin_add_gtest(utest src/test/utest.cpp)
+target_link_libraries(utest ${catkin_LIBRARIES})

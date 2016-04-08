@@ -88,3 +88,9 @@ add_executable(open_loop
 target_link_libraries(open_loop ${catkin_LIBRARIES})
 add_dependencies(open_loop uranus_dp_generate_messages_cpp)
 add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})
+
+# Joystick dummy node:
+add_executable(dummy_joystick
+  src/dummy_joystick.cpp)
+target_link_libraries(dummy_joystick ${catkin_LIBRARIES})
+add_dependencies(dummy_joystick uranus_dp_generate_messages_cpp)

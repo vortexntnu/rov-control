@@ -11,7 +11,7 @@ void OpenLoop::joyCallback(const joystick::Joystick &joy_msg)
     geometry_msgs::Wrench tau;
     tau.force.x  = joy_msg.strafe_X * NORMALIZATION * SCALING_LIN;
     tau.force.y  = joy_msg.strafe_Y * NORMALIZATION * SCALING_LIN;
-    tau.force.z  = joy_msg.ascend   * NORMALIZATION * SCALING_LIN;
+    tau.force.z  = 0;
     tau.torque.x = 0;
     tau.torque.y = joy_msg.turn_X   * NORMALIZATION * SCALING_ANG;
     tau.torque.z = joy_msg.turn_Y   * NORMALIZATION * SCALING_ANG;

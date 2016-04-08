@@ -3,7 +3,7 @@
 OpenLoop::OpenLoop()
 {
     joySub = n.subscribe("joystick", 1, &OpenLoop::joyCallback, this);
-    tauPub = n.advertise<geometry_msgs::Wrench>("controlForces", 1);
+    tauPub = n.advertise<geometry_msgs::Wrench>("control_forces", 1);
 }
 
 void OpenLoop::joyCallback(const joystick::Joystick &joy_msg)

@@ -3,7 +3,7 @@
 #include <iostream>
 
 template<typename Derived>
-inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
+inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
 {
     return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
@@ -24,13 +24,13 @@ void printMatrix6x6(Eigen::MatrixXd m){
 
 LagrangeAllocator::LagrangeAllocator()
 {
-    n = 4;
-    r = 6;
+    // n = 4;
+    // r = 6;
 
-    tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
-    uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
+    tauSub = nh.subscribe("control_forces", 1, &LagrangeAllocator::tauCallback, this);
+    uPub   = nh.advertise<uranus_dp::ThrusterForces>("control_inputs", 1);
 
-    W.setIdentity(6,6); // Default to identity (i.e. no weights)
+    W.setIdentity(6,6); // Default to identity (i.e. equal weights)
     K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity
 
     // Our test ROV cannot control heave and roll, so they are removed from the control objective
@@ -54,7 +54,7 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 
     u = K_inverse * T_geninverse * tau;
 
-    if(is_fucked(K_inverse))
+    if (isFucked(K_inverse))
     {
         ROS_WARN("K is not invertible");
     }
@@ -68,7 +68,7 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
     uMsg.F6 = u(5);
     uPub.publish(uMsg);
 
-    ROS_INFO_STREAM("Published: " <<u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
+    ROS_INFO_STREAM("Published: " << u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
 }
 
 void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
@@ -76,13 +76,13 @@ void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
     bool correctDimensions = ( W_new.rows() == r && W_new.cols() == r );
     if (!correctDimensions)
     {
-        ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".\n");
+        ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".");
         return;
     }
 
-    W = W_new; // I have checked that Eigen does a deep copy here
+    W = W_new;
 
-    // New weights mean we must recompute the generalized inverse of the  matrix
+    // New weights require recomputing the generalized inverse of the thrust config matrix
     computeGeneralizedInverse();
 }
 
@@ -90,17 +90,17 @@ void LagrangeAllocator::computeGeneralizedInverse()
 {
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
 
-    if(is_fucked(T_geninverse))
+    if (isFucked(T_geninverse))
     {
         ROS_WARN("T_geninverse NAN");
     }
 
-    if(is_fucked( W.inverse() ))
+    if (isFucked( W.inverse() ))
     {
         ROS_WARN("W is not invertible");
     }
 
-    if(is_fucked( (T*W.inverse()*T.transpose()).inverse() ) )
+    if (isFucked( (T*W.inverse()*T.transpose()).inverse() ) )
     {
         ROS_WARN("T * W_inv * T transposed is not invertible");
     }

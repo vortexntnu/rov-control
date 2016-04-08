@@ -11,10 +11,10 @@ The Uranus dynamic positioning system, a complete control system for our ROV.
 ## Todo
 - [x] Implement model node (with get-services for model matrices) 
 - [ ] Add matrix values to model node
-- [ ] Write sensorCallback for EKF
+- [x] Write sensorCallback for EKF
 - [ ] Implement del_f_del_x in EKF
-- [ ] Get values for K and T for Lagrange allocator
+- [x] Get values for K and T for Lagrange allocator
 - [ ] Get values r_g, r_b, W, B for Quaternion controller
-- [ ] Move skew function out of Quaternion controller class?
+- [x] Move skew function out of Quaternion controller class?
 - [ ] Normalize quaternions everywhere
 - [ ] Split ExtendedKalmanFilter::updateSystemDynamics()

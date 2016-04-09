@@ -27,6 +27,7 @@ add_service_files(DIRECTORY srv FILES
   GetR.srv
   GetT.srv
   GetJ.srv
+  ToggleControlMode.srv
 )
 
 generate_messages(DEPENDENCIES geometry_msgs)

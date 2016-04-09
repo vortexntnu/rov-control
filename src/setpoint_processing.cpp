@@ -1,61 +1,93 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
-#include <iostream>
-#include <string.h>
-#include "geometry_msgs/Twist.h"
+#include "geometry_msgs/Wrench.h"
+#include "geometry_msgs/Pose.h"
 #include <joystick/DirectionalInput.h>
+#include <string>
+#include "uranus_dp/ToggleControlMode.h"
 
-// Delivers twist.msg
-
-class SetpointProcessing{
+class SetpointProcessing
+{
 public:
-    SetpointProcessing(){
-        pub = n.advertise<geometry_msgs::Twist>("temp", 1);
-        sub = n.subscribe("joy_input", 1, &SetpointProcessing::callback, this);
+    SetpointProcessing()
+    {
+        joystickSub = nh.subscribe("joy_input", 1, &SetpointProcessing::callback, this);
+        wrenchPub   = nh.advertise<geometry_msgs::Wrench>("open_loop_setpoint", 1);
+        posePub     = nh.advertise<geometry_msgs::Pose>("stationkeeping_setpoint", 1);
+        modeClient  = nh.serviceClient<uranus_dp::ToggleControlMode>("toggle_control_mode");
+
+        control_mode = joystick::DirectionalInput::OPEN_LOOP;
     }
 
-    void callback(const joystick::DirectionalInput& input)
+    void callback(const joystick::DirectionalInput &joy_msg)
     {
-        geometry_msgs::Twist output;
+        if (joy_msg.control_mode != control_mode)
+        {
+            control_mode = joy_msg.control_mode;
+            uranus_dp::ToggleControlMode srv;
+            if (!modeClient.call(srv))
+            {
+                ROS_ERROR_STREAM("Failed to call service toggle_control_mode. New mode " << controlModeString(control_mode) << " not activated.");
+            }
+        }
 
-        output.linear.x = (input.strafe_X/STRAFE_RANGE)*MAX_LINEAR_X;
-        output.linear.y = (input.strafe_Y/STRAFE_RANGE)*MAX_LINEAR_Y;
-        output.linear.z = (input.ascend/ASCEND_RANGE)*MAX_LINEAR_Z;
-        output.angular.x = 0.0;
-        output.angular.y = (input.turn_Y/TURN_RANGE)*MAX_ANGULAR_X;
-        output.angular.z = (input.turn_X/TURN_RANGE)*MAX_ANGULAR_Z;
-
-        pub.publish(output);
-        // printf("aa");
+        if (control_mode == joystick::DirectionalInput::OPEN_LOOP)
+        {
+            geometry_msgs::Wrench setpoint_msg;
+            setpoint_msg.force.x  = joy_msg.strafe_X * NORMALIZATION * SCALING_LIN;
+            setpoint_msg.force.y  = joy_msg.strafe_Y * NORMALIZATION * SCALING_LIN;
+            setpoint_msg.force.z  = 0;
+            setpoint_msg.torque.x = 0;
+            setpoint_msg.torque.y = joy_msg.turn_X * NORMALIZATION * SCALING_ANG;
+            setpoint_msg.torque.z = joy_msg.turn_Y * NORMALIZATION * SCALING_ANG;
+            wrenchPub.publish(setpoint_msg);
+        }
+        else if (control_mode == joystick::DirectionalInput::STATIONKEEPING)
+        {
+            // Todo: Actually populate the pose message with values
+            geometry_msgs::Pose setpoint_msg;
+            setpoint_msg.position.x    = 0;
+            setpoint_msg.position.y    = 0;
+            setpoint_msg.position.z    = 0;
+            setpoint_msg.orientation.x = 0;
+            setpoint_msg.orientation.y = 0;
+            setpoint_msg.orientation.z = 0;
+            setpoint_msg.orientation.w = 0;
+            posePub.publish(setpoint_msg);
+        }
+        else
+        {
+            ROS_ERROR_STREAM("Invalid mode " << control_mode << " detected. Will not send setpoint message.");
+        }
     }
 
 private:
-    ros::NodeHandle n;
-    ros::Publisher  pub;
-    ros::Subscriber sub;
+    ros::NodeHandle    nh;
+    ros::Subscriber    joystickSub;
+    ros::Publisher     wrenchPub;
+    ros::Publisher     posePub;
+    ros::ServiceClient modeClient;
 
-    static const double MAX_LINEAR_X  = 1.0;
-    static const double MAX_LINEAR_Y  = 1.0;
-    static const double MAX_LINEAR_Z  = 1.0;
-    static const double MAX_ANGULAR_X = 1.0;
-    static const double MAX_ANGULAR_Y = 1.0;
-    static const double MAX_ANGULAR_Z = 1.0;
+    int control_mode;
 
-    static const int STRAFE_RANGE = 10;
-    static const int TURN_RANGE   = 10;
-    static const int ASCEND_RANGE = 10;
+    static const double NORMALIZATION = 0.000030517578125; // Scale joystick inputs down to [-1, 1]
+    static const double SCALING_LIN   = 10;                // Scale forces up to [-10, 10] (Newton)
+    static const double SCALING_ANG   = 2;                 // Scale torques up to [-2, 2] (Newton meters)
 
-    // static const int STRAFE_RANGE = (2 << 16);
-    // static const int TURN_RANGE   = (2 << 16);
-    // static const int ASCEND_RANGE = (2 << 16);
+    std::string controlModeString(int mode)
+    {
+        if (mode == joystick::DirectionalInput::OPEN_LOOP)
+            return "open loop";
+        else if (mode == joystick::DirectionalInput::STATIONKEEPING)
+            return "stationkeeping";
+        else
+            return "invalid mode";
+    }
 };
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "setpoint_processing");
-
-    SetpointProcessing f;
-
+    ROS_INFO("Launching node setpoint_processing.");
+    SetpointProcessing s;
     ros::spin();
-
     return 0;
 }

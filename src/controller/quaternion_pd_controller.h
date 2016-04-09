@@ -20,6 +20,9 @@ private:
     ros::Subscriber setpointSub;
     ros::Publisher  controlInputPub;
 
+    // Output
+    Eigen::Matrix<double,6,1> tau;
+
     // State
     Eigen::Vector3d    p;  // Position
     Eigen::Quaterniond q;  // Attitude

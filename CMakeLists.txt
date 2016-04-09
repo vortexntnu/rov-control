@@ -95,3 +95,6 @@ add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})
 # Test file stuff
 catkin_add_gtest(allocator_test src/test/allocator_test.cpp)
 target_link_libraries(allocator_test ${catkin_LIBRARIES})
+
+catkin_add_gtest(controller_test src/test/controller_test.cpp)
+target_link_libraries(controller_test ${catkin_LIBRARIES})

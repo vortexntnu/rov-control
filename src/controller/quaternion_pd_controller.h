@@ -33,7 +33,7 @@ private:
     Eigen::Matrix<double, 6, 1> z; // (6) Pose error vector
 
     // Other stuff
-    Eigen::Matrix<double, 6, 1> g;     // (6)   Restoring force vector
+    Eigen::Matrix<double, 6, 1> g;   // (6)   Restoring force vector
     Eigen::Matrix<double, 3, 3> R;   // (3*3) Rotation matrix from {n} to {b}
 
     // Controller gains

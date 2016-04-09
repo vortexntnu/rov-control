@@ -6,7 +6,16 @@ QuaternionPdController::QuaternionPdController()
 {
     stateSub        = nh.subscribe("state", 1, &QuaternionPdController::stateCallback, this);
     setpointSub     = nh.subscribe("setpoint", 1, &QuaternionPdController::setpointCallback, this);
-    controlInputPub = nh.advertise<geometry_msgs::Wrench>("controlInput", 1);
+    controlInputPub = nh.advertise<geometry_msgs::Wrench>("control_input", 1);
+
+    // Initial state and inputs
+    p         << 0, 0, 0;
+    q.w()     =  0;
+    q.vec()   << 0, 0, 0;
+    nu        << 0, 0, 0, 0, 0, 0;
+    p_d       << 0, 0, 0;
+    q_d.w()   =  0;
+    q_d.vec() << 0, 0, 0;
 
     // Values from paper, only temporary
     K_D = Eigen::MatrixXd::Identity(6,6);
@@ -28,9 +37,9 @@ void QuaternionPdController::compute()
 
     // Publish tau
     geometry_msgs::Wrench tauMsg;
-    tauMsg.force.x = tau(0);
-    tauMsg.force.y = tau(1);
-    tauMsg.force.z = tau(2);
+    tauMsg.force.x  = tau(0);
+    tauMsg.force.y  = tau(1);
+    tauMsg.force.z  = tau(2);
     tauMsg.torque.x = tau(3);
     tauMsg.torque.y = tau(4);
     tauMsg.torque.z = tau(5);

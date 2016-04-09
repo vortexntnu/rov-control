@@ -60,6 +60,7 @@ add_dependencies(allocator uranus_dp_generate_messages_cpp)
 add_executable(controller
   src/controller/controller.cpp
   src/controller/quaternion_pd_controller.cpp
+  src/controller/open_loop_controller.cpp
 )
 target_link_libraries(controller ${catkin_LIBRARIES})
 add_dependencies(controller uranus_dp_generate_messages_cpp)
@@ -90,7 +91,6 @@ add_executable(open_loop
 target_link_libraries(open_loop ${catkin_LIBRARIES})
 add_dependencies(open_loop uranus_dp_generate_messages_cpp)
 add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})
-
 
 # Test file stuff
 catkin_add_gtest(allocator_test src/test/allocator_test.cpp)

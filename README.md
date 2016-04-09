@@ -8,12 +8,10 @@ The Uranus dynamic positioning system, a complete control system for our ROV.
 - Depends on the Eigen library which can be downloaded as the package libeigen3-dev with apt-get (or any other package manager).
 
 ## Todo
-- [x] Implement model node (with get-services for model matrices) 
-- [ ] Add matrix values to model node
-- [x] Write sensorCallback for EKF
-- [ ] Implement del_f_del_x in EKF
-- [x] Get values for K and T for Lagrange allocator
-- [ ] Get values r_g, r_b, W, B for Quaternion controller
-- [x] Move skew function out of Quaternion controller class?
-- [ ] Normalize quaternions everywhere
-- [ ] Split ExtendedKalmanFilter::updateSystemDynamics()
+- Rewrite model_server as a simple class, not a node
+- Rewrite controller node as a class node
+- Add matrix values to model node
+- Implement del_f_del_x in EKF
+- Get values r_g, r_b, W, B for Quaternion controller
+- Normalize quaternions everywhere
+- Split ExtendedKalmanFilter::updateSystemDynamics()

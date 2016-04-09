@@ -1,8 +1,8 @@
-#include "../allocator/lagrange_allocator.h"
-#include "geometry_msgs/Wrench.h"
-#include "uranus_dp/ThrusterForces.h"
+#include "ros/ros.h"
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
+#include "geometry_msgs/Wrench.h"
+#include "uranus_dp/ThrusterForces.h"
 
 class LagrangeAllocatorTest : public ::testing::Test {
 public:
@@ -42,7 +42,7 @@ public:
     }
 
     Eigen::Matrix<double,6,1> u_;
-    static const double EPSILON        = 0.000000000001;
+    static const double EPSILON = 0.000000000001;
 
  private:
     ros::NodeHandle node_handle_;
@@ -72,7 +72,7 @@ public:
     }
 };
 
-TEST_F(LagrangeAllocatorTest, ExpectedOutput)
+TEST_F(LagrangeAllocatorTest, NormalInput)
 {
     Publish(-29051, -27049, 0, 0, 24354, -7259);
     WaitForMessage();

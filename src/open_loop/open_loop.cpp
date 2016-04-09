@@ -21,7 +21,7 @@ void OpenLoop::joyCallback(const joystick::Joystick &joy_msg)
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "openloop");
+    ros::init(argc, argv, "open_loop");
     ROS_INFO("Launching node open_loop.");
     OpenLoop openLoop;
     ros::spin();

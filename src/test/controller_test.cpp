@@ -82,7 +82,7 @@ public:
 
     void Callback(const geometry_msgs::Wrench& msg)
     {
-        tf::wrenchMsgtoEigen(msg, tau_);
+        tf::wrenchMsgToEigen(msg, tau_);
         message_received_ = true;
     }
 

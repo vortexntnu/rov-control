@@ -35,7 +35,7 @@ public:
 
     void WaitForMessage()
     {
-        while(!message_received_)
+        while (!message_received_)
         {
             ros::spinOnce();
         }

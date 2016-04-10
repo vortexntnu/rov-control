@@ -78,16 +78,9 @@ target_link_libraries(state_estimator ${catkin_LIBRARIES} model_server)
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
 add_dependencies(state_estimator ${joystick_EXPORTED_TARGETS} ${ros_arduino_EXPORTED_TARGETS})
 
-# Open loop mode, used only for testing:
-# add_executable(open_loop
-#   src/open_loop/open_loop.cpp)
-# target_link_libraries(open_loop ${catkin_LIBRARIES})
-# add_dependencies(open_loop uranus_dp_generate_messages_cpp)
-# add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})
-
 # Test file stuff
-catkin_add_gtest(allocator_test src/test/allocator_test.cpp)
+catkin_add_gtest(allocator_test test/allocator_test.cpp)
 target_link_libraries(allocator_test ${catkin_LIBRARIES})
 
-catkin_add_gtest(controller_test src/test/controller_test.cpp)
+catkin_add_gtest(controller_test test/controller_test.cpp)
 target_link_libraries(controller_test ${catkin_LIBRARIES})

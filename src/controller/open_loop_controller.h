@@ -1,5 +1,5 @@
 /*
- * This 'controller' passes force/torque setpoints directly to the allocator.
+ * This 'controller' passes control force setpoints directly to the allocator.
  */
 
 #ifndef OPEN_LOOP_CONTROLLER_H
@@ -13,10 +13,13 @@ class OpenLoopController
 public:
     OpenLoopController();
     void callback(const geometry_msgs::Wrench &msg);
+    void enable();
+    void disable();
 private:
     ros::NodeHandle nh;
     ros::Subscriber sub;
     ros::Publisher  pub;
+    bool enabled;
 };
 
 #endif

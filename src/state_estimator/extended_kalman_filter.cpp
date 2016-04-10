@@ -7,12 +7,6 @@
 
 ExtendedKalmanFilter::ExtendedKalmanFilter(double sampleTime)
 {
-    clientM = nh.serviceClient<uranus_dp::GetM>("get_m");
-    clientC = nh.serviceClient<uranus_dp::GetC>("get_c");
-    clientD = nh.serviceClient<uranus_dp::GetD>("get_d");
-    clientG = nh.serviceClient<uranus_dp::GetG>("get_g");
-    clientJ = nh.serviceClient<uranus_dp::GetJ>("get_j");
-
     h = sampleTime;
 
     Q.setIdentity();
@@ -24,12 +18,7 @@ void ExtendedKalmanFilter::controlCallback(const geometry_msgs::Wrench &tauMsg)
 {
     // The input to the model used for filter design is tau (control forces), not u (thruster forces),
     // but in the context of the filter, it makes sense to use the name u. Mmmmmkay?
-    u << tauMsg.force.x,
-         tauMsg.force.y,
-         tauMsg.force.z,
-         tauMsg.torque.x,
-         tauMsg.torque.y,
-         tauMsg.torque.z;
+    tf::wrenchMsgToEigen(tauMsg, u);
 }
 
 void ExtendedKalmanFilter::sensorCallback(const ros_arduino::SensorRaw &yMsg)
@@ -97,84 +86,12 @@ void ExtendedKalmanFilter::updateSystemDynamics()
           x_hat(11),
           x_hat(12);
 
-    // Update J matrix
-    uranus_dp::GetJ srvJ;
-    tf::quaternionEigenToMsg(q, srvJ.request.q);
-    if (clientJ.call(srvJ))
-    {
-        for (int i = 0; i < 42; i++)
-        {
-            J(i) = srvJ.response.J[i];
-        }
-    }
-    else
-    {
-        ROS_ERROR("Failed to call service get_j");
-        return;
-    }
-
-    // Update M matrix
-    uranus_dp::GetM srvM;
-    if (clientM.call(srvM))
-    {
-        for (int i = 0; i < 36; i++)
-        {
-            M(i) = srvM.response.M[i];
-        }
-    }
-    else
-    {
-        ROS_ERROR("Failed to call service get_m");
-        return;
-    }
-
-    // Update C matrix
-    uranus_dp::GetC srvC;
-    tf::twistEigenToMsg(nu, srvC.request.nu);
-    if (clientC.call(srvC))
-    {
-        for (int i = 0; i < 36; i++)
-        {
-            C(i) = srvC.response.C[i];
-        }
-    }
-    else
-    {
-        ROS_ERROR("Failed to call service get_c");
-        return;
-    }
-
-    // Update D matrix
-    uranus_dp::GetD srvD;
-    tf::twistEigenToMsg(nu, srvD.request.nu);
-    if (clientD.call(srvD))
-    {
-        for (int i = 0; i < 36; i++)
-        {
-            D(i) = srvD.response.D[i];
-        }
-    }
-    else
-    {
-        ROS_ERROR("Failed to call service get_d");
-        return;
-    }
-
-    // Update g vector
-    uranus_dp::GetG srvG;
-    tf::quaternionEigenToMsg(q, srvG.request.q);
-    if (clientG.call(srvG))
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            g(i) = srvG.response.g[i];
-        }
-    }
-    else
-    {
-        ROS_ERROR("Failed to call service get_g");
-        return;
-    }
+    // Update matrices
+    M = getM();
+    C = getC();
+    D = getD();
+    g = getG();
+    J = getJ(q);
 
     f << J*nu,
          -M.inverse() * (C*nu + D*nu + g);

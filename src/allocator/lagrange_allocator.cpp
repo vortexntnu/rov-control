@@ -3,13 +3,14 @@
 #include <iostream>
 
 template<typename Derived>
-inline bool is_fucked(const Eigen::MatrixBase<Derived>& x)
+inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
 {
     return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
 
 // Worlds worst print function :DDD
-void printMatrix(Eigen::MatrixXd m){
+void printMatrix6(Eigen::MatrixXd m)
+{
     ROS_INFO("----------------------------------");
     for(int col = 0; col < 6; col++){
 
@@ -26,23 +27,20 @@ void printMatrix(Eigen::MatrixXd m){
 
 LagrangeAllocator::LagrangeAllocator()
 {
-    n = 6;
-    r = 6;
+    // n = 4;
+    // r = 6;
 
-    tauSub = nh.subscribe("controlForces", 1, &LagrangeAllocator::tauCallback, this);
-    uPub   = nh.advertise<uranus_dp::ThrusterForces>("controlInputs", 1);
+    tauSub = nh.subscribe("control_forces", 1, &LagrangeAllocator::tauCallback, this);
+    uPub   = nh.advertise<uranus_dp::ThrusterForces>("control_inputs", 1);
 
-    W.setIdentity(6,6); // Default to identity (i.e. no weights)
+    W.setIdentity(6,6); // Default to identity (i.e. equal weights)
     K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity
 
-    T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    ,
-         -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    ,
-         -0.01   ,  0.01   ,  0.01   , -0.01   ,  0    ,  0    , // Nonzero elements added to make matrix nonsingular
-          0.06718, -0.06718,  0.06718, -0.06718,  0    ,  0    ,
-          0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210,
-          0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165;
-
-    printMatrix(T);
+    // Our test ROV cannot control heave and roll, so they are removed from the control objective
+    T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    , // Surge
+         -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    , // Sway
+          0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210, // Pitch
+          0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165; // Yaw
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();
@@ -52,14 +50,14 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
 {
     tau << tauMsg.force.x,
            tauMsg.force.y,
-           tauMsg.force.z,
-           tauMsg.torque.x,
+           // tauMsg.force.z,  // Not part of control objective for test rov
+           // tauMsg.torque.x, // Ditto
            tauMsg.torque.y,
            tauMsg.torque.z;
 
     u = K_inverse * T_geninverse * tau;
 
-    if(is_fucked(K_inverse))
+    if (isFucked(K_inverse))
     {
         ROS_WARN("K is not invertible");
     }
@@ -72,21 +70,22 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
     uMsg.F5 = u(4);
     uMsg.F6 = u(5);
     uPub.publish(uMsg);
+
+    ROS_INFO_STREAM("Published: " << u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
 }
 
 void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 {
     bool correctDimensions = ( W_new.rows() == r && W_new.cols() == r );
-    // ROS_INFO("correctDimensions = %d\n", correctDimensions);
     if (!correctDimensions)
     {
-        ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".\n");
+        ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".");
         return;
     }
 
-    W = W_new; // I have checked that Eigen does a deep copy here
+    W = W_new;
 
-    // New weights mean we must recompute the generalized inverse of the T matrix
+    // New weights require recomputing the generalized inverse of the thrust config matrix
     computeGeneralizedInverse();
 }
 
@@ -94,22 +93,23 @@ void LagrangeAllocator::computeGeneralizedInverse()
 {
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
 
-    printMatrix(T_geninverse);
-    printMatrix(W);
-    printMatrix(T);
-    printMatrix(K_inverse);
 
-    if(is_fucked(T_geninverse))
+    printMatrix6(T_geninverse);
+    printMatrix6(W);
+    printMatrix6(T);
+    printMatrix6(K_inverse);
+
+    if (isFucked(T_geninverse))
     {
         ROS_WARN("T_geninverse NAN");
     }
 
-    if(is_fucked( W.inverse() ))
+    if (isFucked( W.inverse() ))
     {
         ROS_WARN("W is not invertible");
     }
 
-    if(is_fucked( (T*W.inverse()*T.transpose()).inverse() ) )
+    if (isFucked( (T*W.inverse()*T.transpose()).inverse() ) )
     {
         ROS_WARN("T * W_inv * T transposed is not invertible");
     }

@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="uranus_dp" type="allocator" name="allocator" />
+  <test test-name="allocator_test" pkg="uranus_dp" type="allocator_test" />
+</launch>

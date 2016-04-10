@@ -5,15 +5,16 @@
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
 #include "uranus_dp/State.h"
-#include "uranus_dp/ToggleControlMode.h"
+#include "uranus_dp/SetControlMode.h"
+#include "../control_mode_enum.h"
 
 class OpenLoopControllerTest : public ::testing::Test {
 public:
     OpenLoopControllerTest()
     {
-        pub      = nh.advertise<geometry_msgs::Wrench>("open_loop_setpoint", 1);
-        sub        = nh.subscribe("control_input", 5, &OpenLoopControllerTest::Callback, this);
-        // modeClient         = nh.serviceClient<uranus_dp::ToggleControlMode>("toggle_control_mode");
+        pub    = nh.advertise<geometry_msgs::Wrench>("open_loop_setpoint", 1);
+        sub    = nh.subscribe("control_input", 5, &OpenLoopControllerTest::Callback, this);
+        client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
 
         message_received = false;
     }
@@ -46,7 +47,7 @@ public:
         }
     }
 
-    // ros::ServiceClient modeClient;
+    ros::ServiceClient client; // Should be private?
     Eigen::Matrix<double,6,1> tau;
     static const double EPSILON = 1e-6; // Max absolute error
 
@@ -74,6 +75,13 @@ public:
   */
 TEST_F(OpenLoopControllerTest, CheckResponsiveness)
 {
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = ControlModes::OPEN_LOOP;
+    if (!client.call(srv))
+    {
+        ROS_ERROR("Failed to call service toggle_control_mode. New mode open loop not activated.");
+    }
+
     PublishSetpoint(1,2,3,4,5,6);
     WaitForMessage();
     EXPECT_TRUE(true);

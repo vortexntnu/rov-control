@@ -6,7 +6,7 @@ QuaternionPdController::QuaternionPdController()
 {
     enabled = false;
     stateSub        = nh.subscribe("state", 1, &QuaternionPdController::stateCallback, this);
-    setpointSub     = nh.subscribe("setpoint", 1, &QuaternionPdController::setpointCallback, this);
+    setpointSub     = nh.subscribe("quaternion_pd_setpoint", 1, &QuaternionPdController::setpointCallback, this);
     controlInputPub = nh.advertise<geometry_msgs::Wrench>("control_input", 1);
 
     // Initial values
@@ -51,16 +51,10 @@ void QuaternionPdController::stateCallback(const uranus_dp::State &stateMsg)
     R = q.toRotationMatrix();
 }
 
-void QuaternionPdController::setpointCallback(const uranus_dp::State &setpointMsg)
+void QuaternionPdController::setpointCallback(const geometry_msgs::Pose &setpointMsg)
 {
-    p_d << setpointMsg.pose.position.x,
-           setpointMsg.pose.position.y,
-           setpointMsg.pose.position.z;
-
-    q_d.w()   =  setpointMsg.pose.orientation.x;
-    q_d.vec() << setpointMsg.pose.orientation.y,
-                 setpointMsg.pose.orientation.z,
-                 setpointMsg.pose.orientation.w;
+    tf::pointMsgToEigen(setpointMsg.position, p_d);
+    tf::quaternionMsgToEigen(setpointMsg.orientation, q_d);
 }
 
 void QuaternionPdController::compute()

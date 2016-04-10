@@ -4,6 +4,7 @@
 #include "ros/ros.h"
 #include "uranus_dp/State.h"
 #include "geometry_msgs/Wrench.h"
+#include "geometry_msgs/Pose.h"
 #include <Eigen/Dense>
 #include <eigen_conversions/eigen_msg.h>
 
@@ -11,12 +12,13 @@
 // typedef Eigen::Matrix<double,6,1> Eigen::Vector6d;
 
 // Change name to reflect that this is a position and attitude controller, not a velocity controller
+// Maybe "StationkeepingController"
 class QuaternionPdController
 {
 public:
     QuaternionPdController();
     void stateCallback(const uranus_dp::State &stateMsg);
-    void setpointCallback(const uranus_dp::State &setpointMsg);
+    void setpointCallback(const geometry_msgs::Pose &setpointMsg);
     void compute();
     void enable();
     void disable();

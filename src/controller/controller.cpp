@@ -18,19 +18,26 @@ public:
 
     bool setControlMode(uranus_dp::SetControlMode::Request &req, uranus_dp::SetControlMode::Response &resp)
     {
-        control_mode = static_cast<ControlMode>(req.mode);
-        switch (control_mode)
+        ControlMode new_control_mode = static_cast<ControlMode>(req.mode);
+        if (new_control_mode != control_mode)
         {
-        case ControlModes::OPEN_LOOP:
-            ROS_INFO("Setting control mode open loop.");
-            stationkeeper.disable();
-            openlooper.enable();
-            break;
-        case ControlModes::STATIONKEEPING:
-            ROS_INFO("Setting control mode stationkeeping.");
-            openlooper.disable();
-            stationkeeper.enable();
-            break;
+            control_mode = new_control_mode;
+            switch (control_mode)
+            {
+            case ControlModes::OPEN_LOOP:
+                ROS_INFO("Setting control mode open loop.");
+                stationkeeper.disable();
+                openlooper.enable();
+                break;
+            case ControlModes::STATIONKEEPING:
+                ROS_INFO("Setting control mode stationkeeping.");
+                openlooper.disable();
+                stationkeeper.enable();
+                break;
+            default:
+                ROS_WARN("Invalid control mode set.");
+                break;
+            }
         }
         return true;
     }
@@ -64,5 +71,6 @@ int main(int argc, char **argv)
     ros::ServiceServer ss = nh.advertiseService("set_control_mode", &Controller::setControlMode, &controller);
 
     controller.run();
+    ROS_ERROR("controller.run() has returned. That's not meant to happen.");
     return 0;
 }

@@ -3,26 +3,23 @@
 #include "open_loop_controller.h"
 #include "uranus_dp/ToggleControlMode.h"
 #include "joystick/DirectionalInput.h"
+#include "../control_mode_enum.h"
 
-int control_mode; // Maybe turn this whole thing into a class with control_mode as a member
+ControlMode control_mode;
 
 bool toggleControlMode(uranus_dp::ToggleControlMode::Request &req, uranus_dp::ToggleControlMode::Response &resp)
 {
-    if (control_mode == joystick::DirectionalInput::OPEN_LOOP)
+    switch (control_mode)
     {
-        control_mode = joystick::DirectionalInput::STATIONKEEPING;
+    case ControlModes::OPEN_LOOP:
+        control_mode = ControlModes::STATIONKEEPING;
         ROS_INFO("Switching to stationkeeping control mode.");
-    }
-    else if (control_mode == joystick::DirectionalInput::STATIONKEEPING)
-    {
-        control_mode = joystick::DirectionalInput::OPEN_LOOP;
+        break;
+    case ControlModes::STATIONKEEPING:
+        control_mode = ControlModes::OPEN_LOOP;
         ROS_INFO("Switching to open loop control mode");
+        break;
     }
-    else
-    {
-        ROS_ERROR("Invalid mode");
-    }
-
     return true;
 }
 
@@ -33,19 +30,20 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::ServiceServer service = nh.advertiseService("toggle_control_mode", toggleControlMode);
 
-    control_mode = joystick::DirectionalInput::OPEN_LOOP;
+    control_mode = ControlModes::OPEN_LOOP;
 
     QuaternionPdController stationkeeper; // I hardly know her.
     OpenLoopController     openlooper;
+
+    stationkeeper.disable();
+    openlooper.enable();
 
     unsigned int frequency = 10; // To param server
     ros::Rate loop_rate(frequency);
     while (ros::ok())
     {
         ros::spinOnce();
-        if (control_mode == joystick::DirectionalInput::STATIONKEEPING)
-            stationkeeper.compute();
-        loop_rate.sleep();
+        stationkeeper.compute();
     }
     return 0;
 }

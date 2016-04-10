@@ -25,12 +25,12 @@ public:
             switch (control_mode)
             {
             case ControlModes::OPEN_LOOP:
-                ROS_INFO("Setting control mode open loop.");
+                ROS_INFO("Changing control mode to open loop.");
                 stationkeeper.disable();
                 openlooper.enable();
                 break;
             case ControlModes::STATIONKEEPING:
-                ROS_INFO("Setting control mode stationkeeping.");
+                ROS_INFO("Changing control mode to stationkeeping.");
                 openlooper.disable();
                 stationkeeper.enable();
                 break;
@@ -38,6 +38,10 @@ public:
                 ROS_WARN("Invalid control mode set.");
                 break;
             }
+        }
+        else
+        {
+            ROS_INFO("Attempt to set already active control mode, ignoring.");
         }
         return true;
     }

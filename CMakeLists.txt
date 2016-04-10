@@ -20,13 +20,6 @@ add_message_files(DIRECTORY msg FILES
 )
 
 add_service_files(DIRECTORY srv FILES
-  GetM.srv
-  GetC.srv
-  GetD.srv
-  GetG.srv
-  GetR.srv
-  GetT.srv
-  GetJ.srv
   SetControlMode.srv
 )
 
@@ -47,6 +40,11 @@ include_directories(
   ${EIGEN_INCLUDE_DIRS}
   ${GTEST_INCLUDE_DIRS}
 )
+
+
+# Model server
+add_library(model_server
+  src/model_server.cpp)
 
 
 
@@ -76,22 +74,16 @@ add_executable(state_estimator
   src/state_estimator/state_estimator.cpp
   src/state_estimator/extended_kalman_filter.cpp
 )
-target_link_libraries(state_estimator ${catkin_LIBRARIES})
+target_link_libraries(state_estimator ${catkin_LIBRARIES} model_server)
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
 add_dependencies(state_estimator ${joystick_EXPORTED_TARGETS} ${ros_arduino_EXPORTED_TARGETS})
 
-# Model server node:
-add_executable(model_server
-  src/model_server.cpp)
-target_link_libraries(model_server ${catkin_LIBRARIES})
-add_dependencies(model_server uranus_dp_generate_messages_cpp)
-
 # Open loop mode, used only for testing:
-add_executable(open_loop
-  src/open_loop/open_loop.cpp)
-target_link_libraries(open_loop ${catkin_LIBRARIES})
-add_dependencies(open_loop uranus_dp_generate_messages_cpp)
-add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})
+# add_executable(open_loop
+#   src/open_loop/open_loop.cpp)
+# target_link_libraries(open_loop ${catkin_LIBRARIES})
+# add_dependencies(open_loop uranus_dp_generate_messages_cpp)
+# add_dependencies(open_loop ${joystick_EXPORTED_TARGETS})
 
 # Test file stuff
 catkin_add_gtest(allocator_test src/test/allocator_test.cpp)

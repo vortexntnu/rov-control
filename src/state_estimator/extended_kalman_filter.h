@@ -5,13 +5,9 @@
 #include <Eigen/Dense>
 #include "uranus_dp/State.h"
 #include "geometry_msgs/Wrench.h"
-#include "uranus_dp/GetM.h"
-#include "uranus_dp/GetC.h"
-#include "uranus_dp/GetD.h"
-#include "uranus_dp/GetG.h"
-#include "uranus_dp/GetJ.h"
 #include <eigen_conversions/eigen_msg.h>
 #include "ros_arduino/SensorRaw.h"
+#include "../model_server.h"
 
 class ExtendedKalmanFilter
 {
@@ -25,11 +21,6 @@ private:
     ros::Subscriber    controlSub;
     ros::Subscriber    sensorSub;
     ros::Publisher     statePub;
-    ros::ServiceClient clientM;
-    ros::ServiceClient clientC;
-    ros::ServiceClient clientD;
-    ros::ServiceClient clientG;
-    ros::ServiceClient clientJ;
 
     // Sampling time
     double h;
@@ -55,6 +46,7 @@ private:
     Eigen::Matrix<double,13,13> P_bar; // Covariance projection (or something)
     Eigen::Matrix<double,13,13> Phi;   // 
     Eigen::Matrix<double,13,13> Gamma; // 
+    Eigen::Matrix<double,13,13> del_f_del_x; // f part. diff. wrt. x
 
     // Unmodified system variables
     Eigen::Matrix<double,6,6> M; // 

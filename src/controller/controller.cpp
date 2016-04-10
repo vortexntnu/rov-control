@@ -1,49 +1,68 @@
 #include "ros/ros.h"
 #include "quaternion_pd_controller.h"
 #include "open_loop_controller.h"
-#include "uranus_dp/ToggleControlMode.h"
+#include "uranus_dp/SetControlMode.h"
 #include "joystick/DirectionalInput.h"
 #include "../control_mode_enum.h"
 
-ControlMode control_mode;
-
-bool toggleControlMode(uranus_dp::ToggleControlMode::Request &req, uranus_dp::ToggleControlMode::Response &resp)
+class Controller
 {
-    switch (control_mode)
+public:
+    Controller(unsigned int f)
     {
-    case ControlModes::OPEN_LOOP:
-        control_mode = ControlModes::STATIONKEEPING;
-        ROS_INFO("Switching to stationkeeping control mode.");
-        break;
-    case ControlModes::STATIONKEEPING:
+        frequency = f;
         control_mode = ControlModes::OPEN_LOOP;
-        ROS_INFO("Switching to open loop control mode");
-        break;
+        stationkeeper.disable();
+        openlooper.enable();
     }
-    return true;
-}
+
+    bool setControlMode(uranus_dp::SetControlMode::Request &req, uranus_dp::SetControlMode::Response &resp)
+    {
+        control_mode = static_cast<ControlMode>(req.mode);
+        switch (control_mode)
+        {
+        case ControlModes::OPEN_LOOP:
+            ROS_INFO("Setting control mode open loop.");
+            stationkeeper.disable();
+            openlooper.enable();
+            break;
+        case ControlModes::STATIONKEEPING:
+            ROS_INFO("Setting control mode stationkeeping.");
+            openlooper.disable();
+            stationkeeper.enable();
+            break;
+        }
+        return true;
+    }
+
+    void run()
+    {
+        ros::Rate loop_late(frequency);
+        while (ros::ok())
+        {
+            ros::spinOnce();
+            stationkeeper.compute();
+        }
+    }
+private:
+    ros::NodeHandle nh;
+    unsigned int frequency;
+
+    ControlMode control_mode;
+    QuaternionPdController stationkeeper; // I hardly know her.
+    OpenLoopController     openlooper;
+};
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "controller");
     ROS_INFO("Launching node controller.");
     ros::NodeHandle nh;
-    ros::ServiceServer service = nh.advertiseService("toggle_control_mode", toggleControlMode);
 
-    control_mode = ControlModes::OPEN_LOOP;
+    unsigned int frequency = 10;
+    Controller controller(frequency);
+    ros::ServiceServer ss = nh.advertiseService("set_control_mode", &Controller::setControlMode, &controller);
 
-    QuaternionPdController stationkeeper; // I hardly know her.
-    OpenLoopController     openlooper;
-
-    stationkeeper.disable();
-    openlooper.enable();
-
-    unsigned int frequency = 10; // To param server
-    ros::Rate loop_rate(frequency);
-    while (ros::ok())
-    {
-        ros::spinOnce();
-        stationkeeper.compute();
-    }
+    controller.run();
     return 0;
 }

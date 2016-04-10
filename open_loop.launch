@@ -1,5 +1,20 @@
 <launch>
-    <node name="open_loop"      pkg="uranus_dp" type="open_loop"/>
-    <node name="dummy_joystick" pkg="uranus_dp" type="dummy_joystick"/>
-    <node name="allocator"      pkg="uranus_dp" type="allocator" output="screen"/>
+  <node
+    name="setpoint_processing"
+    pkg="uranus_dp"
+    type="setpoint_processing"
+    output="screen"
+  />
+  <node
+    name="controller"
+    pkg="uranus_dp"
+    type="controller"
+    output="screen"
+  />
+  <node
+    name="allocator"
+    pkg="uranus_dp"
+    type="allocator"
+    output="screen"
+  />
 </launch>

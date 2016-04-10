@@ -12,11 +12,12 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
 void printMatrix6(Eigen::MatrixXd m)
 {
     ROS_INFO("----------------------------------");
-    for(int col = 0; col < 6; col++){
-
+    for(int col = 0; col < 6; col++)
+    {
         char buffer[512];
 
-        for(int row = 0; row < 6; row++){
+        for(int row = 0; row < 6; row++)
+        {
             snprintf( (buffer + (row*8) ), sizeof(buffer), "  %f  ", m(col, row));
         }
         ROS_INFO("%s", buffer);
@@ -93,11 +94,11 @@ void LagrangeAllocator::computeGeneralizedInverse()
 {
     T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
 
-
-    printMatrix6(T_geninverse);
-    printMatrix6(W);
-    printMatrix6(T);
-    printMatrix6(K_inverse);
+    // ROS_INFO("Printing in order: T_geninverse, W, T, K_inverse.");
+    // printMatrix6(T_geninverse);
+    // printMatrix6(W);
+    // printMatrix6(T);
+    // printMatrix6(K_inverse);
 
     if (isFucked(T_geninverse))
     {

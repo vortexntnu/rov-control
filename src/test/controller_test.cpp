@@ -16,6 +16,13 @@ public:
         sub    = nh.subscribe("control_input", 5, &OpenLoopControllerTest::Callback, this);
         client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
 
+        uranus_dp::SetControlMode srv;
+        srv.request.mode = ControlModes::OPEN_LOOP;
+        if (!client.call(srv))
+        {
+            ROS_ERROR("Failed to call service set_control_mode. New mode OPEN_LOOP not set.");
+        }
+
         message_received = false;
     }
 
@@ -30,9 +37,9 @@ public:
     void PublishSetpoint(double X, double Y, double Z, double K, double M, double N)
     {
         geometry_msgs::Wrench msg;
-        msg.force.x = X;
-        msg.force.y = Y;
-        msg.force.z = Z;
+        msg.force.x  = X;
+        msg.force.y  = Y;
+        msg.force.z  = Z;
         msg.torque.x = K;
         msg.torque.y = M;
         msg.torque.z = N;
@@ -70,18 +77,88 @@ public:
     }
 };
 
+class QuaternionPdControllerTest : public ::testing::Test {
+public:
+    QuaternionPdControllerTest()
+    {
+        pub    = nh.advertise<geometry_msgs::Pose>("quaternion_pd_setpoint", 1);
+        statePub = nh.advertise<uranus_dp::State>("state", 1);
+        sub    = nh.subscribe("control_input", 5, &QuaternionPdControllerTest::Callback, this);
+        client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
+
+        uranus_dp::SetControlMode srv;
+        srv.request.mode = ControlModes::STATIONKEEPING;
+        if (!client.call(srv))
+        {
+            ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+        }
+
+        message_received = false;
+    }
+
+    void SetUp()
+    {
+        while (!IsNodeReady())
+        {
+            ros::spinOnce();
+        }
+    }
+
+    void PublishSetpoint(Eigen::Vector3d p, Eigen::Quaterniond q)
+    {
+        geometry_msgs::Pose msg;
+        tf::pointEigenToMsg(p, msg.position);
+        tf::quaternionEigenToMsg(q, msg.orientation);
+        pub.publish(msg);
+    }
+
+    void PublishState(Eigen::Vector3d p, Eigen::Quaterniond q, Eigen::Vector3d v, Eigen::Vector3d omega)
+    {
+        uranus_dp::State msg;
+        tf::pointEigenToMsg(p, msg.pose.position);
+        tf::quaternionEigenToMsg(q, msg.pose.orientation);
+        tf::vectorEigenToMsg(v, msg.twist.linear);
+        tf::vectorEigenToMsg(omega, msg.twist.angular);
+        statePub.publish(msg);
+    }
+
+    void WaitForMessage()
+    {
+        while (!message_received)
+        {
+            ros::spinOnce();
+        }
+    }
+
+    ros::ServiceClient client; // Should be private?
+    Eigen::Matrix<double,6,1> tau;
+    static const double EPSILON = 1e-6; // Max absolute error
+
+ private:
+    ros::NodeHandle nh;
+    ros::Publisher  pub;
+    ros::Publisher statePub;
+    ros::Subscriber sub;
+
+    bool message_received;
+
+    void Callback(const geometry_msgs::Wrench& msg)
+    {
+        tf::wrenchMsgToEigen(msg, tau);
+        message_received = true;
+    }
+
+    bool IsNodeReady()
+    {
+        return (pub.getNumSubscribers() > 0) && (sub.getNumPublishers() > 0);
+    }
+};
+
  /*
   * Make sure we receive any messages at all.
   */
 TEST_F(OpenLoopControllerTest, CheckResponsiveness)
 {
-    uranus_dp::SetControlMode srv;
-    srv.request.mode = ControlModes::OPEN_LOOP;
-    if (!client.call(srv))
-    {
-        ROS_ERROR("Failed to call service toggle_control_mode. New mode open loop not activated.");
-    }
-
     PublishSetpoint(1,2,3,4,5,6);
     WaitForMessage();
     EXPECT_TRUE(true);
@@ -105,33 +182,27 @@ TEST_F(OpenLoopControllerTest, DirectFeedthrough)
  /*
   * Input zero speed and nonzero pose. Input same pose state and pose setpoint. Expect zero output.
   */
-// TEST_F(OpenLoopControllerTest, ZeroErrorZeroOutput)
-// {
-//     uranus_dp::ToggleControlMode srv;
-//     if (!modeClient.call(srv))
-//     {
-//         ROS_ERROR_STREAM("Failed to call service toggle_control_mode. New mode not activated.");
-//     }
+TEST_F(QuaternionPdControllerTest, ZeroErrorZeroOutput)
+{
+    Eigen::Vector3d    p(1,2,3);
+    Eigen::Quaterniond q(4,5,6,7);
+    q.normalize();
 
-//     Eigen::Vector3d    p(1,2,3);
-//     Eigen::Quaterniond q(4,5,6,7);
-//     q.normalize();
+    Eigen::Vector3d v(0,0,0);
+    Eigen::Vector3d omega(0,0,0);
 
-//     Eigen::Vector3d v(0,0,0);
-//     Eigen::Vector3d omega(0,0,0);
+    PublishState(p, q, v, omega);
+    PublishSetpoint(p, q);
 
-//     PublishState(p, q, v, omega);
-//     PublishStationkeeperSetpoint(p, q);
+    WaitForMessage();
 
-//     WaitForMessage();
-
-//     EXPECT_NEAR(tau(0), 0, EPSILON);
-//     EXPECT_NEAR(tau(1), 0, EPSILON);
-//     EXPECT_NEAR(tau(2), 0, EPSILON);
-//     EXPECT_NEAR(tau(3), 0, EPSILON);
-//     EXPECT_NEAR(tau(4), 0, EPSILON);
-//     EXPECT_NEAR(tau(5), 0, EPSILON);
-// }
+    EXPECT_NEAR(tau(0), 0, EPSILON);
+    EXPECT_NEAR(tau(1), 0, EPSILON);
+    EXPECT_NEAR(tau(2), 0, EPSILON);
+    EXPECT_NEAR(tau(3), 0, EPSILON);
+    EXPECT_NEAR(tau(4), 0, EPSILON);
+    EXPECT_NEAR(tau(5), 0, EPSILON);
+}
 
 int main(int argc, char **argv)
 {

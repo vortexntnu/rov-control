@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="uranus_dp" type="controller" name="controller" />
-  <test test-name="controller_test" pkg="uranus_dp" type="controller_test" />
-</launch>

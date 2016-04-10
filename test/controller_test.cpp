@@ -6,7 +6,7 @@
 #include "geometry_msgs/Pose.h"
 #include "uranus_dp/State.h"
 #include "uranus_dp/SetControlMode.h"
-#include "../control_mode_enum.h"
+#include "../src/control_mode_enum.h"
 
 class OpenLoopControllerTest : public ::testing::Test {
 public:
@@ -15,13 +15,6 @@ public:
         pub    = nh.advertise<geometry_msgs::Wrench>("open_loop_setpoint", 1);
         sub    = nh.subscribe("control_input", 5, &OpenLoopControllerTest::Callback, this);
         client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
-
-        uranus_dp::SetControlMode srv;
-        srv.request.mode = ControlModes::OPEN_LOOP;
-        if (!client.call(srv))
-        {
-            ROS_ERROR("Failed to call service set_control_mode. New mode OPEN_LOOP not set.");
-        }
 
         message_received = false;
     }
@@ -85,13 +78,6 @@ public:
         statePub = nh.advertise<uranus_dp::State>("state", 1);
         sub    = nh.subscribe("control_input", 5, &QuaternionPdControllerTest::Callback, this);
         client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
-
-        uranus_dp::SetControlMode srv;
-        srv.request.mode = ControlModes::STATIONKEEPING;
-        if (!client.call(srv))
-        {
-            ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
-        }
 
         message_received = false;
     }
@@ -159,6 +145,13 @@ public:
   */
 TEST_F(OpenLoopControllerTest, CheckResponsiveness)
 {
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = ControlModes::OPEN_LOOP;
+    if (!client.call(srv))
+    {
+        ROS_ERROR("Failed to call service set_control_mode. New mode OPEN_LOOP not set.");
+    }
+
     PublishSetpoint(1,2,3,4,5,6);
     WaitForMessage();
     EXPECT_TRUE(true);
@@ -169,6 +162,13 @@ TEST_F(OpenLoopControllerTest, CheckResponsiveness)
   */
 TEST_F(OpenLoopControllerTest, DirectFeedthrough)
 {
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = ControlModes::OPEN_LOOP;
+    if (!client.call(srv))
+    {
+        ROS_ERROR("Failed to call service set_control_mode. New mode OPEN_LOOP not set.");
+    }
+
     PublishSetpoint(-9.966, -7.907, 7.626, -6.023, 1.506, 2.805);
     WaitForMessage();
     EXPECT_NEAR(tau(0), -9.966, EPSILON);
@@ -184,6 +184,13 @@ TEST_F(OpenLoopControllerTest, DirectFeedthrough)
   */
 TEST_F(QuaternionPdControllerTest, ZeroErrorZeroOutput)
 {
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = ControlModes::STATIONKEEPING;
+    if (!client.call(srv))
+    {
+        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+    }
+
     Eigen::Vector3d    p(1,2,3);
     Eigen::Quaterniond q(4,5,6,7);
     q.normalize();

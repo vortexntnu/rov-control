@@ -31,8 +31,8 @@ LagrangeAllocator::LagrangeAllocator()
     // n = 4;
     // r = 6;
 
-    tauSub = nh.subscribe("control_forces", 1, &LagrangeAllocator::tauCallback, this);
-    uPub   = nh.advertise<uranus_dp::ThrusterForces>("control_inputs", 1);
+    tauSub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::tauCallback, this);
+    uPub   = nh.advertise<uranus_dp::ThrusterForces>("thruster_forces", 10);
 
     W.setIdentity(6,6); // Default to identity (i.e. equal weights)
     K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity

@@ -3,8 +3,8 @@
 OpenLoopController::OpenLoopController()
 {
     enabled = false;
-    sub = nh.subscribe("open_loop_setpoint", 1, &OpenLoopController::callback, this);
-    pub = nh.advertise<geometry_msgs::Wrench>("control_input", 1);
+    sub = nh.subscribe("wrench_setpoints", 10, &OpenLoopController::callback, this);
+    pub = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 }
 
 void OpenLoopController::callback(const geometry_msgs::Wrench &msg)

@@ -9,8 +9,8 @@ class AllocatorTest : public ::testing::Test {
 public:
     AllocatorTest()
     {
-        publisher_  = node_handle_.advertise<geometry_msgs::Wrench>("control_forces", 5);
-        subscriber_ = node_handle_.subscribe("control_inputs", 5, &AllocatorTest::Callback, this);
+        publisher_  = node_handle_.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+        subscriber_ = node_handle_.subscribe("thruster_forces", 10, &AllocatorTest::Callback, this);
         message_received_ = false;
     }
 

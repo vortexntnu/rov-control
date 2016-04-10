@@ -5,9 +5,9 @@
 QuaternionPdController::QuaternionPdController()
 {
     enabled = false;
-    stateSub        = nh.subscribe("state", 1, &QuaternionPdController::stateCallback, this);
-    setpointSub     = nh.subscribe("quaternion_pd_setpoint", 1, &QuaternionPdController::setpointCallback, this);
-    controlInputPub = nh.advertise<geometry_msgs::Wrench>("control_input", 1);
+    stateSub        = nh.subscribe("state_estimate", 10, &QuaternionPdController::stateCallback, this);
+    setpointSub     = nh.subscribe("pose_setpoints", 10, &QuaternionPdController::setpointCallback, this);
+    controlInputPub = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
     // Initial values
     p         << 0, 0, 0;

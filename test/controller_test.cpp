@@ -12,8 +12,8 @@ class OpenLoopControllerTest : public ::testing::Test {
 public:
     OpenLoopControllerTest()
     {
-        pub    = nh.advertise<geometry_msgs::Wrench>("open_loop_setpoint", 1);
-        sub    = nh.subscribe("control_input", 5, &OpenLoopControllerTest::Callback, this);
+        pub    = nh.advertise<geometry_msgs::Wrench>("wrench_setpoints", 1);
+        sub    = nh.subscribe("rov_forces", 5, &OpenLoopControllerTest::Callback, this);
         client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
 
         message_received = false;
@@ -74,9 +74,9 @@ class QuaternionPdControllerTest : public ::testing::Test {
 public:
     QuaternionPdControllerTest()
     {
-        pub    = nh.advertise<geometry_msgs::Pose>("quaternion_pd_setpoint", 1);
-        statePub = nh.advertise<uranus_dp::State>("state", 1);
-        sub    = nh.subscribe("control_input", 5, &QuaternionPdControllerTest::Callback, this);
+        pub    = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
+        statePub = nh.advertise<uranus_dp::State>("state_estimate", 10);
+        sub    = nh.subscribe("rov_forces", 10, &QuaternionPdControllerTest::Callback, this);
         client = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
 
         message_received = false;

@@ -31,21 +31,9 @@ QuaternionPdController::QuaternionPdController()
 
 void QuaternionPdController::stateCallback(const uranus_dp::State &stateMsg)
 {
-    p << stateMsg.pose.position.x,
-         stateMsg.pose.position.y,
-         stateMsg.pose.position.z;
-
-    q.w()   =  stateMsg.pose.orientation.x;
-    q.vec() << stateMsg.pose.orientation.y,
-               stateMsg.pose.orientation.z,
-               stateMsg.pose.orientation.w;
-
-    nu << stateMsg.twist.linear.x,
-          stateMsg.twist.linear.y,
-          stateMsg.twist.linear.z,
-          stateMsg.twist.angular.x,
-          stateMsg.twist.angular.y,
-          stateMsg.twist.angular.z;
+    tf::pointMsgToEigen(stateMsg.pose.position, p);
+    tf::quaternionMsgToEigen(stateMsg.pose.orientation, q);
+    tf::twistMsgToEigen(stateMsg.twist, nu);
 
     // Update rotation matrix
     R = q.toRotationMatrix();
@@ -70,12 +58,6 @@ void QuaternionPdController::compute()
         // Publish tau
         geometry_msgs::Wrench tauMsg;
         tf::wrenchEigenToMsg(tau, tauMsg);
-        // tauMsg.force.x  = tau(0);
-        // tauMsg.force.y  = tau(1);
-        // tauMsg.force.z  = tau(2);
-        // tauMsg.torque.x = tau(3);
-        // tauMsg.torque.y = tau(4);
-        // tauMsg.torque.z = tau(5);
         controlInputPub.publish(tauMsg);
     }
 }

@@ -1,5 +1,0 @@
-# Return big ass J matrix
-
-geometry_msgs/Quaternion q
----
-float64[42] J

@@ -1,5 +1,0 @@
-# Return restoring force vector
-
-geometry_msgs/Quaternion q
----
-float64[6] g

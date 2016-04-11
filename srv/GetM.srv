@@ -1,4 +1,0 @@
-# Return mass matrix (rigid-body and added mass)
-
----
-float64[36] M

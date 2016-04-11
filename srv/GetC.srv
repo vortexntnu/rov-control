@@ -1,5 +1,0 @@
-# Return Coriolis and centripetal matrix (rigid-body and hydrodynamic)
-
-geometry_msgs/Twist nu
----
-float64[36] C

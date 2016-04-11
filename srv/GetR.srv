@@ -1,5 +1,0 @@
-# Return linear velocity transformation matrix
-
-geometry_msgs/Quaternion q
----
-float64[9] R

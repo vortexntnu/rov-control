@@ -4,6 +4,7 @@
 #include "geometry_msgs/Wrench.h"
 #include "uranus_dp/ThrusterForces.h"
 #include <eigen_conversions/eigen_msg.h>
+#include <unistd.h>
 
 class AllocatorTest : public ::testing::Test {
 public:
@@ -71,6 +72,8 @@ public:
 
 TEST_F(AllocatorTest, CheckResponsiveness)
 {
+    sleep(1);
+
     Publish(1,2,3,4,5,6);
     WaitForMessage();
     EXPECT_TRUE(true);

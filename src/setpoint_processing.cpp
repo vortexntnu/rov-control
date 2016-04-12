@@ -34,6 +34,7 @@ public:
 
         if (control_mode == ControlModes::OPEN_LOOP)
         {
+            ROS_INFO("setpoint_processing: Sending open loop setpoints.");
             geometry_msgs::Wrench setpoint_msg;
             setpoint_msg.force.x  = joy_msg.strafe_X * NORMALIZATION * SCALING_LIN;
             setpoint_msg.force.y  = joy_msg.strafe_Y * NORMALIZATION * SCALING_LIN;
@@ -45,6 +46,7 @@ public:
         }
         else if (control_mode == ControlModes::STATIONKEEPING)
         {
+            ROS_INFO("setpoint_processing: Sending stationkeeping setpoints.");
             // Todo: Actually populate the pose message with values
             geometry_msgs::Pose setpoint_msg;
             setpoint_msg.position.x    = 0;
@@ -74,16 +76,6 @@ private:
     static const double NORMALIZATION = 0.000030517578125; // Scale joystick inputs down to [-1, 1]
     static const double SCALING_LIN   = 10;                // Scale forces up to [-10, 10] (Newton)
     static const double SCALING_ANG   = 2;                 // Scale torques up to [-2, 2] (Newton meters)
-
-    // std::string controlModeString(int mode)
-    // {
-    //     if (mode == joystick::DirectionalInput::OPEN_LOOP)
-    //         return "open loop";
-    //     else if (mode == joystick::DirectionalInput::STATIONKEEPING)
-    //         return "stationkeeping";
-    //     else
-    //         return "invalid mode";
-    // }
 };
 
 int main(int argc, char** argv){

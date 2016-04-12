@@ -11,6 +11,7 @@ void OpenLoopController::callback(const geometry_msgs::Wrench &msg)
 {
     if (enabled)
     {
+        ROS_INFO("open_loop_controller: Sending rov forces.");
         pub.publish(msg);
     }
 }

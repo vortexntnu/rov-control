@@ -84,3 +84,6 @@ target_link_libraries(allocator_test ${catkin_LIBRARIES})
 
 catkin_add_gtest(controller_test test/controller_test.cpp)
 target_link_libraries(controller_test ${catkin_LIBRARIES})
+
+catkin_add_gtest(open_loop_integration_test test/open_loop_integration_test.cpp)
+target_link_libraries(open_loop_integration_test ${catkin_LIBRARIES})

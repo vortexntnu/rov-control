@@ -1,0 +1,25 @@
+<launch>
+  <node
+    name="setpoint_processing"
+    pkg="uranus_dp"
+    type="setpoint_processing"
+    output="screen"
+  />
+  <node
+    name="controller"
+    pkg="uranus_dp"
+    type="controller"
+    output="screen"
+  />
+  <node
+    name="allocator"
+    pkg="uranus_dp"
+    type="allocator"
+    output="screen"
+  />
+  <test
+    test-name="open_loop_integration_test"
+    pkg="uranus_dp"
+    type="open_loop_integration_test"
+  />
+</launch>

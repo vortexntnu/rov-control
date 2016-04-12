@@ -4,7 +4,6 @@
 #include "uranus_dp/ThrusterForces.h"
 #include "../src/control_mode_enum.h"
 #include <Eigen/Dense>
-#include <unistd.h>
 
 class OpenLoopIntegrationTest : public ::testing::Test {
 public:
@@ -73,7 +72,8 @@ public:
 
 TEST_F(OpenLoopIntegrationTest, CheckResponsiveness)
 {
-    sleep(1);
+    ros::Duration(0.5).sleep();
+
     Publish(1,2,3,4,5,control_mode_);
     WaitForMessage();
     EXPECT_TRUE(true);

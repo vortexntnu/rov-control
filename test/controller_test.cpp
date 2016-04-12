@@ -7,7 +7,6 @@
 #include "uranus_dp/State.h"
 #include "uranus_dp/SetControlMode.h"
 #include "../src/control_mode_enum.h"
-#include <unistd.h>
 
 class OpenLoopControllerTest : public ::testing::Test {
 public:
@@ -146,7 +145,7 @@ public:
   */
 TEST_F(OpenLoopControllerTest, CheckResponsiveness)
 {
-    sleep(1);
+    ros::Duration(0.5).sleep();
 
     uranus_dp::SetControlMode srv;
     srv.request.mode = ControlModes::OPEN_LOOP;

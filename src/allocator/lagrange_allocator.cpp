@@ -8,31 +8,15 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
     return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
 
-// Worlds worst print function :DDD
-void printMatrix6(Eigen::MatrixXd m)
-{
-    ROS_INFO("----------------------------------");
-    for(int col = 0; col < 6; col++)
-    {
-        char buffer[512];
-
-        for(int row = 0; row < 6; row++)
-        {
-            snprintf( (buffer + (row*8) ), sizeof(buffer), "  %f  ", m(col, row));
-        }
-        ROS_INFO("%s", buffer);
-    }
-    ROS_INFO("----------------------------------\n");
-}
-
+void printMatrix6(Eigen::MatrixXd m);
 
 LagrangeAllocator::LagrangeAllocator()
 {
     // n = 4;
     // r = 6;
 
-    tauSub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::tauCallback, this);
-    uPub   = nh.advertise<uranus_dp::ThrusterForces>("thruster_forces", 10);
+    sub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::callback, this);
+    pub = nh.advertise<uranus_dp::ThrusterForces>("thruster_forces", 10);
 
     W.setIdentity(6,6); // Default to identity (i.e. equal weights)
     K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity
@@ -47,7 +31,7 @@ LagrangeAllocator::LagrangeAllocator()
     computeGeneralizedInverse();
 }
 
-void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
+void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
 {
     tau << tauMsg.force.x,
            tauMsg.force.y,
@@ -70,9 +54,9 @@ void LagrangeAllocator::tauCallback(const geometry_msgs::Wrench& tauMsg)
     uMsg.F4 = u(3);
     uMsg.F5 = u(4);
     uMsg.F6 = u(5);
-    uPub.publish(uMsg);
+    pub.publish(uMsg);
 
-    ROS_INFO_STREAM("Published: " << u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
+    ROS_INFO_STREAM("lagrange_allocator: Sending " << u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
 }
 
 void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
@@ -115,3 +99,21 @@ void LagrangeAllocator::computeGeneralizedInverse()
         ROS_WARN("T * W_inv * T transposed is not invertible");
     }
 } 
+
+
+// Worlds worst print function :DDD
+void printMatrix6(Eigen::MatrixXd m)
+{
+    ROS_INFO("----------------------------------");
+    for(int col = 0; col < 6; col++)
+    {
+        char buffer[512];
+
+        for(int row = 0; row < 6; row++)
+        {
+            snprintf( (buffer + (row*8) ), sizeof(buffer), "  %f  ", m(col, row));
+        }
+        ROS_INFO("%s", buffer);
+    }
+    ROS_INFO("----------------------------------\n");
+}

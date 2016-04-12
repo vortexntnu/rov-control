@@ -10,12 +10,12 @@ class LagrangeAllocator
 {
 public:
     LagrangeAllocator();
-    void tauCallback(const geometry_msgs::Wrench& tauMsg);
+    void callback(const geometry_msgs::Wrench& tauMsg);
     void setWeights(const Eigen::MatrixXd &W_new);
 private:
     ros::NodeHandle nh;
-    ros::Subscriber tauSub;
-    ros::Publisher  uPub;
+    ros::Subscriber sub;
+    ros::Publisher  pub;
 
     // Move to param server
     static const unsigned int n = 4; // Number of control forces (length of tau)

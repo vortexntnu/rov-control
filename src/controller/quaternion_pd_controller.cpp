@@ -4,10 +4,10 @@
 
 QuaternionPdController::QuaternionPdController()
 {
-    enabled = false;
     stateSub    = nh.subscribe("state_estimate", 10, &QuaternionPdController::stateCallback, this);
     setpointSub = nh.subscribe("pose_setpoints", 10, &QuaternionPdController::setpointCallback, this);
     controlPub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+    enabled = false;
 
     // Initial values
     p         << 0, 0, 0;
@@ -83,7 +83,8 @@ void QuaternionPdController::updateErrorVector()
     Eigen::Vector3d    p_tilde = p - p_d;
     Eigen::Quaterniond q_tilde = q_d.conjugate()*q;
 
-    z << p_tilde, sgn(q_tilde.w())*q_tilde.vec();
+    z << p_tilde,
+         sgn(q_tilde.w())*q_tilde.vec();
 }
 
 void QuaternionPdController::updateRestoringForceVector()
@@ -92,7 +93,8 @@ void QuaternionPdController::updateRestoringForceVector()
     Eigen::Vector3d f_g = R.transpose() * Eigen::Vector3d(0, 0, W);
     Eigen::Vector3d f_b = R.transpose() * Eigen::Vector3d(0, 0, -B);
 
-    g << f_g + f_b, r_g.cross(f_g) + r_b.cross(f_b);
+    g << f_g + f_b,
+         r_g.cross(f_g) + r_b.cross(f_b);
 }
 
 int QuaternionPdController::sgn(double x)

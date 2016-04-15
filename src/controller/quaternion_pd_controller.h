@@ -15,8 +15,8 @@ class QuaternionPdController
 {
 public:
     QuaternionPdController();
-    void stateCallback(const uranus_dp::State &stateMsg);
-    void setpointCallback(const geometry_msgs::Pose &setpointMsg);
+    void stateCallback(const uranus_dp::State &msg);
+    void setpointCallback(const geometry_msgs::Pose &msg);
     void compute();
     void enable();
     void disable();
@@ -31,39 +31,30 @@ private:
     void updateErrorVector();
     void updateRestoringForceVector();
 
-    // State
-    Eigen::Vector3d    p;  // Position
-    Eigen::Quaterniond q;  // Orientation
-    Eigen::Vector6d    nu; // Velocity (linear and angular)
-    
-    // Setpoints
+    int             sgn(double x);
+    Eigen::Matrix3d skew(const Eigen::Vector3d &v);
+
+    Eigen::Vector3d    p;   // Position state
+    Eigen::Quaterniond q;   // Orientation state
+    Eigen::Vector6d    nu;  // Velocity state (linear and angular)
     Eigen::Vector3d    p_d; // Desired position
     Eigen::Quaterniond q_d; // Desired attitude
-    
-    // Error variables
-    Eigen::Vector6d z; // (6) Pose error vector
-    
-    // Output
-    Eigen::Vector6d tau; // (6) Control forces
+    Eigen::Vector6d    z;   // Pose error
 
-    // Other stuff
-    Eigen::Vector6d g; // (6)   Restoring force vector
-    Eigen::Matrix3d R; // (3*3) Rotation matrix from {n} to {b}
+    Eigen::Matrix6d K_P; // Proportional gain matrix
+    Eigen::Matrix6d K_D; // Derivative gain matrix
+    Eigen::Matrix3d K_p; // Position error gain matrix (submatrix of K_P)
+    double c;            // Attitude error gain
 
-    // Controller gains
-    Eigen::Matrix6d K_P; // (6*6) Proportional gain matrix
-    Eigen::Matrix6d K_D; // (6*6) Derivative gain matrix
-    Eigen::Matrix3d K_p; // (3*3) Position error gain matrix (part of K_P)
-    double c;            //       Attitude error gain
+    Eigen::Vector6d tau; // Control ROV forces
 
-    // Constants
-    Eigen::Vector3d r_g; // (3) Center of gravity, expressed in {b}
-    Eigen::Vector3d r_b; // (3) Center of buoyancy, expressed in {b}
+    Eigen::Vector6d g; // Restoring force vector
+    Eigen::Matrix3d R; // Rotation matrix from {n} to {b}
+
+    Eigen::Vector3d r_g; // Center of gravity, expressed in body frame
+    Eigen::Vector3d r_b; // Center of buoyancy, expressed in body frame
     double W;            // [N] Weight of ROV
     double B;            // [N] Buoyancy of ROV
-
-    int sgn(double x);
-    Eigen::Matrix3d skew(const Eigen::Vector3d &v);
 };
 
 #endif

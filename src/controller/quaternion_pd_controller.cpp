@@ -5,9 +5,9 @@
 QuaternionPdController::QuaternionPdController()
 {
     enabled = false;
-    stateSub        = nh.subscribe("state_estimate", 10, &QuaternionPdController::stateCallback, this);
-    setpointSub     = nh.subscribe("pose_setpoints", 10, &QuaternionPdController::setpointCallback, this);
-    controlInputPub = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+    stateSub    = nh.subscribe("state_estimate", 10, &QuaternionPdController::stateCallback, this);
+    setpointSub = nh.subscribe("pose_setpoints", 10, &QuaternionPdController::setpointCallback, this);
+    controlPub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
     // Initial values
     p         << 0, 0, 0;
@@ -19,7 +19,7 @@ QuaternionPdController::QuaternionPdController()
     q_d.vec() << 0, 0, 0;
     tau       << -1, -1, -1, -1, -1, -1;
 
-    // Values from paper, only temporary
+    // Gains etc. (from paper, temporary)
     K_D = Eigen::MatrixXd::Identity(6,6);
     K_p = 30*Eigen::MatrixXd::Identity(3,3);
     c = 200;
@@ -29,20 +29,20 @@ QuaternionPdController::QuaternionPdController()
     B = 185*9.8;
 }
 
-void QuaternionPdController::stateCallback(const uranus_dp::State &stateMsg)
+void QuaternionPdController::stateCallback(const uranus_dp::State &msg)
 {
-    tf::pointMsgToEigen(stateMsg.pose.position, p);
-    tf::quaternionMsgToEigen(stateMsg.pose.orientation, q);
-    tf::twistMsgToEigen(stateMsg.twist, nu);
+    tf::pointMsgToEigen(msg.pose.position, p);
+    tf::quaternionMsgToEigen(msg.pose.orientation, q);
+    tf::twistMsgToEigen(msg.twist, nu);
 
     // Update rotation matrix
     R = q.toRotationMatrix();
 }
 
-void QuaternionPdController::setpointCallback(const geometry_msgs::Pose &setpointMsg)
+void QuaternionPdController::setpointCallback(const geometry_msgs::Pose &msg)
 {
-    tf::pointMsgToEigen(setpointMsg.position, p_d);
-    tf::quaternionMsgToEigen(setpointMsg.orientation, q_d);
+    tf::pointMsgToEigen(msg.position, p_d);
+    tf::quaternionMsgToEigen(msg.orientation, q_d);
 }
 
 void QuaternionPdController::compute()
@@ -53,12 +53,11 @@ void QuaternionPdController::compute()
         updateErrorVector();
         updateRestoringForceVector();
 
-        tau = - K_D * nu - K_P * z + g;
+        tau = - K_D*nu - K_P*z + g;
 
-        // Publish tau
-        geometry_msgs::Wrench tauMsg;
-        tf::wrenchEigenToMsg(tau, tauMsg);
-        controlInputPub.publish(tauMsg);
+        geometry_msgs::Wrench msg;
+        tf::wrenchEigenToMsg(tau, msg);
+        controlPub.publish(msg);
     }
 }
 

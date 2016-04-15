@@ -7,9 +7,7 @@
 #include "geometry_msgs/Pose.h"
 #include <Eigen/Dense>
 #include <eigen_conversions/eigen_msg.h>
-
-// typedef Eigen::Matrix<double,6,6> Eigen::Matrix6d;
-// typedef Eigen::Matrix<double,6,1> Eigen::Vector6d;
+#include "../eigen_typedefs.h"
 
 // Change name to reflect that this is a position and attitude controller, not a velocity controller
 // Maybe "StationkeepingController"
@@ -26,7 +24,7 @@ private:
     ros::NodeHandle nh;
     ros::Subscriber stateSub;
     ros::Subscriber setpointSub;
-    ros::Publisher  controlInputPub;
+    ros::Publisher  controlPub;
     bool enabled;
 
     void updateProportionalGainMatrix();
@@ -34,28 +32,28 @@ private:
     void updateRestoringForceVector();
 
     // State
-    Eigen::Vector3d    p;           // Position
-    Eigen::Quaterniond q;           // Orientation
-    Eigen::Matrix<double, 6, 1> nu; // Velocity (linear and angular)
+    Eigen::Vector3d    p;  // Position
+    Eigen::Quaterniond q;  // Orientation
+    Eigen::Vector6d    nu; // Velocity (linear and angular)
     
     // Setpoints
     Eigen::Vector3d    p_d; // Desired position
     Eigen::Quaterniond q_d; // Desired attitude
     
     // Error variables
-    Eigen::Matrix<double,6,1> z; // (6) Pose error vector
+    Eigen::Vector6d z; // (6) Pose error vector
     
     // Output
-    Eigen::Matrix<double,6,1> tau; // (6) Control forces
+    Eigen::Vector6d tau; // (6) Control forces
 
     // Other stuff
-    Eigen::Matrix<double,6,1> g; // (6)   Restoring force vector
-    Eigen::Matrix<double,3,3> R; // (3*3) Rotation matrix from {n} to {b}
+    Eigen::Vector6d g; // (6)   Restoring force vector
+    Eigen::Matrix3d R; // (3*3) Rotation matrix from {n} to {b}
 
     // Controller gains
-    Eigen::Matrix<double,6,6> K_P; // (6*6) Proportional gain matrix
-    Eigen::Matrix<double,6,6> K_D; // (6*6) Derivative gain matrix
-    Eigen::Matrix3d           K_p; // (3*3) Position error gain matrix (part of K_P)
+    Eigen::Matrix6d K_P; // (6*6) Proportional gain matrix
+    Eigen::Matrix6d K_D; // (6*6) Derivative gain matrix
+    Eigen::Matrix3d K_p; // (3*3) Position error gain matrix (part of K_P)
     double c;            //       Attitude error gain
 
     // Constants

@@ -73,6 +73,7 @@ add_dependencies(setpoint_processing uranus_dp_generate_messages_cpp)
 add_executable(state_estimator
   src/state_estimator/state_estimator.cpp
   src/state_estimator/extended_kalman_filter.cpp
+  src/state_estimator/integration_filter.cpp
 )
 target_link_libraries(state_estimator ${catkin_LIBRARIES} model_server)
 add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
@@ -84,6 +85,10 @@ target_link_libraries(allocator_test ${catkin_LIBRARIES})
 
 catkin_add_gtest(controller_test test/controller_test.cpp)
 target_link_libraries(controller_test ${catkin_LIBRARIES})
+
+catkin_add_gtest(integration_filter_test test/integration_filter_test.cpp)
+target_link_libraries(integration_filter_test ${catkin_LIBRARIES})
+# add_dependencies(integration_filter_test ros_arduino)
 
 catkin_add_gtest(open_loop_integration_test test/open_loop_integration_test.cpp)
 target_link_libraries(open_loop_integration_test ${catkin_LIBRARIES})

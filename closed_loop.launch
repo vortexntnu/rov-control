@@ -1,0 +1,26 @@
+<launch>
+  <node
+    name="setpoint_processing"
+    pkg="uranus_dp"
+    type="setpoint_processing"
+    output="screen"
+  />
+  <node
+    name="controller"
+    pkg="uranus_dp"
+    type="controller"
+    output="screen"
+  />
+  <node
+    name="allocator"
+    pkg="uranus_dp"
+    type="allocator"
+    output="screen"
+  />
+  <node
+    name="state_estimator"
+    pkg="uranus_dp"
+    type="state_estimator"
+    output="screen"
+  />
+</launch>

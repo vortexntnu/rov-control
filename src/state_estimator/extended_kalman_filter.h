@@ -17,10 +17,10 @@ public:
     void sensorCallback(const ros_arduino::SensorRaw &yMsg);
     void update();
 private:
-    ros::NodeHandle    nh;
-    ros::Subscriber    controlSub;
-    ros::Subscriber    sensorSub;
-    ros::Publisher     statePub;
+    ros::NodeHandle nh;
+    ros::Subscriber controlSub;
+    ros::Subscriber sensorSub;
+    ros::Publisher  statePub;
 
     // Sampling time
     double h;

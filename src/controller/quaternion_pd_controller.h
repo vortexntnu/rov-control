@@ -1,3 +1,5 @@
+// Based on Fjellstad & Fossen 1994: Quaternion Feedback Regulation of Underwater Vehicles
+
 #ifndef QUATERNION_PD_CONTROLLER_H
 #define QUATERNION_PD_CONTROLLER_H
 
@@ -9,8 +11,6 @@
 #include <eigen_conversions/eigen_msg.h>
 #include "../eigen_typedefs.h"
 
-// Change name to reflect that this is a position and attitude controller, not a velocity controller
-// Maybe "StationkeepingController"
 class QuaternionPdController
 {
 public:

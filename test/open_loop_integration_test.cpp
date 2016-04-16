@@ -22,7 +22,7 @@ public:
         }
     }
 
-    void Publish(int strafe_X, int strafe_Y, int turn_X, int turn_Y, int ascend, ControlMode control_mode)
+    void Publish(int strafe_X, int strafe_Y, int turn_X, int turn_Y, int ascend)
     {
         joystick::DirectionalInput msg;
         msg.strafe_X = strafe_X;
@@ -30,7 +30,7 @@ public:
         msg.turn_X = turn_X;
         msg.turn_Y = turn_Y;
         msg.ascend = ascend;
-        msg.control_mode = static_cast<int>(control_mode);
+        msg.control_mode = static_cast<int>(control_mode_);
         publisher_.publish(msg);
     }
 
@@ -44,7 +44,7 @@ public:
 
     Eigen::Matrix<double,6,1> u_;
     static const ControlMode control_mode_ = ControlModes::OPEN_LOOP;
-    static const double EPSILON = 1e-6; // Max absolute error 1 micronewton
+    // static const double EPSILON = 1e-6; // Max absolute error 1 micronewton
 
  private:
     ros::NodeHandle node_handle_;
@@ -74,9 +74,20 @@ TEST_F(OpenLoopIntegrationTest, CheckResponsiveness)
 {
     ros::Duration(0.5).sleep();
 
-    Publish(1,2,3,4,5,control_mode_);
+    Publish(1,2,3,4,5);
     WaitForMessage();
     EXPECT_TRUE(true);
+}
+
+ /*
+  * Command maximum forward thrust. Check this gives 10 N forward.
+  */
+TEST_F(OpenLoopIntegrationTest, MaxForward)
+{
+    Publish(32767,0,0,0,0);
+    WaitForMessage();
+    double totalForwardThrust = 0.7071*(u_(0) + u_(1) + u_(2) + u_(3)) + u_(4) + u_(5);
+    EXPECT_NEAR(totalForwardThrust, 10, 1e-3);
 }
 
 int main(int argc, char **argv)

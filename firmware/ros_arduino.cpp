@@ -146,11 +146,7 @@ void pwm_update( const uranus_dp::ThrusterForces& force_input ){
   
 }
 
-<<<<<<< HEAD
 ros::Subscriber<uranus_dp::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
-=======
-ros::Subscriber<uranus_dp::ThrusterForces> pwm_input_sub("control_inputs", &pwm_update );
->>>>>>> cb65ecb0801c3b26d3877fc7748033a45a4bf3e6
 
 
 double GyroLsbSens, AccelLsbSens;

@@ -53,6 +53,7 @@ public:
         {
             ros::spinOnce();
             stationkeeper.compute();
+            loop_late.sleep();
         }
     }
 private:
@@ -63,6 +64,8 @@ private:
     QuaternionPdController stationkeeper; // I hardly know her.
     OpenLoopController     openlooper;
 };
+
+
 
 int main(int argc, char **argv)
 {

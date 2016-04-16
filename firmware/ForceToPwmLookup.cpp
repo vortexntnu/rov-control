@@ -1,22 +1,32 @@
 #include "ForceToPwmLookup.h"
-
+#include <Arduino.h>
 
 int ForceToPwm(float force) {
+  return MicroSecToPwmValue(ForceToMicroSec(force));
+}
 
-  int pwmus = 0;
+
+int ForceToMicroSec(float force) {
+
+  int us = 0;
 
   
   for(int i = 0; i < FoceToPwmLookupTableSize; i++) {
 
     if( force < FoceToPwmLookupTable[i] ) {
 
-      pwmus = i * PwmIncremetMicroSec + PwmLowerMicroSec;
+      us = i * PwmIncremetMicroSec + PwmLowerMicroSec;
       
       break;
     }
     
   }
   
-  return pwmus;
+  return us;
   
+}
+
+int MicroSecToPwmValue(int us) {
+  return map(us, PwmLowerMicroSec, PwmUpperMicroSec,
+	     PwmLowerValue, PwmUpperValue);
 }

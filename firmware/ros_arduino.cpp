@@ -30,14 +30,80 @@ ros::Publisher pub_imu( "SensorRaw", &sensor_raw_msg);
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;
 
-//PWM-variable:
 int dbg_count = 0;
+
+//Hold orden på pwm-pins og hvilke rigeistre om må settes for å endre on-time
 const int PwmCount = 6;
-int PwmOnTime[PwmCount];
-const int PwmPins[PwmCount] = { 3, 5, 6, 9, 10, 11 };
-const int PwmTotalTime = 3600;
-int PwmPinState[PwmCount] = { LOW, LOW, LOW, LOW, LOW, LOW };
-unsigned long PreviousToggleMicros[PwmCount] = { 0, 0, 0, 0, 0, 0 };
+const int PwmPins[PwmCount] = { 2, 3, 7, 8, 12, 13 };
+int PwmValue[PwmCount];
+
+
+void WritePwm(int pin, uint8_t value) {
+  switch(pin) {
+  case 2:
+    OCR3BH = 0;
+    OCR3BL = value;
+    break;
+  case 3:
+    OCR3CH = 0;
+    OCR3CL = value;
+    break;
+  case 7:
+    OCR4BH = 0;
+    OCR4BL = value;
+    break;
+  case 8:
+    OCR4CH = 0;
+    OCR4CL = value;
+    break;
+  case 12:
+    OCR1BH = 0;
+    OCR1BL = value;
+    break;
+  case 13:
+    OCR1CH = 0;
+    OCR1CL = value;
+    break;
+  };
+}
+
+
+void InitPwm() {
+
+  //sett alle pwmpinnene som utputt
+  for(int i = 0; i < PwmCount; i++)
+    pinMode(PwmPins[i], OUTPUT);
+
+  //initialiser Timer/Counter 1, 3 og 4
+  TCCR4A |= (1<<COM4B1) | (1<<COM4C1)  | (1<<WGM41) | (1<<WGM40);
+  TCCR3A |= (1<<COM3B1) | (1<<COM3C1)  | (1<<WGM31) | (1<<WGM30);
+  TCCR1A |= (1<<COM1B1) | (1<<COM1C1)  | (1<<WGM11) | (1<<WGM10);
+
+  //sett Clock select
+  //På Timer/Counter 4
+  TCCR4B |= (1<<CS41) | (1<<CS40);
+  TCCR4B &= ~(1<<CS42);
+  //på Timer/Counter 3
+  TCCR3B |= (1<<CS31) | (1<<CS30);
+  TCCR3B &= ~(1<<CS32);
+  //på Timer/Counter 1
+  TCCR1B |= (1<<CS11) | (1<<CS10);
+  TCCR1B &= ~(1<<CS12);
+
+
+  //sett alle motorer til 0 Newton
+  for(int i = 0; i < PwmCount; i++) {
+    PwmValue[i] = ForceToPwm(0);
+    WritePwm(PwmPins[i], PwmValue[i]);
+  }
+  
+  
+}
+
+
+//const int PwmTotalTime = 3600;
+//int PwmPinState[PwmCount] = { LOW, LOW, LOW, LOW, LOW, LOW };
+//unsigned long PreviousToggleMicros[PwmCount] = { 0, 0, 0, 0, 0, 0 };
 
 
 
@@ -52,21 +118,25 @@ ros::Publisher arduino_dbg_pub("ArduinoDbg", &arduino_dbg_msg);
 
 void pwm_update( const uranus_dp::ThrusterForces& force_input ){
   
-  PwmOnTime[0] = ForceToPwm(force_input.F1);
-  PwmOnTime[1] = ForceToPwm(force_input.F2);
-  PwmOnTime[2] = ForceToPwm(force_input.F3);
-  PwmOnTime[3] = ForceToPwm(force_input.F4);
-  PwmOnTime[4] = ForceToPwm(force_input.F5);
-  PwmOnTime[5] = ForceToPwm(force_input.F6);
+  PwmValue[0] = ForceToPwm(force_input.F1);
+  PwmValue[1] = ForceToPwm(force_input.F2);
+  PwmValue[2] = ForceToPwm(force_input.F3);
+  PwmValue[3] = ForceToPwm(force_input.F4);
+  PwmValue[4] = ForceToPwm(force_input.F5);
+  PwmValue[5] = ForceToPwm(force_input.F6);
+
+  for(int i = 0; i < PwmCount; i++) {
+    WritePwm(PwmPins[i], PwmValue[i]);
+  }
   
   
   //Send PWM-verdiene tilbake som debugoutput
-  pwm_status_msg.pwm1 = PwmOnTime[0];
-  pwm_status_msg.pwm2 = PwmOnTime[1];
-  pwm_status_msg.pwm3 = PwmOnTime[2];
-  pwm_status_msg.pwm4 = PwmOnTime[3];
-  pwm_status_msg.pwm5 = PwmOnTime[4];
-  pwm_status_msg.pwm6 = PwmOnTime[5];
+  pwm_status_msg.pwm1 = PwmValue[0];
+  pwm_status_msg.pwm2 = PwmValue[1];
+  pwm_status_msg.pwm3 = PwmValue[2];
+  pwm_status_msg.pwm4 = PwmValue[3];
+  pwm_status_msg.pwm5 = PwmValue[4];
+  pwm_status_msg.pwm6 = PwmValue[5];
   
   dbg_count = 0;
   
@@ -76,7 +146,7 @@ void pwm_update( const uranus_dp::ThrusterForces& force_input ){
   
 }
 
-ros::Subscriber<uranus_dp::ThrusterForces> pwm_input_sub("controlInput", &pwm_update );
+ros::Subscriber<uranus_dp::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
 
 
 double GyroLsbSens, AccelLsbSens;
@@ -137,6 +207,16 @@ void getFsRangeAndSetLsbSensisivity() {
 }
 
 void setup() {
+  /*
+  //still ned hovedklokkefrekvensen
+  CLKPR = 0b10000000;
+  CLKPR = 0x3; // del på 8 (2^3)
+  delay(1);
+  */
+  
+  InitPwm();
+
+  
   //start ROS-node
   nh.initNode();
 
@@ -163,12 +243,6 @@ void setup() {
 
   nh.spinOnce();
 
-
-  //sett alle motorer til 0 Newton
-  for(int i = 0; i < PwmCount; i++) {
-    PwmOnTime[i] = ForceToPwm(0);
-  }
-  
 
 }
 
@@ -210,9 +284,7 @@ void loop(){
 
   nh.spinOnce();
 
-  /*
-    //komenterte vekk IMU for å kunne bruke software-PWM uten forstyrrelser
-
+  
   if( millis() - PrevoiusSensorReadMillis >= SensorReadDelay ) {
     PrevoiusSensorReadMillis = millis();
   
@@ -228,7 +300,7 @@ void loop(){
     
     
   }
-  */
+  
   
   
   /*
@@ -240,35 +312,6 @@ void loop(){
   arduino_dbg_pub.publish( &arduino_dbg_msg );  
   nh.spinOnce();
   */
-
-
-  //Software-PWM
-  for(int i = 0; i < PwmCount; i++) {
-     nh.spinOnce();
-    
-    unsigned long CurrentMicros = micros();
-    if(PwmPinState[i] == HIGH) {
-      if(CurrentMicros - PreviousToggleMicros[i] >= PwmOnTime[i]) {
-	PwmPinState[i] = LOW;
-	digitalWrite(PwmPins[i], PwmPinState[i]);
-	PreviousToggleMicros[i] = CurrentMicros;
-
-	
-      }
-    } else { // (PwmPinState[i] == LOW)
-      if(CurrentMicros - PreviousToggleMicros[i] >= PwmTotalTime - PwmOnTime[i] ) {
-	PwmPinState[i] = HIGH;
-	digitalWrite(PwmPins[i], PwmPinState[i]);
-	PreviousToggleMicros[i] = CurrentMicros;
-      }
-      
-    }
-
-    
-    //analogWrite(pwm_pins[i], PwmOnTime[i]);
-    
-  }
-
 
   
 }

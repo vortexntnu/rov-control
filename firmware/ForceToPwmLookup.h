@@ -4,34 +4,20 @@
 
 int ForceToPwm(float force);
 
+int ForceToMicroSec(float force);
+int MicroSecToPwmValue(int us);
 
-const int PwmLowerMicroSec = 1100;
-const int PwmUpperMicroSec = 1900;
+
+const int PwmLowerMicroSec = 1300;
+const int PwmUpperMicroSec = 1700;
 const int PwmIncremetMicroSec = 10;
 
-const int FoceToPwmLookupTableSize = 81;
+const int PwmLowerValue = 161;
+const int PwmUpperValue = 212;
+
+const int FoceToPwmLookupTableSize = 40;
 const float FoceToPwmLookupTable[FoceToPwmLookupTableSize] = {
   //kraft i Newton
-  -17.3399402255,
-  -16.0918211373,
-  -15.4677615882,
-  -14.9774290882,
-  -14.1304911373,
-  -13.72931,
-  -12.9715234118,
-  -12.3474638627,
-  -11.8571313627,
-  -11.411374549,
-  -10.8318906863,
-  -10.2078311373,
-  -9.7174986373,
-  -9.0934390882,
-  -8.3802281863,
-  -7.7561686373,
-  -7.3995631863,
-  -6.9092306863,
-  -6.5526252255,
-  -6.1068684118,
   -5.7056872745,
   -5.2153547745,
   -4.6358709118,
@@ -54,7 +40,6 @@ const float FoceToPwmLookupTable[FoceToPwmLookupTableSize] = {
   0,
   0,
   0,
-  0,
   0.0891513627,
   0.356605451,
   0.624059549,
@@ -72,28 +57,7 @@ const float FoceToPwmLookupTable[FoceToPwmLookupTableSize] = {
   7.221260451,
   7.8898956863,
   8.6476822745,
-  9.450044549,
-  10.3861338627,
-  11.0993447745,
-  11.634252951,
-  12.3028881863,
-  12.7932206863,
-  13.595582951,
-  14.6208236373,
-  15.4677615882,
-  16.2255481863,
-  16.9387590882,
-  17.8748484118,
-  19.2121188627,
-  20.0590568137,
-  20.593965,
-  21.3963272745,
-  22.198689549,
-  22.7781734118,
-  23.7142627255,
-  24.382897951,
-  24.6949277255, // indeks 79
-  
+  9.450044549, //indeks 39
   
 };
 

@@ -16,21 +16,35 @@ def read_ps3_into_control_msg(device, model):
         elif input == 'Y2':
             if event.value != 0:
                 model.turn_Y = deadzone(event.value)
+
         elif input == 'R1':
             model.lights_increase = (event.value == 1)
         elif input == 'L1':
             model.lights_decrease = (event.value == 1)
+
         elif input == 'TRIANGLE':
             model.lights_on = (event.value == 1)
         elif input == 'SQUARE':
             model.lights_off = (event.value == 1)
+        elif input == 'CIRCLE':
+            model.arm_grip_open = (event.value == 1)
+        elif input == 'X':
+            model.arm_grip_close = (event.value == 1)
+
         elif input == 'DY':
             model.arm_base = event.value
         elif input == 'DX':
             model.arm_rot = event.value
-        elif input == 'R2':
-            model.arm_grip = event.value
 
+        elif input == 'L2':
+            model.ascend = event.value
+        elif input == 'R2':
+            model.descend = event.value
+
+        elif input == 'START':
+            model.free_roam = (event.value == 1)
+        elif input == 'SELECT':
+            model.hold_position = (event.value == 1)
 
 def read_xbox_into_control_msg(device, model):
 
@@ -44,20 +58,30 @@ def read_xbox_into_control_msg(device, model):
             model.turn_Y = event.value
         elif input == 'Y2':
             model.turn_Y = event.value
+
         elif input == 'HTrigth':
             model.lights_increase = event.value
         elif input == 'HTleft':
             model.lights_decrease = event.value
+
         elif input == 'Y':
             model.lights_on = event.value
         elif input == 'X':
             model.lights_off = event.value
+        elif input == 'A':
+            model.arm_grip_open = not (event.value == 0)
+        elif input == 'B':
+            model.arm_grip_close = not (event.value == 0)
+
         elif input == 'DY':
             model.arm_base = event.value
         elif input == 'DX':
             model.arm_rot = event.value
+
         elif input == 'STright':
-            model.arm_grip = event.value
+            model.ascend = event.value
+        elif input == 'STleft':
+            model.descend = event.value
 
 
 def deadzone(value):

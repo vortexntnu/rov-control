@@ -5,7 +5,6 @@ from evdev import InputDevice
 import rospy
 import threading
 from joystick.msg import Joystick
-# from uranus_dp.msg import JoystickUranus
 import xctrl
 import subprocess
 import os
@@ -18,7 +17,7 @@ class JoystickNode:
     def __init__(self):
         self.model = Joystick()
         rospy.init_node('joystick_node')
-        self.pub = rospy.Publisher('Joystick', Joystick, queue_size=10)
+        self.pub = rospy.Publisher('joystick', Joystick, queue_size=10)
         self.rate = rospy.Rate(10)
     '''
         # to test the arduino
@@ -31,11 +30,13 @@ class JoystickNode:
         device_type, self.device = self.init_device()
         if device_type == 'xbox':
             # start reading xbox controller signals into control msg
+            print("Doing xbox things")
             input_thread = threading.Thread(target=xctrl.read_ps3_into_control_msg, args=(self.device, self.model))
             input_thread.daemon = True
             input_thread.start()
 
         if device_type == 'ps3':
+            print("Doing ps3 things")
             xctrl.read_ps3_into_control_msg(self.device, self.model)
 
         while not rospy.is_shutdown():

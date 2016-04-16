@@ -8,7 +8,7 @@ int ForceToPwm(float force) {
 
 int ForceToMicroSec(float force) {
 
-  int us = 0;
+  int us = PwmUpperMicroSec;
 
   
   for(int i = 0; i < FoceToPwmLookupTableSize; i++) {

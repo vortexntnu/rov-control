@@ -12,8 +12,8 @@ const int PwmLowerMicroSec = 1300;
 const int PwmUpperMicroSec = 1700;
 const int PwmIncremetMicroSec = 10;
 
-const int PwmLowerValue = 161;
-const int PwmUpperValue = 212;
+const int PwmLowerValue = 162;
+const int PwmUpperValue = 214;
 
 const int FoceToPwmLookupTableSize = 40;
 const float FoceToPwmLookupTable[FoceToPwmLookupTableSize] = {

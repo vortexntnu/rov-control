@@ -34,20 +34,12 @@ int dbg_count = 0;
 
 //Hold orden på pwm-pins og hvilke rigeistre om må settes for å endre on-time
 const int PwmCount = 6;
-const int PwmPins[PwmCount] = { 2, 3, 7, 8, 12, 13 };
+const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45 };
 int PwmValue[PwmCount];
 
 
 void WritePwm(int pin, uint8_t value) {
   switch(pin) {
-  case 2:
-    OCR3BH = 0;
-    OCR3BL = value;
-    break;
-  case 3:
-    OCR3CH = 0;
-    OCR3CL = value;
-    break;
   case 7:
     OCR4BH = 0;
     OCR4BL = value;
@@ -64,6 +56,14 @@ void WritePwm(int pin, uint8_t value) {
     OCR1CH = 0;
     OCR1CL = value;
     break;
+  case 44:
+    OCR5BH = 0;
+    OCR5BL = value;
+    break;
+  case 45:
+    OCR5CH = 0;
+    OCR5CL = value;
+    break;
   };
 }
 
@@ -74,21 +74,21 @@ void InitPwm() {
   for(int i = 0; i < PwmCount; i++)
     pinMode(PwmPins[i], OUTPUT);
 
-  //initialiser Timer/Counter 1, 3 og 4
-  TCCR4A |= (1<<COM4B1) | (1<<COM4C1)  | (1<<WGM41) | (1<<WGM40);
-  TCCR3A |= (1<<COM3B1) | (1<<COM3C1)  | (1<<WGM31) | (1<<WGM30);
+  //initialiser Timer/Counter 3, 4 og 5
   TCCR1A |= (1<<COM1B1) | (1<<COM1C1)  | (1<<WGM11) | (1<<WGM10);
+  TCCR4A |= (1<<COM4B1) | (1<<COM4C1)  | (1<<WGM41) | (1<<WGM40);
+  TCCR5A |= (1<<COM5B1) | (1<<COM5C1)  | (1<<WGM51) | (1<<WGM50);
 
   //sett Clock select
-  //På Timer/Counter 4
-  TCCR4B |= (1<<CS41) | (1<<CS40);
-  TCCR4B &= ~(1<<CS42);
-  //på Timer/Counter 3
-  TCCR3B |= (1<<CS31) | (1<<CS30);
-  TCCR3B &= ~(1<<CS32);
   //på Timer/Counter 1
   TCCR1B |= (1<<CS11) | (1<<CS10);
   TCCR1B &= ~(1<<CS12);
+  //På Timer/Counter 4
+  TCCR4B |= (1<<CS41) | (1<<CS40);
+  TCCR4B &= ~(1<<CS42);
+  //på Timer/Counter 5
+  TCCR5B |= (1<<CS51) | (1<<CS50);
+  TCCR5B &= ~(1<<CS52);
 
 
   //sett alle motorer til 0 Newton

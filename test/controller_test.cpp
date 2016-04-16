@@ -230,7 +230,7 @@ TEST_F(QuaternionPdControllerTest, OnlySurge)
     PublishState(p, q, v, omega);
     PublishSetpoint(p_sp, q);
 
-    ros::Duration(0.1).sleep(); // Controller runs at 10 Hz, must give it time to compute new value.
+    ros::Duration(0.5).sleep(); // Controller runs at 10 Hz, must give it time to compute new value.
     WaitForMessage();
 
     EXPECT_NEAR(tau(0), 30, EPSILON);
@@ -241,11 +241,74 @@ TEST_F(QuaternionPdControllerTest, OnlySurge)
     EXPECT_NEAR(tau(5),  0, EPSILON);
 }
 
+ /*
+  * Give error only in sway, assure rov force command only in sway.
+  */
+TEST_F(QuaternionPdControllerTest, OnlySway)
+{
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = ControlModes::STATIONKEEPING;
+    if (!client.call(srv))
+        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+
+    Eigen::Vector3d    p(0,0,0);
+    Eigen::Quaterniond q(1,0,0,0);
+    Eigen::Vector3d    v(0,0,0);
+    Eigen::Vector3d    omega(0,0,0);
+
+    Eigen::Vector3d p_sp(0,1,0);
+
+    PublishState(p, q, v, omega);
+    PublishSetpoint(p_sp, q);
+
+    ros::Duration(0.5).sleep(); // Controller runs at 10 Hz, must give it time to compute new value.
+    WaitForMessage();
+
+    EXPECT_NEAR(tau(0),  0, EPSILON);
+    EXPECT_NEAR(tau(1), 30, EPSILON);
+    EXPECT_NEAR(tau(2),  0, EPSILON);
+    EXPECT_NEAR(tau(3),  0, EPSILON);
+    EXPECT_NEAR(tau(4),  0, EPSILON);
+    EXPECT_NEAR(tau(5),  0, EPSILON);
+}
+
+ /*
+  * Give error only in yaw, assure rov force command only in yaw.
+  */
+TEST_F(QuaternionPdControllerTest, OnlyYaw)
+{
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = ControlModes::STATIONKEEPING;
+    if (!client.call(srv))
+        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+
+    Eigen::Vector3d    p(0,0,0);
+    Eigen::Quaterniond q(1,0,0,0);
+    Eigen::Vector3d    v(0,0,0);
+    Eigen::Vector3d    omega(0,0,0);
+
+    Eigen::Quaterniond q_sp(0.923879532511287,0,0,0.382683432365090); // Equal to 45 degrees yaw
+    q_sp.normalize();
+
+    PublishState(p, q, v, omega);
+    PublishSetpoint(p, q_sp);
+
+    ros::Duration(0.5).sleep(); // Controller runs at 10 Hz, must give it time to compute new value.
+    WaitForMessage();
+
+    EXPECT_NEAR(tau(0),  0, EPSILON);
+    EXPECT_NEAR(tau(1),  0, EPSILON);
+    EXPECT_NEAR(tau(2),  0, EPSILON);
+    EXPECT_NEAR(tau(3),  0, EPSILON);
+    EXPECT_NEAR(tau(4),  0, EPSILON);
+    EXPECT_NEAR(tau(5), 76.536686473017951, EPSILON);
+}
+
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
     ros::init(argc, argv, "controller_test");
-    ROS_INFO("Launching node controller_test.");
 
     int ret = RUN_ALL_TESTS();
     ros::shutdown();

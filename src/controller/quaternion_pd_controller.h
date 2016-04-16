@@ -17,6 +17,7 @@ public:
     QuaternionPdController();
     void stateCallback(const uranus_dp::State &msg);
     void setpointCallback(const geometry_msgs::Pose &msg);
+    void setGains(double a, double b, double c);
     void compute();
     void enable();
     void disable();
@@ -41,10 +42,12 @@ private:
     Eigen::Quaterniond q_d; // Desired attitude
     Eigen::Vector6d    z;   // Pose error
 
+    double a;            // Derivative gain
+    double b;            // Position gain
+    double c;            // Orientation gain
     Eigen::Matrix6d K_P; // Proportional gain matrix
     Eigen::Matrix6d K_D; // Derivative gain matrix
     Eigen::Matrix3d K_p; // Position error gain matrix (submatrix of K_P)
-    double c;            // Attitude error gain
 
     Eigen::Vector6d tau; // Control ROV forces
 

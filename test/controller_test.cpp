@@ -6,6 +6,7 @@
 #include "geometry_msgs/Pose.h"
 #include "uranus_dp/State.h"
 #include "uranus_dp/SetControlMode.h"
+#include "uranus_dp/SetControllerGains.h"
 #include "../src/control_mode_enum.h"
 
 class OpenLoopControllerTest : public ::testing::Test
@@ -79,7 +80,8 @@ public:
         setpointPub = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
         statePub    = nh.advertise<uranus_dp::State>("state_estimate", 10);
         sub         = nh.subscribe("rov_forces", 10, &QuaternionPdControllerTest::Callback, this);
-        client      = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
+        modeClient  = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
+        gainClient  = nh.serviceClient<uranus_dp::SetControllerGains>("set_controller_gains");
 
         message_received = false;
     }
@@ -118,7 +120,8 @@ public:
         }
     }
 
-    ros::ServiceClient client; // Should be private?
+    ros::ServiceClient modeClient;
+    ros::ServiceClient gainClient;
     Eigen::Matrix<double,6,1> tau;
     static const double EPSILON = 1e-6; // Max absolute error
 
@@ -186,7 +189,7 @@ TEST_F(QuaternionPdControllerTest, ZeroErrorZeroOutput)
 {
     uranus_dp::SetControlMode srv;
     srv.request.mode = ControlModes::STATIONKEEPING;
-    if (!client.call(srv))
+    if (!modeClient.call(srv))
         ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
 
     Eigen::Vector3d    p(1,2,3);
@@ -214,14 +217,20 @@ TEST_F(QuaternionPdControllerTest, ZeroErrorZeroOutput)
   */
 TEST_F(QuaternionPdControllerTest, OnlySurge)
 {
-    uranus_dp::SetControlMode srv;
-    srv.request.mode = ControlModes::STATIONKEEPING;
-    if (!client.call(srv))
+    uranus_dp::SetControlMode modeSrv;
+    modeSrv.request.mode = ControlModes::STATIONKEEPING;
+    if (!modeClient.call(modeSrv))
         ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+
+    uranus_dp::SetControllerGains gainSrv;
+    gainSrv.request.a = 1;
+    gainSrv.request.b = 30;
+    gainSrv.request.c = 200;
+    if (!gainClient.call(gainSrv))
+        ROS_ERROR("Failed to call service set_controller_gains.");
 
     Eigen::Vector3d    p(0,0,0);
     Eigen::Quaterniond q(1,0,0,0);
-    q.normalize();
     Eigen::Vector3d    v(0,0,0);
     Eigen::Vector3d    omega(0,0,0);
 
@@ -248,8 +257,15 @@ TEST_F(QuaternionPdControllerTest, OnlySway)
 {
     uranus_dp::SetControlMode srv;
     srv.request.mode = ControlModes::STATIONKEEPING;
-    if (!client.call(srv))
+    if (!modeClient.call(srv))
         ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+
+    uranus_dp::SetControllerGains gainSrv;
+    gainSrv.request.a = 1;
+    gainSrv.request.b = 30;
+    gainSrv.request.c = 200;
+    if (!gainClient.call(gainSrv))
+        ROS_ERROR("Failed to call service set_controller_gains.");
 
     Eigen::Vector3d    p(0,0,0);
     Eigen::Quaterniond q(1,0,0,0);
@@ -279,8 +295,15 @@ TEST_F(QuaternionPdControllerTest, OnlyYaw)
 {
     uranus_dp::SetControlMode srv;
     srv.request.mode = ControlModes::STATIONKEEPING;
-    if (!client.call(srv))
+    if (!modeClient.call(srv))
         ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+
+    uranus_dp::SetControllerGains gainSrv;
+    gainSrv.request.a = 1;
+    gainSrv.request.b = 30;
+    gainSrv.request.c = 200;
+    if (!gainClient.call(gainSrv))
+        ROS_ERROR("Failed to call service set_controller_gains.");
 
     Eigen::Vector3d    p(0,0,0);
     Eigen::Quaterniond q(1,0,0,0);

@@ -21,6 +21,7 @@ add_message_files(DIRECTORY msg FILES
 
 add_service_files(DIRECTORY srv FILES
   SetControlMode.srv
+  SetControllerGains.srv
 )
 
 generate_messages(DEPENDENCIES geometry_msgs)

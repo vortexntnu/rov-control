@@ -1,0 +1,10 @@
+# Derivative gain (K_D = a * identity)
+float64 a
+
+# Position error gain (K_p = b * identity)
+float64 b
+
+# Orientation error gain (<bottom right block of K_P> = c * identity)
+float64 c
+
+---

@@ -25,9 +25,7 @@ QuaternionPdController::QuaternionPdController()
     R = q.toRotationMatrix();
 
     // Gains etc. (temporary values from paper)
-    K_D = Eigen::MatrixXd::Identity(6,6);
-    K_p = 30*Eigen::MatrixXd::Identity(3,3);
-    c = 200;
+    setGains(1,30,200);
     r_g.setZero();
     r_b.setZero();
     W = 185*9.8;
@@ -50,6 +48,15 @@ void QuaternionPdController::setpointCallback(const geometry_msgs::Pose &msg)
     tf::quaternionMsgToEigen(msg.orientation, q_d);
     if (isFucked(p_d))
         ROS_WARN("p_d is fucked.");
+}
+
+void QuaternionPdController::setGains(double a_new, double b_new, double c_new)
+{
+    a = a_new;
+    b = b_new;
+    c = c_new;
+    K_D = a * Eigen::MatrixXd::Identity(6,6);
+    K_p = b * Eigen::MatrixXd::Identity(3,3);
 }
 
 void QuaternionPdController::compute()

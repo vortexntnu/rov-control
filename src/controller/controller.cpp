@@ -2,6 +2,7 @@
 #include "quaternion_pd_controller.h"
 #include "open_loop_controller.h"
 #include "uranus_dp/SetControlMode.h"
+#include "uranus_dp/SetControllerGains.h"
 #include "joystick/DirectionalInput.h"
 #include "../control_mode_enum.h"
 
@@ -46,6 +47,12 @@ public:
         return true;
     }
 
+    bool setControllerGains(uranus_dp::SetControllerGains::Request &req, uranus_dp::SetControllerGains::Response &resp)
+    {
+        ROS_INFO_STREAM("Setting new gains: a = " << req.a << ", b = " << req.b << ", c = " << req.c << ".");
+        stationkeeper.setGains(req.a, req.b, req.c);
+    }
+
     void run()
     {
         ros::Rate loop_late(frequency);
@@ -75,7 +82,8 @@ int main(int argc, char **argv)
 
     unsigned int frequency = 10;
     Controller controller(frequency);
-    ros::ServiceServer ss = nh.advertiseService("set_control_mode", &Controller::setControlMode, &controller);
+    ros::ServiceServer ss1 = nh.advertiseService("set_control_mode", &Controller::setControlMode, &controller);
+    ros::ServiceServer ss2 = nh.advertiseService("set_controller_gains", &Controller::setControllerGains, &controller);
 
     controller.run();
     ROS_ERROR("controller.run() has returned. That's not meant to happen.");

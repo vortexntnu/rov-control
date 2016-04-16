@@ -9,7 +9,6 @@ The Uranus dynamic positioning system, a complete control system for our ROV.
 
 ## Todo
 - Add values values to model node
-- Implement del_f_del_x in EKF
 - Get values r_g, r_b, W, B for Quaternion controller
 - Normalize quaternions everywhere
 - Split ExtendedKalmanFilter::updateSystemDynamics()
@@ -18,4 +17,4 @@ The Uranus dynamic positioning system, a complete control system for our ROV.
 - Have a look at variable names for ros::Publisher/Subscribers
 - Proper ROS parameter use
 - Consider return by value for quaternion pd update functions
-- Add some sort of setGains service to dp controller
+- Clean tests for controller (write nice method for service calling)

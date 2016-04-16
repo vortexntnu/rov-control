@@ -67,14 +67,18 @@ public:
 
 TEST_F(IntegrationFilterTest, CheckResponsiveness)
 {
-    // ros::Duration(0.5).sleep();
-
     Eigen::Vector3d acceleration;
     Eigen::Vector3d gyro;
 
     Publish(acceleration, gyro); 
     WaitForMessage();
     EXPECT_TRUE(true);
+}
+
+TEST_F(IntegrationFilterTest, ZeroInZeroOut)
+{
+    Eigen::Vector3d acceleration;
+    Eigen::Vector3d gyro;
 }
 
 int main(int argc, char **argv)

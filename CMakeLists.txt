@@ -14,17 +14,30 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Eigen REQUIRED)
 find_package(GTest REQUIRED)
 
-add_message_files(DIRECTORY msg FILES
+################################################
+## Declare ROS messages, services and actions ##
+################################################
+
+add_message_files(
+  FILES
   ThrusterForces.msg
   State.msg
 )
 
-add_service_files(DIRECTORY srv FILES
+add_service_files(
+  FILES
   SetControlMode.srv
   SetControllerGains.srv
 )
 
-generate_messages(DEPENDENCIES geometry_msgs)
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+)
+
+###################################
+## catkin specific configuration ##
+###################################
 
 catkin_package(CATKIN_DEPENDS
   cmake_modules
@@ -35,61 +48,77 @@ catkin_package(CATKIN_DEPENDS
   joystick
 )
 
+###########
+## Build ##
+###########
+
 include_directories(
   include
-  ${roscpp_INCLUDE_DIRS}
   ${EIGEN_INCLUDE_DIRS}
   ${GTEST_INCLUDE_DIRS}
 )
 
-
-# Model server
 add_library(model_server
-  src/model_server.cpp)
+  src/model_server.cpp
+)
 
-
-
-# Control allocation node:
-add_executable(allocator
-  src/allocator/allocator.cpp
-  src/allocator/lagrange_allocator.cpp)
-target_link_libraries(allocator ${catkin_LIBRARIES})
-add_dependencies(allocator uranus_dp_generate_messages_cpp)
-
-# Controller node:
+add_executable(setpoint_processing
+  src/setpoint_processing.cpp
+)
 add_executable(controller
   src/controller/controller.cpp
   src/controller/quaternion_pd_controller.cpp
   src/controller/open_loop_controller.cpp
 )
-target_link_libraries(controller ${catkin_LIBRARIES})
-add_dependencies(controller uranus_dp_generate_messages_cpp)
-
-# Setpoint processing node:
-add_executable(setpoint_processing src/setpoint_processing.cpp)
-target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
-add_dependencies(setpoint_processing uranus_dp_generate_messages_cpp)
-
-# State estimator node:
+add_executable(allocator
+  src/allocator/allocator.cpp
+  src/allocator/lagrange_allocator.cpp
+)
 add_executable(state_estimator
   src/state_estimator/state_estimator.cpp
-  src/state_estimator/extended_kalman_filter.cpp
   src/state_estimator/integration_filter.cpp
+#  src/state_estimator/extended_kalman_filter.cpp
 )
-target_link_libraries(state_estimator ${catkin_LIBRARIES} model_server)
-add_dependencies(state_estimator uranus_dp_generate_messages_cpp)
-add_dependencies(state_estimator ${joystick_EXPORTED_TARGETS} ${ros_arduino_EXPORTED_TARGETS})
 
-# Test file stuff
+add_dependencies(setpoint_processing
+  uranus_dp_generate_messages_cpp
+)
+add_dependencies(controller
+  uranus_dp_generate_messages_cpp
+)
+add_dependencies(allocator
+  uranus_dp_generate_messages_cpp
+)
+add_dependencies(state_estimator
+  uranus_dp_generate_messages_cpp
+  ${joystick_EXPORTED_TARGETS}
+  ${ros_arduino_EXPORTED_TARGETS}
+)
+
+target_link_libraries(setpoint_processing
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(controller
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(allocator
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(state_estimator
+  model_server
+  ${catkin_LIBRARIES}
+)
+
+#############
+## Testing ##
+#############
+
 catkin_add_gtest(allocator_test test/allocator_test.cpp)
-target_link_libraries(allocator_test ${catkin_LIBRARIES})
-
 catkin_add_gtest(controller_test test/controller_test.cpp)
-target_link_libraries(controller_test ${catkin_LIBRARIES})
-
 catkin_add_gtest(integration_filter_test test/integration_filter_test.cpp)
-target_link_libraries(integration_filter_test ${catkin_LIBRARIES})
-# add_dependencies(integration_filter_test ros_arduino)
-
 catkin_add_gtest(open_loop_integration_test test/open_loop_integration_test.cpp)
+
+target_link_libraries(allocator_test ${catkin_LIBRARIES})
+target_link_libraries(controller_test ${catkin_LIBRARIES})
+target_link_libraries(integration_filter_test ${catkin_LIBRARIES})
 target_link_libraries(open_loop_integration_test ${catkin_LIBRARIES})

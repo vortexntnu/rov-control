@@ -3,19 +3,13 @@ project(ros_arduino)
 
 
 
-
 find_package(catkin REQUIRED COMPONENTS
   rosserial_arduino
   rosserial_client
   message_generation
   std_msgs
   geometry_msgs
-)
-
-
-add_message_files(
-    FILES
-    SensorRaw.msg
+  maelstrom_msgs
 )
 
 generate_messages(

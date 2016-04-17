@@ -4,7 +4,7 @@
 #include "ros/ros.h"
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
-#include "uranus_dp/ThrusterForces.h"
+#include "maelstrom_msgs/ThrusterForces.h"
 
 class LagrangeAllocator
 {

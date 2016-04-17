@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
-#include "uranus_dp/ThrusterForces.h"
+#include "maelstrom_msgs/ThrusterForces.h"
 #include <eigen_conversions/eigen_msg.h>
 
 class AllocatorTest : public ::testing::Test {
@@ -51,7 +51,7 @@ public:
     ros::Subscriber subscriber_;
     bool message_received_;
 
-    void Callback(const uranus_dp::ThrusterForces& msg)
+    void Callback(const maelstrom_msgs::ThrusterForces& msg)
     {
         u_(0) = msg.F1;
         u_(1) = msg.F2;

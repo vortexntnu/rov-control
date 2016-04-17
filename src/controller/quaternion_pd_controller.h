@@ -4,7 +4,7 @@
 #define QUATERNION_PD_CONTROLLER_H
 
 #include "ros/ros.h"
-#include "uranus_dp/State.h"
+#include "maelstrom_msgs/State.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
 #include <Eigen/Dense>
@@ -15,7 +15,7 @@ class QuaternionPdController
 {
 public:
     QuaternionPdController();
-    void stateCallback(const uranus_dp::State &msg);
+    void stateCallback(const maelstrom_msgs::State &msg);
     void setpointCallback(const geometry_msgs::Pose &msg);
     void setGains(double a, double b, double c);
     void compute();

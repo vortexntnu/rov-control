@@ -3,14 +3,14 @@
 
 #include "ros/ros.h"
 #include <Eigen/Dense>
-#include "ros_arduino/SensorRaw.h"
-#include "uranus_dp/State.h"
+#include "maelstrom_msgs/SensorRaw.h"
+#include "maelstrom_msgs/State.h"
 
 class IntegrationFilter
 {
 public:
     IntegrationFilter();
-    void callback(const ros_arduino::SensorRaw &msg);
+    void callback(const maelstrom_msgs::SensorRaw &msg);
 private:
     ros::NodeHandle nh_;
     ros::Subscriber sub_;

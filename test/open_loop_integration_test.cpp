@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
 #include "joystick/DirectionalInput.h"
-#include "uranus_dp/ThrusterForces.h"
+#include "maelstrom_msgs/ThrusterForces.h"
 #include "../src/control_mode_enum.h"
 #include <Eigen/Dense>
 
@@ -52,7 +52,7 @@ public:
     ros::Subscriber subscriber_;
     bool message_received_;
 
-    void Callback(const uranus_dp::ThrusterForces& msg)
+    void Callback(const maelstrom_msgs::ThrusterForces& msg)
     {
         u_(0) = msg.F1;
         u_(1) = msg.F2;

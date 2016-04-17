@@ -4,10 +4,10 @@ project(uranus_dp)
 find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   roscpp
-  std_msgs
   message_generation
   geometry_msgs
   joystick
+  ros_arduino
   eigen_conversions
 )
 
@@ -39,21 +39,14 @@ generate_messages(
 ## catkin specific configuration ##
 ###################################
 
-catkin_package(CATKIN_DEPENDS
-  cmake_modules
-  roscpp
-  std_msgs
-  message_generation
-  geometry_msgs
-  joystick
-)
+catkin_package()
 
 ###########
 ## Build ##
 ###########
 
 include_directories(
-  include
+  ${catkin_INCLUDE_DIRS}
   ${EIGEN_INCLUDE_DIRS}
   ${GTEST_INCLUDE_DIRS}
 )
@@ -81,18 +74,16 @@ add_executable(state_estimator
 )
 
 add_dependencies(setpoint_processing
-  uranus_dp_generate_messages_cpp
+  ${catkin_EXPORTED_TARGETS}
+#  ${PROJECT_NAME}_generate_messages_cpp
 )
 add_dependencies(controller
-  uranus_dp_generate_messages_cpp
+#  ${catkin_EXPORTED_TARGETS}
+  ${PROJECT_NAME}_generate_messages_cpp
 )
 add_dependencies(allocator
-  uranus_dp_generate_messages_cpp
-)
-add_dependencies(state_estimator
-  uranus_dp_generate_messages_cpp
-  ${joystick_EXPORTED_TARGETS}
-  ${ros_arduino_EXPORTED_TARGETS}
+#  ${catkin_EXPORTED_TARGETS}
+  ${PROJECT_NAME}_generate_messages_cpp
 )
 
 target_link_libraries(setpoint_processing

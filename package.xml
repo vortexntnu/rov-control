@@ -16,13 +16,16 @@
   <build_depend>geometry_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>joystick</build_depend>
+  <build_depend>ros_arduino</build_depend>
   <build_depend>eigen_conversions</build_depend>
 
+  <run_depend>cmake_modules</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>message_generation</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>joystick</run_depend>
+  <run_depend>ros_arduino</run_depend>
   <run_depend>eigen_conversions</run_depend>
 
 </package>

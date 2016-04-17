@@ -1,10 +1,10 @@
 #include <string.h>
 
-#include <ros.h>
+#include "ros.h"
 
-#include <std_msgs/String.h>
-#include <joystick/PwmRequests.h>
-#include <uranus_dp/ThrusterForces.h>
+#include "std_msgs/String.h"
+#include "joystick/PwmRequests.h"
+#include "maelstrom_msgs/ThrusterForces.h"
 
 #include "ForceToPwmLookup.h"
 
@@ -13,7 +13,7 @@
 #include "MPU6050/MPU6050.h"
 #include "MS5803_14BA.h"
 #include <Wire.h>
-#include <ros_arduino/SensorRaw.h>
+#include "maelstrom_msgs/SensorRaw.h"
 #include <geometry_msgs/Vector3.h>
 
 #define MPU9150_I2C_ADDR 0x69
@@ -24,8 +24,8 @@ MS5803_14BA depthSensor;
 ros::NodeHandle nh;
 
 
-ros_arduino::SensorRaw sensor_raw_msg;
-ros::Publisher pub_imu( "SensorRaw", &sensor_raw_msg);
+maelstrom_msgs::SensorRaw sensor_raw_msg;
+ros::Publisher pub_imu("SensorRaw", &sensor_raw_msg);
 
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;
@@ -116,7 +116,7 @@ ros::Publisher arduino_dbg_pub("ArduinoDbg", &arduino_dbg_msg);
 
 
 
-void pwm_update( const uranus_dp::ThrusterForces& force_input ){
+void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   
   PwmValue[0] = ForceToPwm(force_input.F1);
   PwmValue[1] = ForceToPwm(force_input.F2);
@@ -146,7 +146,7 @@ void pwm_update( const uranus_dp::ThrusterForces& force_input ){
   
 }
 
-ros::Subscriber<uranus_dp::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
+ros::Subscriber<maelstrom_msgs::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
 
 
 double GyroLsbSens, AccelLsbSens;

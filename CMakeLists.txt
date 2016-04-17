@@ -39,7 +39,16 @@ generate_messages(
 ## catkin specific configuration ##
 ###################################
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS
+  cmake_modules
+  roscpp
+  message_generation
+  geometry_msgs
+  joystick
+  ros_arduino
+  eigen_conversions
+)
 
 ###########
 ## Build ##

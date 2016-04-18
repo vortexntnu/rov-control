@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <name>maelstrom_msgs</name>
+  <version>0.0.0</version>
+  <description>The maelstrom_msgs package, containing all messages for the Maelstrom ROV control system.</description>
+
+  <maintainer email="morten.fyhn.amundsen@gmail.com">Morten Fyhn Amundsen</maintainer>
+  <license>Whatever</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <run_depend>message_generation</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+
+</package>

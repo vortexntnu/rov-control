@@ -1,9 +1,9 @@
+#include <ros.h>
 #include <string.h>
 
-#include "ros.h"
 
 #include "std_msgs/String.h"
-#include "joystick/PwmRequests.h"
+#include "maelstrom_msgs/PwmRequests.h"
 #include "maelstrom_msgs/ThrusterForces.h"
 
 #include "ForceToPwmLookup.h"
@@ -107,7 +107,7 @@ void InitPwm() {
 
 
 
-joystick::PwmRequests  pwm_status_msg;
+maelstrom_msgs::PwmRequests  pwm_status_msg;
 ros::Publisher pwm_status_pub("PwmStatus", &pwm_status_msg);
 
 

@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
-#include "joystick/DirectionalInput.h"
+#include "maelstrom_msgs/DirectionalInput.h"
 #include "maelstrom_msgs/ThrusterForces.h"
 #include "../src/control_mode_enum.h"
 #include <Eigen/Dense>
@@ -9,7 +9,7 @@ class OpenLoopIntegrationTest : public ::testing::Test {
 public:
     OpenLoopIntegrationTest()
     {
-        publisher_  = node_handle_.advertise<joystick::DirectionalInput>("joy_input", 10);
+        publisher_  = node_handle_.advertise<maelstrom_msgs::DirectionalInput>("joy_input", 10);
         subscriber_ = node_handle_.subscribe("thruster_forces", 10, &OpenLoopIntegrationTest::Callback, this);
         message_received_ = false;
     }
@@ -24,7 +24,7 @@ public:
 
     void Publish(int strafe_X, int strafe_Y, int turn_X, int turn_Y, int ascend)
     {
-        joystick::DirectionalInput msg;
+        maelstrom_msgs::DirectionalInput msg;
         msg.strafe_X = strafe_X;
         msg.strafe_Y = strafe_Y;
         msg.turn_X = turn_X;

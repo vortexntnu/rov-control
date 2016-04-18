@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
-#include <joystick/DirectionalInput.h>
+#include <maelstrom_msgs/DirectionalInput.h>
 #include <string>
 #include "uranus_dp/SetControlMode.h"
 #include "control_mode_enum.h"
@@ -19,7 +19,7 @@ public:
         control_mode = ControlModes::OPEN_LOOP;
     }
 
-    void callback(const joystick::DirectionalInput &joy_msg)
+    void callback(const maelstrom_msgs::DirectionalInput &joy_msg)
     {
         if (joy_msg.control_mode != control_mode)
         {

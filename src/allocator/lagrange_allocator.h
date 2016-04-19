@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
 #include "uranus_dp/ThrusterForces.h"
+#include "../eigen_typedefs.h"
 
 class LagrangeAllocator
 {
@@ -21,14 +22,14 @@ private:
     static const unsigned int n = 5; // Number of control forces (length of tau)
     static const unsigned int r = 6; // Number of control inputs (length of u)
 
-    Eigen::Matrix<double,5,1> tau; // (n) Control forces (forces and moments on the ROV)
-    Eigen::Matrix<double,6,1> u;   // (r) Control inputs (forces for each thruster)
+    Eigen::Vector5d tau; // (n) Control forces (forces and moments on the ROV)
+    Eigen::Vector6d u;   // (r) Control inputs (forces for each thruster)
 
-    Eigen::Matrix<double,6,6> W;            // (r*r) Control force weight matrix
-    Eigen::Matrix<double,6,6> K;            // (r*r) Thrust coefficient matrix
-    Eigen::Matrix<double,6,6> K_inverse;    // (r*r) Inverse of K
-    Eigen::Matrix<double,5,6> T;            // (n*r) Thrust configuration matrix
-    Eigen::Matrix<double,6,5> T_geninverse; // (r*n) Generalized inverse of T
+    Eigen::Matrix6d    W;            // (r*r) Control force weight matrix
+    Eigen::Matrix6d    K;            // (r*r) Thrust coefficient matrix
+    Eigen::Matrix6d    K_inverse;    // (r*r) Inverse of K
+    Eigen::Matrix5by6d T;            // (n*r) Thrust configuration matrix
+    Eigen::Matrix6by5d T_geninverse; // (r*n) Generalized inverse of T
 
     void computeGeneralizedInverse();
 };

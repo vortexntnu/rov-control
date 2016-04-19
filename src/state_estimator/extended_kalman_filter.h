@@ -3,10 +3,10 @@
 
 #include "ros/ros.h"
 #include <Eigen/Dense>
-#include "uranus_dp/State.h"
+#include "maelstrom_msgs/State.h"
 #include "geometry_msgs/Wrench.h"
 #include <eigen_conversions/eigen_msg.h>
-#include "ros_arduino/SensorRaw.h"
+#include "maelstrom_msgs/SensorRaw.h"
 #include "../model_server.h"
 
 class ExtendedKalmanFilter
@@ -14,7 +14,7 @@ class ExtendedKalmanFilter
 public:
     ExtendedKalmanFilter(double sampleTime);
     void controlCallback(const geometry_msgs::Wrench &uMsg);
-    void sensorCallback(const ros_arduino::SensorRaw &yMsg);
+    void sensorCallback(const maelstrom_msgs::SensorRaw &yMsg);
     void update();
 private:
     ros::NodeHandle nh;

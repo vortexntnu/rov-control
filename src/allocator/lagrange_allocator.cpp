@@ -13,7 +13,7 @@ void printMatrix6(Eigen::MatrixXd m);
 LagrangeAllocator::LagrangeAllocator()
 {
     sub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::callback, this);
-    pub = nh.advertise<uranus_dp::ThrusterForces>("thruster_forces", 10);
+    pub = nh.advertise<maelstrom_msgs::ThrusterForces>("thruster_forces", 10);
 
     W.setIdentity(); // Default to identity (i.e. equal weights)
     K.setIdentity(); // Scaling is done on Arduino, so this can be identity
@@ -45,7 +45,7 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
         ROS_WARN("K is not invertible");
     }
 
-    uranus_dp::ThrusterForces uMsg;
+    maelstrom_msgs::ThrusterForces uMsg;
     uMsg.F1 = u(0);
     uMsg.F2 = u(1);
     uMsg.F3 = u(2);

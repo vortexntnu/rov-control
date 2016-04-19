@@ -32,7 +32,7 @@ QuaternionPdController::QuaternionPdController()
     B = 185*9.8;
 }
 
-void QuaternionPdController::stateCallback(const uranus_dp::State &msg)
+void QuaternionPdController::stateCallback(const maelstrom_msgs::State &msg)
 {
     tf::pointMsgToEigen(msg.pose.position, p);
     tf::quaternionMsgToEigen(msg.pose.orientation, q);

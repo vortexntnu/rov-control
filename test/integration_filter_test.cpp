@@ -2,14 +2,14 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 #include <eigen_conversions/eigen_msg.h>
-#include "ros_arduino/SensorRaw.h"
-#include "uranus_dp/State.h"
+#include "maelstrom_msgs/SensorRaw.h"
+#include "maelstrom_msgs/State.h"
 
 class IntegrationFilterTest : public ::testing::Test {
 public:
     IntegrationFilterTest()
     {
-        pub_ = nh_.advertise<ros_arduino::SensorRaw>("sensor", 10);
+        pub_ = nh_.advertise<maelstrom_msgs::SensorRaw>("sensor", 10);
         sub_ = nh_.subscribe("state_estimate", 10, &IntegrationFilterTest::Callback, this);
         message_received_ = false;
     }
@@ -24,7 +24,7 @@ public:
 
     void Publish(Eigen::Vector3d a, Eigen::Vector3d omega)
     {
-        ros_arduino::SensorRaw msg;
+        maelstrom_msgs::SensorRaw msg;
         tf::vectorEigenToMsg(a, msg.acceleration);
         tf::vectorEigenToMsg(omega, msg.gyro);
         pub_.publish(msg);
@@ -50,7 +50,7 @@ public:
     ros::Subscriber sub_;
     bool message_received_;
 
-    void Callback(const uranus_dp::State& msg)
+    void Callback(const maelstrom_msgs::State& msg)
     {
         tf::pointMsgToEigen(msg.pose.position, p_hat_);
         tf::quaternionMsgToEigen(msg.pose.orientation, q_hat_);

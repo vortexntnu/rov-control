@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   joystick
   ros_arduino
   eigen_conversions
+  maelstrom_msgs
 )
 
 find_package(Eigen REQUIRED)
@@ -18,11 +19,11 @@ find_package(GTest REQUIRED)
 ## Declare ROS messages, services and actions ##
 ################################################
 
-add_message_files(
-  FILES
-  ThrusterForces.msg
-  State.msg
-)
+#add_message_files(
+#  FILES
+#  ThrusterForces.msg
+#  State.msg
+#)
 
 add_service_files(
   FILES
@@ -48,6 +49,7 @@ catkin_package(
   joystick
   ros_arduino
   eigen_conversions
+  maelstrom_msgs
 )
 
 ###########

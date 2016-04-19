@@ -3,11 +3,11 @@
 IntegrationFilter::IntegrationFilter()
 {
     sub_ = nh_.subscribe("sensor", 10, &IntegrationFilter::callback, this);
-    pub_ = nh_.advertise<uranus_dp::State>("state_estimate", 10);
+    pub_ = nh_.advertise<maelstrom_msgs::State>("state_estimate", 10);
 }
 
-void IntegrationFilter::callback(const ros_arduino::SensorRaw &msg)
+void IntegrationFilter::callback(const maelstrom_msgs::SensorRaw &msg)
 {
-    uranus_dp::State state_msg;
+    maelstrom_msgs::State state_msg;
     pub_.publish(state_msg);
 }

@@ -21,7 +21,7 @@ void ExtendedKalmanFilter::controlCallback(const geometry_msgs::Wrench &tauMsg)
     tf::wrenchMsgToEigen(tauMsg, u);
 }
 
-void ExtendedKalmanFilter::sensorCallback(const ros_arduino::SensorRaw &yMsg)
+void ExtendedKalmanFilter::sensorCallback(const maelstrom_msgs::SensorRaw &yMsg)
 {
     y << yMsg.acceleration.x,
          yMsg.acceleration.y,
@@ -51,7 +51,7 @@ void ExtendedKalmanFilter::update()
     P_bar = Phi*P_hat*Phi.transpose() + Gamma*Q*Gamma.transpose();
 
     // Publish
-    uranus_dp::State xMsg;
+    maelstrom_msgs::State xMsg;
     xMsg.pose.position.x    = x_bar(0);
     xMsg.pose.position.y    = x_bar(1);
     xMsg.pose.position.z    = x_bar(2);

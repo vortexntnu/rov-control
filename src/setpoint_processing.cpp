@@ -36,12 +36,12 @@ public:
         {
             ROS_INFO("setpoint_processing: Sending open loop setpoints.");
             geometry_msgs::Wrench setpoint_msg;
-            setpoint_msg.force.x  = joy_msg.strafe_X * NORMALIZATION * SCALING_LIN;
-            setpoint_msg.force.y  = joy_msg.strafe_Y * NORMALIZATION * SCALING_LIN;
-            setpoint_msg.force.z  = 0;
+            setpoint_msg.force.x  = joy_msg.strafe_X * NORMALIZATION * MAX_FORCE;
+            setpoint_msg.force.y  = joy_msg.strafe_Y * NORMALIZATION * MAX_FORCE;
+            setpoint_msg.force.z  = joy_msg.ascend   * NORMALIZATION * MAX_FORCE;
             setpoint_msg.torque.x = 0;
-            setpoint_msg.torque.y = joy_msg.turn_X * NORMALIZATION * SCALING_ANG;
-            setpoint_msg.torque.z = joy_msg.turn_Y * NORMALIZATION * SCALING_ANG;
+            setpoint_msg.torque.y = joy_msg.turn_X * NORMALIZATION * MAX_TORQUE;
+            setpoint_msg.torque.z = joy_msg.turn_Y * NORMALIZATION * MAX_TORQUE;
             wrenchPub.publish(setpoint_msg);
         }
         else if (control_mode == ControlModes::STATIONKEEPING)
@@ -74,8 +74,8 @@ private:
     ControlMode control_mode;
 
     static const double NORMALIZATION = 0.000030517578125; // Scale joystick inputs down to [-1, 1]
-    static const double SCALING_LIN   = 10;                // Scale forces up to [-10, 10] (Newton)
-    static const double SCALING_ANG   = 2;                 // Scale torques up to [-2, 2] (Newton meters)
+    static const double MAX_FORCE     = 10;                // Scale forces up to [-10, 10] (Newton)
+    static const double MAX_TORQUE    = 5;                 // Scale torques up to [-5, 5] (Newton meters)
 };
 
 int main(int argc, char** argv){

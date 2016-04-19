@@ -19,11 +19,11 @@ LagrangeAllocator::LagrangeAllocator()
     K.setIdentity(); // Scaling is done on Arduino, so this can be identity
 
     // Thruster configuration does not allow control of roll.
-    T = << 0.7071 ,  0.7071 , -0.7071 , -0.7071 ,  0     ,  0     , // Surge
-           0.7071 , -0.7071 , -0.7071 ,  0.7071 ,  0     ,  0     , // Sway
-           0      ,  0      ,  0      ,  0      , -1     , -1     , // Heave
-          -0.04667, -0.04667,  0.04667,  0.04667, -0.1260,  0.1260, // Pitch
-          -0.2143 ,  0.2143 , -0.2143 ,  0.2143 ,  0     ,  0     ; // Yaw
+    T << 0.7071 ,  0.7071 , -0.7071 , -0.7071 ,  0     ,  0     , // Surge
+         0.7071 , -0.7071 , -0.7071 ,  0.7071 ,  0     ,  0     , // Sway
+         0      ,  0      ,  0      ,  0      , -1     , -1     , // Heave
+        -0.04667, -0.04667,  0.04667,  0.04667, -0.1260,  0.1260, // Pitch
+        -0.2143 ,  0.2143 , -0.2143 ,  0.2143 ,  0     ,  0     ; // Yaw
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();

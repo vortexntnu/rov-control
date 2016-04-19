@@ -86,7 +86,7 @@ TEST_F(OpenLoopIntegrationTest, MaxForward)
 {
     Publish(32767,0,0,0,0);
     WaitForMessage();
-    double totalForwardThrust = 0.7071*(u_(0) + u_(1) + u_(2) + u_(3)) + u_(4) + u_(5);
+    double totalForwardThrust = 0.7071*(u_(0) + u_(1) - u_(2) - u_(3));
     EXPECT_NEAR(totalForwardThrust, 10, 1e-3);
 }
 

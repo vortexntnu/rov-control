@@ -12,20 +12,18 @@ void printMatrix6(Eigen::MatrixXd m);
 
 LagrangeAllocator::LagrangeAllocator()
 {
-    // n = 4;
-    // r = 6;
-
     sub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::callback, this);
     pub = nh.advertise<uranus_dp::ThrusterForces>("thruster_forces", 10);
 
-    W.setIdentity(6,6); // Default to identity (i.e. equal weights)
-    K.setIdentity(6,6); // Scaling is done on Arduino, so this can be identity
+    W.setIdentity(); // Default to identity (i.e. equal weights)
+    K.setIdentity(); // Scaling is done on Arduino, so this can be identity
 
-    // Our test ROV cannot control heave and roll, so they are removed from the control objective
-    T <<  0.7071 ,  0.7071 ,  0.7071 ,  0.7071 ,  1    ,  1    , // Surge
-         -0.7071 ,  0.7071 , -0.7071 ,  0.7071 ,  0    ,  0    , // Sway
-          0.06718,  0.06718,  0.06718,  0.06718, -0.210, -0.210, // Pitch
-          0.4172 ,  0.4172 , -0.4172 , -0.4172 , -0.165,  0.165; // Yaw
+    // Thruster configuration does not allow control of roll.
+    T = << 0.7071 ,  0.7071 , -0.7071 , -0.7071 ,  0     ,  0     , // Surge
+           0.7071 , -0.7071 , -0.7071 ,  0.7071 ,  0     ,  0     , // Sway
+           0      ,  0      ,  0      ,  0      , -1     , -1     , // Heave
+          -0.04667, -0.04667,  0.04667,  0.04667, -0.1260,  0.1260, // Pitch
+          -0.2143 ,  0.2143 , -0.2143 ,  0.2143 ,  0     ,  0     ; // Yaw
 
     K_inverse = K.inverse();
     computeGeneralizedInverse();
@@ -35,8 +33,8 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
 {
     tau << tauMsg.force.x,
            tauMsg.force.y,
-           // tauMsg.force.z,  // Not part of control objective for test rov
-           // tauMsg.torque.x, // Ditto
+           tauMsg.force.z,
+           // tauMsg.torque.x, // Roll is not controllable
            tauMsg.torque.y,
            tauMsg.torque.z;
 

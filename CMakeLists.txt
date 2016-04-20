@@ -18,6 +18,8 @@ add_message_files(
   DirectionalInput.msg
   PwmRequests.msg
   Joystick.msg
+  LightInput.msg
+  ArmInput.msg
 )
 
 generate_messages(

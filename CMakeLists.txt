@@ -13,6 +13,8 @@ add_message_files(DIRECTORY msg FILES
    Joystick.msg
    PwmRequests.msg
    DirectionalInput.msg
+   LightInput.msg
+   ArmInput.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)

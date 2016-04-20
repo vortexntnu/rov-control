@@ -1,11 +1,31 @@
 // See Fossen 2011, chapter 12.3.2
 #include "lagrange_allocator.h"
 #include <iostream>
+#include <math.h>
 
 template<typename Derived>
 inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
 {
     return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
+}
+
+// Function to check for existence of Indian bread
+template<typename T, int r, int c>
+inline bool hasNan(const Eigen::Matrix<T,r,c>& M)
+{
+    int rows = M.rows();
+    int cols = M.cols();
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            if (isnan(M(i,j)))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void printMatrix6(Eigen::MatrixXd m);

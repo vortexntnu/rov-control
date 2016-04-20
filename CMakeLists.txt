@@ -5,9 +5,6 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   roscpp
   message_generation
-  geometry_msgs
-  joystick
-  ros_arduino
   eigen_conversions
   maelstrom_msgs
 )
@@ -19,22 +16,13 @@ find_package(GTest REQUIRED)
 ## Declare ROS messages, services and actions ##
 ################################################
 
-#add_message_files(
-#  FILES
-#  ThrusterForces.msg
-#  State.msg
-#)
-
 add_service_files(
   FILES
   SetControlMode.srv
   SetControllerGains.srv
 )
 
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs
-)
+generate_messages()
 
 ###################################
 ## catkin specific configuration ##
@@ -45,9 +33,6 @@ catkin_package(
   cmake_modules
   roscpp
   message_generation
-  geometry_msgs
-  joystick
-  ros_arduino
   eigen_conversions
   maelstrom_msgs
 )
@@ -66,50 +51,31 @@ add_library(model_server
   src/model_server.cpp
 )
 
-add_executable(setpoint_processing
-  src/setpoint_processing.cpp
-)
-add_executable(controller
-  src/controller/controller.cpp
-  src/controller/quaternion_pd_controller.cpp
-  src/controller/open_loop_controller.cpp
-)
-add_executable(allocator
-  src/allocator/allocator.cpp
-  src/allocator/lagrange_allocator.cpp
-)
-add_executable(state_estimator
-  src/state_estimator/state_estimator.cpp
-  src/state_estimator/integration_filter.cpp
-#  src/state_estimator/extended_kalman_filter.cpp
+add_executable(setpoint_processing src/setpoint_processing.cpp
 )
 
-add_dependencies(setpoint_processing
-  ${catkin_EXPORTED_TARGETS}
-#  ${PROJECT_NAME}_generate_messages_cpp
-)
-add_dependencies(controller
-#  ${catkin_EXPORTED_TARGETS}
-  ${PROJECT_NAME}_generate_messages_cpp
-)
-add_dependencies(allocator
-#  ${catkin_EXPORTED_TARGETS}
-  ${PROJECT_NAME}_generate_messages_cpp
+add_executable(controller src/controller/controller.cpp
+                          src/controller/quaternion_pd_controller.cpp
+                          src/controller/open_loop_controller.cpp
 )
 
-target_link_libraries(setpoint_processing
-  ${catkin_LIBRARIES}
+add_executable(allocator src/allocator/allocator.cpp
+                         src/allocator/lagrange_allocator.cpp
 )
-target_link_libraries(controller
-  ${catkin_LIBRARIES}
+
+add_executable(state_estimator src/state_estimator/state_estimator.cpp
+                               src/state_estimator/integration_filter.cpp
+#                               src/state_estimator/extended_kalman_filter.cpp
 )
-target_link_libraries(allocator
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(state_estimator
-  model_server
-  ${catkin_LIBRARIES}
-)
+
+add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})
+add_dependencies(controller ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(allocator ${PROJECT_NAME}_generate_messages_cpp)
+
+target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
+target_link_libraries(controller ${catkin_LIBRARIES})
+target_link_libraries(allocator ${catkin_LIBRARIES})
+target_link_libraries(state_estimator model_server ${catkin_LIBRARIES})
 
 #############
 ## Testing ##

@@ -188,9 +188,9 @@ TEST_F(OpenLoopControllerTest, DirectFeedthrough)
 TEST_F(QuaternionPdControllerTest, ZeroErrorZeroOutput)
 {
     uranus_dp::SetControlMode srv;
-    srv.request.mode = ControlModes::STATIONKEEPING;
+    srv.request.mode = ControlModes::POSITION_HOLD;
     if (!modeClient.call(srv))
-        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+        ROS_ERROR("Failed to call service set_control_mode. New mode POSITION_HOLD not set.");
 
     Eigen::Vector3d    p(1,2,3);
     Eigen::Quaterniond q(4,5,6,7);
@@ -218,9 +218,9 @@ TEST_F(QuaternionPdControllerTest, ZeroErrorZeroOutput)
 TEST_F(QuaternionPdControllerTest, OnlySurge)
 {
     uranus_dp::SetControlMode modeSrv;
-    modeSrv.request.mode = ControlModes::STATIONKEEPING;
+    modeSrv.request.mode = ControlModes::POSITION_HOLD;
     if (!modeClient.call(modeSrv))
-        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+        ROS_ERROR("Failed to call service set_control_mode. New mode POSITION_HOLD not set.");
 
     uranus_dp::SetControllerGains gainSrv;
     gainSrv.request.a = 1;
@@ -256,9 +256,9 @@ TEST_F(QuaternionPdControllerTest, OnlySurge)
 TEST_F(QuaternionPdControllerTest, OnlySway)
 {
     uranus_dp::SetControlMode srv;
-    srv.request.mode = ControlModes::STATIONKEEPING;
+    srv.request.mode = ControlModes::POSITION_HOLD;
     if (!modeClient.call(srv))
-        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+        ROS_ERROR("Failed to call service set_control_mode. New mode POSITION_HOLD not set.");
 
     uranus_dp::SetControllerGains gainSrv;
     gainSrv.request.a = 1;
@@ -294,9 +294,9 @@ TEST_F(QuaternionPdControllerTest, OnlySway)
 TEST_F(QuaternionPdControllerTest, OnlyYaw)
 {
     uranus_dp::SetControlMode srv;
-    srv.request.mode = ControlModes::STATIONKEEPING;
+    srv.request.mode = ControlModes::POSITION_HOLD;
     if (!modeClient.call(srv))
-        ROS_ERROR("Failed to call service set_control_mode. New mode STATIONKEEPING not set.");
+        ROS_ERROR("Failed to call service set_control_mode. New mode POSITION_HOLD not set.");
 
     uranus_dp::SetControllerGains gainSrv;
     gainSrv.request.a = 1;

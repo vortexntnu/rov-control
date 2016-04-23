@@ -52,9 +52,9 @@ public:
             setpoint_msg.torque.z = msg.turn_right * MAX_TORQUE;
             wrenchPub.publish(setpoint_msg);
         }
-        else if (control_mode == ControlModes::STATIONKEEPING)
+        else if (control_mode == ControlModes::POSITION_HOLD)
         {
-            ROS_INFO("setpoint_processing: Sending stationkeeping setpoints.");
+            ROS_INFO("setpoint_processing: Sending position hold setpoints.");
             // Todo: Actually populate the pose message with values
             geometry_msgs::Pose setpoint_msg;
             setpoint_msg.position.x    = 0;

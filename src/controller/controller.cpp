@@ -29,8 +29,8 @@ public:
                 stationkeeper.disable();
                 openlooper.enable();
                 break;
-            case ControlModes::STATIONKEEPING:
-                ROS_INFO("Changing control mode to stationkeeping.");
+            case ControlModes::POSITION_HOLD:
+                ROS_INFO("Changing control mode to hold position.");
                 openlooper.disable();
                 stationkeeper.enable();
                 break;

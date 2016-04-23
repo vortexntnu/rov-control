@@ -13,15 +13,15 @@ float64 right
 # Range [-1, 1]
 float64 down
 
-# Angular turn right/left command
-# Positive right
-# Range [-1, 1]
-float64 turn_right
-
 # Angular tilt up/down command
 # Positive up
 # Range [-1, 1]
 float64 tilt_up
+
+# Angular turn right/left command
+# Positive right
+# Range [-1, 1]
+float64 turn_right
 
 # Control mode
 # Set to 0 for open loop

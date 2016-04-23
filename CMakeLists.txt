@@ -4,6 +4,7 @@ project(maelstrom_msgs)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   geometry_msgs
+  std_msgs
 )
 
 ################################################
@@ -11,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 
 add_message_files(
+  DIRECTORY msg
   FILES
   State.msg
   ThrusterForces.msg
@@ -18,11 +20,13 @@ add_message_files(
   DirectionalInput.msg
   PwmRequests.msg
   Joystick.msg
+  JoystickMotionCommand.msg
 )
 
 generate_messages(
   DEPENDENCIES
   geometry_msgs
+  std_msgs
 )
 
 ###################################
@@ -31,22 +35,7 @@ generate_messages(
 
 catkin_package(
   CATKIN_DEPENDS
-  message_generation
+  message_runtime
   geometry_msgs
+  std_msgs
 )
-
-###########
-## Build ##
-###########
-
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
-
-#target_link_libraries(maelstrom_msgs_node
-#  ${catkin_LIBRARIES}
-#)
-
-#############
-## Testing ##
-#############

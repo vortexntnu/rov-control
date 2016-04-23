@@ -63,10 +63,10 @@ add_executable(allocator src/allocator/allocator.cpp
                          src/allocator/lagrange_allocator.cpp
 )
 
-add_executable(state_estimator src/state_estimator/state_estimator.cpp
-                               src/state_estimator/integration_filter.cpp
+#add_executable(state_estimator src/state_estimator/state_estimator.cpp
+#                               src/state_estimator/integration_filter.cpp
 #                               src/state_estimator/extended_kalman_filter.cpp
-)
+#)
 
 add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})
 add_dependencies(controller ${PROJECT_NAME}_generate_messages_cpp)
@@ -75,7 +75,7 @@ add_dependencies(allocator ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
 target_link_libraries(controller ${catkin_LIBRARIES})
 target_link_libraries(allocator ${catkin_LIBRARIES})
-target_link_libraries(state_estimator model_server ${catkin_LIBRARIES})
+#target_link_libraries(state_estimator model_server ${catkin_LIBRARIES})
 
 #############
 ## Testing ##

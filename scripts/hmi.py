@@ -39,7 +39,6 @@ class HmiNode:
         if(joystick.hold_position): 
             self.directional_input.control_mode = 1
 
-        self.pwm_publisher.publish(self.pwm_signals)
         self.uranus_publisher.publish(self.directional_input)
 
 if __name__ == '__main__': 

@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
-#include <maelstrom_msgs/DirectionalInput.h>
+#include <maelstrom_msgs/JoystickMotionCommand.h>
 #include <string>
 #include "uranus_dp/SetControlMode.h"
 #include "control_mode_enum.h"

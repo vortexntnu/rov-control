@@ -18,9 +18,10 @@
     output="screen"
   />
   <node
-    name="state_estimator"
-    pkg="uranus_dp"
-    type="state_estimator"
+    name="imuintegrationfilter_node"
+    pkg="imuintegrationfilter"
+    type="imuintegrationfilter_node"
+    launch-prefix="sudo -E"
     output="screen"
   />
 </launch>

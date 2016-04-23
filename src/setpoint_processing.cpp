@@ -19,11 +19,12 @@ public:
         control_mode = ControlModes::OPEN_LOOP;
     }
 
-    void callback(const maelstrom_msgs::DirectionalInput &joy_msg)
+    // void callback(const maelstrom_msgs::DirectionalInput &msg)
+    void callback(const maelstrom_msgs::JoystickMotionCommand& msg)
     {
-        if (joy_msg.control_mode != control_mode)
+        if (msg.control_mode != control_mode)
         {
-            control_mode = static_cast<ControlMode>(joy_msg.control_mode);
+            control_mode = static_cast<ControlMode>(msg.control_mode);
             uranus_dp::SetControlMode srv;
             srv.request.mode = control_mode;
             if (!modeClient.call(srv))
@@ -36,12 +37,18 @@ public:
         {
             ROS_INFO("setpoint_processing: Sending open loop setpoints.");
             geometry_msgs::Wrench setpoint_msg;
-            setpoint_msg.force.x  = joy_msg.strafe_X * NORMALIZATION * MAX_FORCE;
-            setpoint_msg.force.y  = joy_msg.strafe_Y * NORMALIZATION * MAX_FORCE;
-            setpoint_msg.force.z  = joy_msg.ascend   * NORMALIZATION * MAX_FORCE;
+            // setpoint_msg.force.x  =  msg.strafe_Y * NORMALIZE_16BIT * MAX_FORCE;
+            // setpoint_msg.force.y  =  msg.strafe_X * NORMALIZE_16BIT * MAX_FORCE;
+            // setpoint_msg.force.z  = -msg.ascend   * NORMALIZE_09BIT * MAX_FORCE;
+            // setpoint_msg.torque.x =  0;
+            // setpoint_msg.torque.y =  msg.turn_Y * NORMALIZE_16BIT * MAX_TORQUE;
+            // setpoint_msg.torque.z =  msg.turn_X * NORMALIZE_16BIT * MAX_TORQUE;
+            setpoint_msg.force.x  = msg.forward * MAX_FORCE;
+            setpoint_msg.force.y  = msg.right   * MAX_FORCE;
+            setpoint_msg.force.z  = msg.down    * MAX_FORCE;
             setpoint_msg.torque.x = 0;
-            setpoint_msg.torque.y = joy_msg.turn_X * NORMALIZATION * MAX_TORQUE;
-            setpoint_msg.torque.z = joy_msg.turn_Y * NORMALIZATION * MAX_TORQUE;
+            setpoint_msg.torque.y = msg.tilt_up    * MAX_TORQUE;
+            setpoint_msg.torque.z = msg.turn_right * MAX_TORQUE;
             wrenchPub.publish(setpoint_msg);
         }
         else if (control_mode == ControlModes::STATIONKEEPING)
@@ -73,9 +80,10 @@ private:
 
     ControlMode control_mode;
 
-    static const double NORMALIZATION = 0.000030517578125; // Scale joystick inputs down to [-1, 1]
-    static const double MAX_FORCE     = 10;                // Scale forces up to [-10, 10] (Newton)
-    static const double MAX_TORQUE    = 5;                 // Scale torques up to [-5, 5] (Newton meters)
+    // static const double NORMALIZE_16BIT = 0.000030517578125; // Scaling from 16 bit signed int to [-1, 1]
+    // static const double NORMALIZE_09BIT = 0.00390625;        // Scaling from [-255, 255] to [-1, 1]
+    static const double MAX_FORCE       = 10;                // Scale forces up to [-10, 10] (Newton)
+    static const double MAX_TORQUE      = 5;                 // Scale torques up to [-5, 5] (Newton meters)
 };
 
 int main(int argc, char** argv){

@@ -1,10 +1,10 @@
 #include <ros.h>
 #include <string.h>
 
-
 #include "std_msgs/String.h"
 #include "maelstrom_msgs/PwmRequests.h"
 #include "maelstrom_msgs/ThrusterForces.h"
+#include "maelstrom_msgs/LightInput.h"
 
 #include "ForceToPwmLookup.h"
 
@@ -32,14 +32,22 @@ unsigned long PrevoiusSensorReadMillis = 0;
 
 int dbg_count = 0;
 
-//Hold orden på pwm-pins og hvilke rigeistre om må settes for å endre on-time
-const int PwmCount = 6;
-const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45 };
+//Hold orden på pwm-pins til motor og lys
+const int PwmCount = 7;
+//                            ********MOTOR**********      LYS 
+const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45,      10};
+const int LigthPwmPin = PwmPins[PwmCount-1]; //pin 10 er på Timer / Counter 2
 int PwmValue[PwmCount];
 
 
 void WritePwm(int pin, uint8_t value) {
   switch(pin) {
+    //LYS
+  case 10:
+    analogWrite(pin, value);
+    break;
+
+    //MOTOR
   case 7:
     OCR4BH = 0;
     OCR4BL = value;
@@ -66,7 +74,6 @@ void WritePwm(int pin, uint8_t value) {
     break;
   };
 }
-
 
 void InitPwm() {
 
@@ -96,16 +103,11 @@ void InitPwm() {
     PwmValue[i] = ForceToPwm(0);
     WritePwm(PwmPins[i], PwmValue[i]);
   }
-  
+  //og så av lys
+  PwmValue[LigthPwmPin] = 0;
+  WritePwm(LigthPwmPin, 0);
   
 }
-
-
-//const int PwmTotalTime = 3600;
-//int PwmPinState[PwmCount] = { LOW, LOW, LOW, LOW, LOW, LOW };
-//unsigned long PreviousToggleMicros[PwmCount] = { 0, 0, 0, 0, 0, 0 };
-
-
 
 maelstrom_msgs::PwmRequests  pwm_status_msg;
 ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
@@ -137,16 +139,33 @@ void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   pwm_status_msg.pwm4 = PwmValue[3];
   pwm_status_msg.pwm5 = PwmValue[4];
   pwm_status_msg.pwm6 = PwmValue[5];
+  pwm_status_msg.pwm7 = PwmValue[6];
   
   dbg_count = 0;
   
   pwm_status_pub.publish( &pwm_status_msg );
-  
-  
+    
   
 }
 
 ros::Subscriber<maelstrom_msgs::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
+
+void LightPwmUpdate( const maelstrom_msgs::LightInput &light_msg) {
+  PwmValue[6] = light_msg.light_intensity;
+
+  WritePwm(LigthPwmPin, PwmValue[6]);
+
+  pwm_status_msg.pwm1 = PwmValue[0];
+  pwm_status_msg.pwm2 = PwmValue[1];
+  pwm_status_msg.pwm3 = PwmValue[2];
+  pwm_status_msg.pwm4 = PwmValue[3];
+  pwm_status_msg.pwm5 = PwmValue[4];
+  pwm_status_msg.pwm6 = PwmValue[5];
+  pwm_status_msg.pwm7 = PwmValue[6];
+  pwm_status_pub.publish( &pwm_status_msg );
+}
+
+ros::Subscriber<maelstrom_msgs::LightInput> light_pwm_input_sub("LightPwm", &LightPwmUpdate );
 
 
 double GyroLsbSens, AccelLsbSens;
@@ -207,16 +226,9 @@ void getFsRangeAndSetLsbSensisivity() {
 }
 
 void setup() {
-  /*
-  //still ned hovedklokkefrekvensen
-  CLKPR = 0b10000000;
-  CLKPR = 0x3; // del på 8 (2^3)
-  delay(1);
-  */
   
   InitPwm();
 
-  
   //start ROS-node
   nh.initNode();
 
@@ -225,9 +237,11 @@ void setup() {
   
   nh.advertise(pub_imu);  
   nh.subscribe(pwm_input_sub);
+  nh.subscribe(light_pwm_input_sub);
   nh.spinOnce();
   
   // Initialize the 'Wire' class for the I2C-bus.
+  // I2C pins: 20 (SDA) og 21 (SCL) (Mega2560)
   Wire.begin();
   accelgyro.initialize();
   getFsRangeAndSetLsbSensisivity();
@@ -291,13 +305,7 @@ void loop(){
     lesSensorer();
     //nh.spinOnce();
     pub_imu.publish(&sensor_raw_msg);
-    
-    //nh.spinOnce();
-    //dbg_count++;
-    //nh.spinOnce();
-
-    
-    
+     
     
   }
   

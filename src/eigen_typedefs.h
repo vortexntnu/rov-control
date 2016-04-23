@@ -10,7 +10,6 @@ typedef Eigen::Matrix<double,6,1> Vector6d;
 typedef Eigen::Matrix<double,5,1> Vector5d;
 typedef Eigen::Matrix<double,6,5> Matrix6by5d;
 typedef Eigen::Matrix<double,5,6> Matrix5by6d;
-
 }
 
 #endif

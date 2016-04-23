@@ -17,7 +17,6 @@ add_message_files(
   State.msg
   ThrusterForces.msg
   SensorRaw.msg
-  DirectionalInput.msg
   PwmRequests.msg
   Joystick.msg
   JoystickMotionCommand.msg

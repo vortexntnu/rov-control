@@ -1,5 +1,5 @@
-geometry_msgs/Vector3 acceleration
-geometry_msgs/Vector3 compass
-geometry_msgs/Vector3 gyro
-float64               temperature
-float64               pressure
+geometry_msgs/Vector3 acceleration	# [g]
+geometry_msgs/Vector3 compass		# [µT]
+geometry_msgs/Vector3 gyro		# [deg/s]
+float64               temperature	# [deg C]
+float64               pressure		# [mbar]

@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
-#include "maelstrom_msgs/DirectionalInput.h"
+#include "maelstrom_msgs/JoystickMotionCommand.h"
 #include "maelstrom_msgs/ThrusterForces.h"
 #include "../src/control_mode_enum.h"
 #include <Eigen/Dense>
@@ -9,7 +9,7 @@ class OpenLoopIntegrationTest : public ::testing::Test {
 public:
     OpenLoopIntegrationTest()
     {
-        pub = nh.advertise<maelstrom_msgs::DirectionalInput>("joy_input", 10);
+        pub = nh.advertise<maelstrom_msgs::JoystickMotionCommand>("joy_input", 10);
         sub = nh.subscribe("thruster_forces", 10, &OpenLoopIntegrationTest::Callback, this);
         message_received = false;
     }
@@ -22,14 +22,14 @@ public:
         }
     }
 
-    void Publish(int forward, int right, int up, int tilt_up, int turn_left)
+    void Publish(int forward, int right, int down, int tilt_up, int turn_right)
     {
-        maelstrom_msgs::DirectionalInput msg;
-        msg.strafe_X = right;
-        msg.strafe_Y = forward;
-        msg.turn_X = -turn_left;
-        msg.turn_Y = tilt_up;
-        msg.ascend = up;
+        maelstrom_msgs::JoystickMotionCommand msg;
+        msg.forward    = forward;
+        msg.right      = right;
+        msg.down       = down;
+        msg.tilt_up    = tilt_up;
+        msg.turn_right = turn_right;
         msg.control_mode = static_cast<int>(ControlModes::OPEN_LOOP);
         pub.publish(msg);
     }
@@ -58,7 +58,6 @@ public:
         u(3) = msg.F4;
         u(4) = msg.F5;
         u(5) = msg.F6;
-
         message_received = true;
     }
 
@@ -70,15 +69,13 @@ public:
 
 TEST_F(OpenLoopIntegrationTest, CheckResponsiveness)
 {
-    ros::Duration(0.5).sleep();
-
     Publish(0,0,0,0,0);
     WaitForMessage();
 }
 
 TEST_F(OpenLoopIntegrationTest, Forward)
 {
-    Publish(10000,0,0,0,0);
+    Publish(1,0,0,0,0);
     WaitForMessage();
 
     EXPECT_TRUE(u(0) > 0);

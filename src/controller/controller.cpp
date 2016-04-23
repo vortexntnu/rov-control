@@ -3,7 +3,6 @@
 #include "open_loop_controller.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
-#include "maelstrom_msgs/DirectionalInput.h"
 #include "../control_mode_enum.h"
 
 class Controller

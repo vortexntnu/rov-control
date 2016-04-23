@@ -11,7 +11,7 @@ class SetpointProcessing
 public:
     SetpointProcessing()
     {
-        joystickSub = nh.subscribe("joy_input", 10, &SetpointProcessing::callback, this);
+        joystickSub = nh.subscribe("joystick_motion_command", 10, &SetpointProcessing::callback, this);
         wrenchPub   = nh.advertise<geometry_msgs::Wrench>("wrench_setpoints", 10);
         posePub     = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
         modeClient  = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");

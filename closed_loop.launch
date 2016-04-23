@@ -21,7 +21,6 @@
     name="imuintegrationfilter_node"
     pkg="imuintegrationfilter"
     type="imuintegrationfilter_node"
-    launch-prefix="sudo -E"
     output="screen"
   />
 </launch>

@@ -32,7 +32,7 @@ unsigned long PrevoiusSensorReadMillis = 0;
 
 int dbg_count = 0;
 
-//Hold orden på pwm-pins og hvilke rigeistre om må settes for å endre on-time
+//Hold orden på pwm-pins
 const int PwmCount = 6;
 const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45 };
 int PwmValue[PwmCount];
@@ -100,13 +100,6 @@ void InitPwm() {
   
 }
 
-
-//const int PwmTotalTime = 3600;
-//int PwmPinState[PwmCount] = { LOW, LOW, LOW, LOW, LOW, LOW };
-//unsigned long PreviousToggleMicros[PwmCount] = { 0, 0, 0, 0, 0, 0 };
-
-
-
 maelstrom_msgs::PwmRequests  pwm_status_msg;
 ros::Publisher pwm_status_pub("PwmStatus", &pwm_status_msg);
 
@@ -141,8 +134,7 @@ void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   dbg_count = 0;
   
   pwm_status_pub.publish( &pwm_status_msg );
-  
-  
+    
   
 }
 
@@ -207,12 +199,6 @@ void getFsRangeAndSetLsbSensisivity() {
 }
 
 void setup() {
-  /*
-  //still ned hovedklokkefrekvensen
-  CLKPR = 0b10000000;
-  CLKPR = 0x3; // del på 8 (2^3)
-  delay(1);
-  */
   
   InitPwm();
 
@@ -291,13 +277,7 @@ void loop(){
     lesSensorer();
     //nh.spinOnce();
     pub_imu.publish(&sensor_raw_msg);
-    
-    //nh.spinOnce();
-    //dbg_count++;
-    //nh.spinOnce();
-
-    
-    
+     
     
   }
   

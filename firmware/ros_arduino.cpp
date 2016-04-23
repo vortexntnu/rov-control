@@ -25,7 +25,7 @@ ros::NodeHandle nh;
 
 
 maelstrom_msgs::SensorRaw sensor_raw_msg;
-ros::Publisher pub_imu("SensorRaw", &sensor_raw_msg);
+ros::Publisher pub_imu("sensor_raw", &sensor_raw_msg);
 
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;
@@ -108,11 +108,11 @@ void InitPwm() {
 
 
 maelstrom_msgs::PwmRequests  pwm_status_msg;
-ros::Publisher pwm_status_pub("PwmStatus", &pwm_status_msg);
+ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
 
 
 std_msgs::String arduino_dbg_msg;
-ros::Publisher arduino_dbg_pub("ArduinoDbg", &arduino_dbg_msg);
+ros::Publisher arduino_dbg_pub("arduino_dbg", &arduino_dbg_msg);
 
 
 

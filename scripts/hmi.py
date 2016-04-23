@@ -2,20 +2,20 @@
 
 import rospy
 from std_msgs.msg import Int32
-from joystick.msg import Joystick
-from joystick.msg import PwmRequests
-from joystick.msg import DirectionalInput
+from maelstrom_msgs.msg import Joystick
+from maelstrom_msgs.msg import JoystickMotionCommand
+
+XBOX_JOYSTICK_RANGE = 32768.0
+XBOX_TRIGGER_RANGE  = 255.0
 
 class HmiNode:
 
     def __init__(self):
         rospy.init_node("hmi_node", anonymous=True)
 
-        self.pwm_signals = PwmRequests()
-        self.directional_input = DirectionalInput()
+        self.directional_input = JoystickMotionCommand()
 
-        self.pwm_publisher = rospy.Publisher('pwm_requests', PwmRequests, queue_size=10)
-        self.uranus_publisher = rospy.Publisher('joy_input', DirectionalInput, queue_size=10)
+        self.uranus_publisher = rospy.Publisher('joystick_motion_command', JoystickMotionCommand, queue_size=10)
 
         rospy.Subscriber('joystick', Joystick, self.joystick_callback)
         self.rate = rospy.Rate(10)
@@ -27,19 +27,11 @@ class HmiNode:
 
     def joystick_callback(self, joystick):
         
-        self.pwm_signals.pwm1 = joystick.strafe_X
-        self.pwm_signals.pwm2 = joystick.strafe_Y
-        self.pwm_signals.pwm3 = joystick.turn_X
-        self.pwm_signals.pwm4 = joystick.turn_Y
-        self.pwm_signals.pwm5 = joystick.ascend
-        self.pwm_signals.pwm6 = joystick.descend
-
-
-        self.directional_input.strafe_X = joystick.strafe_Y
-        self.directional_input.strafe_Y = joystick.strafe_X
-        self.directional_input.turn_X = joystick.turn_X
-        self.directional_input.turn_Y = joystick.turn_Y
-        self.directional_input.ascend = joystick.ascend - joystick.descend
+        self.directional_input.forward      =       joystick.strafe_Y                       /   XBOX_JOYSTICK_RANGE
+        self.directional_input.right        =       joystick.strafe_X                       /   XBOX_JOYSTICK_RANGE
+        self.directional_input.turn_right   =       joystick.turn_X                         /   XBOX_JOYSTICK_RANGE
+        self.directional_input.tilt_up      =       joystick.turn_Y                         /   XBOX_JOYSTICK_RANGE
+        self.directional_input.down         =       (joystick.descend - joystick.ascend)    /   XBOX_TRIGGER_RANGE
 
         if(joystick.free_roam): 
             self.directional_input.control_mode = 0

@@ -4,7 +4,7 @@ import glob
 from evdev import InputDevice
 import rospy
 import threading
-from joystick.msg import Joystick
+from maelstrom_msgs.msg import Joystick
 import xctrl
 import subprocess
 import os

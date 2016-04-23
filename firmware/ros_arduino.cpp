@@ -139,6 +139,7 @@ void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   pwm_status_msg.pwm4 = PwmValue[3];
   pwm_status_msg.pwm5 = PwmValue[4];
   pwm_status_msg.pwm6 = PwmValue[5];
+  pwm_status_msg.pwm7 = PwmValue[6];
   
   dbg_count = 0;
   
@@ -153,7 +154,13 @@ void LightPwmUpdate( const maelstrom_msgs::LightInput &light_msg) {
   PwmValue[6] = light_msg.light_intensity;
 
   WritePwm(LigthPwmPin, PwmValue[6]);
-  
+
+  pwm_status_msg.pwm1 = PwmValue[0];
+  pwm_status_msg.pwm2 = PwmValue[1];
+  pwm_status_msg.pwm3 = PwmValue[2];
+  pwm_status_msg.pwm4 = PwmValue[3];
+  pwm_status_msg.pwm5 = PwmValue[4];
+  pwm_status_msg.pwm6 = PwmValue[5];
   pwm_status_msg.pwm7 = PwmValue[6];
   pwm_status_pub.publish( &pwm_status_msg );
 }

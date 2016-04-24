@@ -4,7 +4,7 @@
 #define QUATERNION_PD_CONTROLLER_H
 
 #include "ros/ros.h"
-#include "maelstrom_msgs/State.h"
+#include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
 #include <Eigen/Dense>
@@ -15,7 +15,7 @@ class QuaternionPdController
 {
 public:
     QuaternionPdController();
-    void stateCallback(const maelstrom_msgs::State &msg);
+    void stateCallback(const nav_msgs::Odometry &msg);
     void setpointCallback(const geometry_msgs::Pose &msg);
     void setGains(double a, double b, double c);
     void compute();

@@ -32,11 +32,11 @@ QuaternionPdController::QuaternionPdController()
     B = 185*9.8;
 }
 
-void QuaternionPdController::stateCallback(const maelstrom_msgs::State &msg)
+void QuaternionPdController::stateCallback(const nav_msgs::Odometry &msg)
 {
-    tf::pointMsgToEigen(msg.pose.position, p);
-    tf::quaternionMsgToEigen(msg.pose.orientation, q);
-    tf::twistMsgToEigen(msg.twist, nu);
+    tf::pointMsgToEigen(msg.pose.pose.position, p);
+    tf::quaternionMsgToEigen(msg.pose.pose.orientation, q);
+    tf::twistMsgToEigen(msg.twist.twist, nu);
     R = q.toRotationMatrix();
     if (isFucked(p) || isFucked(nu) || isFucked(R))
         ROS_WARN("p, nu, or R is fucked.");

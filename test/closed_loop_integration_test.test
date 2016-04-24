@@ -23,4 +23,9 @@
     type="integration_filter"
     output="screen"
   />
+  <test
+    test-name="closed_loop_integration_test"
+    pkg="uranus_dp"
+    type="closed_loop_integration_test"
+  />
 </launch>

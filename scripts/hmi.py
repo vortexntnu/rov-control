@@ -2,9 +2,9 @@
 
 import rospy
 from std_msgs.msg import Int32
-from joystick.msg import Joystick
-from joystick.msg import PwmRequests
-from joystick.msg import DirectionalInput
+from maelstrom_msgs.msg import Joystick
+from maelstrom_msgs.msg import PwmRequests
+from maelstrom_msgs.msg import DirectionalInput
 
 class HmiNode:
 

@@ -70,8 +70,8 @@ private:
 
     ControlMode control_mode;
 
-    static const double MAX_FORCE  = 10;                // Scale forces up to [-10, 10] (Newton)
-    static const double MAX_TORQUE = 5;                 // Scale torques up to [-5, 5] (Newton meters)
+    static const double MAX_FORCE  = 10; // Scale forces up to [-10, 10] (Newton)
+    static const double MAX_TORQUE = 5;  // Scale torques up to [-5, 5] (Newton meters)
 };
 
 int main(int argc, char** argv){

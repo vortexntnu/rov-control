@@ -1,10 +1,10 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
 #include "maelstrom_msgs/ThrusterForces.h"
-#include <eigen_conversions/eigen_msg.h>
-#include "../src/eigen_typedefs.h"
+// #include <eigen_conversions/eigen_msg.h>
+// #include "../src/eigen_typedefs.h"
 
 class AllocatorTest : public ::testing::Test {
 public:
@@ -39,7 +39,13 @@ public:
             ros::spinOnce();
     }
 
-    Eigen::Vector6d u;
+    double F_A;
+    double F_B;
+    double F_C;
+    double F_D;
+    double F_E;
+    double F_F;
+
     static const double MAX_ERROR = 1e-6; // Max absolute error 1 micronewton
 
  private:
@@ -50,12 +56,12 @@ public:
 
     void Callback(const maelstrom_msgs::ThrusterForces& msg)
     {
-        u(0) = msg.F1;
-        u(1) = msg.F2;
-        u(2) = msg.F3;
-        u(3) = msg.F4;
-        u(4) = msg.F5;
-        u(5) = msg.F6;
+        F_A = msg.F1;
+        F_B = msg.F2;
+        F_C = msg.F3;
+        F_D = msg.F4;
+        F_E = msg.F5;
+        F_F = msg.F6;
         message_received = true;
     }
 
@@ -76,12 +82,12 @@ TEST_F(AllocatorTest, ZeroInput)
     Publish(0, 0, 0, 0, 0, 0);
     WaitForMessage();
 
-    EXPECT_NEAR(u(0), 0, MAX_ERROR);
-    EXPECT_NEAR(u(1), 0, MAX_ERROR);
-    EXPECT_NEAR(u(2), 0, MAX_ERROR);
-    EXPECT_NEAR(u(3), 0, MAX_ERROR);
-    EXPECT_NEAR(u(4), 0, MAX_ERROR);
-    EXPECT_NEAR(u(5), 0, MAX_ERROR);
+    EXPECT_NEAR(F_A, 0, MAX_ERROR);
+    EXPECT_NEAR(F_B, 0, MAX_ERROR);
+    EXPECT_NEAR(F_C, 0, MAX_ERROR);
+    EXPECT_NEAR(F_D, 0, MAX_ERROR);
+    EXPECT_NEAR(F_E, 0, MAX_ERROR);
+    EXPECT_NEAR(F_F, 0, MAX_ERROR);
 }
 
 TEST_F(AllocatorTest, Forward)
@@ -89,12 +95,12 @@ TEST_F(AllocatorTest, Forward)
     Publish(1, 0, 0, 0, 0, 0);
     WaitForMessage();
 
-    EXPECT_TRUE(u(0) > 0);
-    EXPECT_TRUE(u(1) > 0);
-    EXPECT_TRUE(u(2) < 0);
-    EXPECT_TRUE(u(3) < 0);
-    EXPECT_TRUE(u(4) > 0);
-    EXPECT_TRUE(u(5) < 0);
+    EXPECT_TRUE(F_A < 0);
+    EXPECT_TRUE(F_B > 0);
+    EXPECT_TRUE(F_C < 0);
+    EXPECT_TRUE(F_D > 0);
+    EXPECT_TRUE(F_E > 0);
+    EXPECT_TRUE(F_F < 0);
 }
 
 TEST_F(AllocatorTest, Sideways)
@@ -102,12 +108,12 @@ TEST_F(AllocatorTest, Sideways)
     Publish(0, 1, 0, 0, 0, 0);
     WaitForMessage();
 
-    EXPECT_TRUE(u(0) > 0);
-    EXPECT_TRUE(u(1) < 0);
-    EXPECT_TRUE(u(2) < 0);
-    EXPECT_TRUE(u(3) > 0);
-    EXPECT_NEAR(u(4), 0, MAX_ERROR);
-    EXPECT_NEAR(u(5), 0, MAX_ERROR);
+    EXPECT_NEAR(F_A, 0, MAX_ERROR);
+    EXPECT_TRUE(F_B < 0);
+    EXPECT_TRUE(F_C < 0);
+    EXPECT_NEAR(F_D, 0, MAX_ERROR);
+    EXPECT_TRUE(F_E > 0);
+    EXPECT_TRUE(F_F > 0);
 }
 
 TEST_F(AllocatorTest, Downward)
@@ -115,12 +121,12 @@ TEST_F(AllocatorTest, Downward)
     Publish(0, 0, 1, 0, 0, 0);
     WaitForMessage();
 
-    EXPECT_NEAR(u(0), 0, MAX_ERROR);
-    EXPECT_NEAR(u(1), 0, MAX_ERROR);
-    EXPECT_NEAR(u(2), 0, MAX_ERROR);
-    EXPECT_NEAR(u(3), 0, MAX_ERROR);
-    EXPECT_TRUE(u(4) > 0); // Positive force 5 pushes front down
-    EXPECT_TRUE(u(5) > 0); // Positive force 6 pushes rear down
+    EXPECT_TRUE(F_A > 0);
+    EXPECT_NEAR(F_B, 0, MAX_ERROR);
+    EXPECT_NEAR(F_C, 0, MAX_ERROR);
+    EXPECT_TRUE(F_D > 0);
+    EXPECT_NEAR(F_E, 0, MAX_ERROR);
+    EXPECT_NEAR(F_F, 0, MAX_ERROR);
 }
 
 TEST_F(AllocatorTest, TiltUp)
@@ -128,12 +134,12 @@ TEST_F(AllocatorTest, TiltUp)
     Publish(0, 0, 0, 0, 1, 0);
     WaitForMessage();
 
-    EXPECT_NEAR(u(0), 0, MAX_ERROR);
-    EXPECT_NEAR(u(1), 0, MAX_ERROR);
-    EXPECT_NEAR(u(2), 0, MAX_ERROR);
-    EXPECT_NEAR(u(3), 0, MAX_ERROR);
-    EXPECT_TRUE(u(4) < 0); // Negative force 5 pushes front up
-    EXPECT_TRUE(u(5) > 0); // Positive force 6 pushes rear down
+    EXPECT_TRUE(F_A < 0);
+    EXPECT_NEAR(F_B, 0, MAX_ERROR);
+    EXPECT_NEAR(F_C, 0, MAX_ERROR);
+    EXPECT_TRUE(F_D > 0);
+    EXPECT_NEAR(F_E, 0, MAX_ERROR);
+    EXPECT_NEAR(F_F, 0, MAX_ERROR);
 }
 
 TEST_F(AllocatorTest, TurnRight)
@@ -141,12 +147,12 @@ TEST_F(AllocatorTest, TurnRight)
     Publish(0, 0, 0, 0, 0, 1);
     WaitForMessage();
 
-    EXPECT_TRUE(u(0) > 0);
-    EXPECT_TRUE(u(1) < 0);
-    EXPECT_TRUE(u(2) > 0);
-    EXPECT_TRUE(u(3) < 0);
-    EXPECT_NEAR(u(4), 0, MAX_ERROR);
-    EXPECT_NEAR(u(5), 0, MAX_ERROR);
+    EXPECT_NEAR(F_A, 0, MAX_ERROR);
+    EXPECT_TRUE(F_B < 0);
+    EXPECT_TRUE(F_C > 0);
+    EXPECT_NEAR(F_D, 0, MAX_ERROR);
+    EXPECT_TRUE(F_E > 0);
+    EXPECT_TRUE(F_F < 0);
 }
 
 int main(int argc, char **argv)

@@ -5,7 +5,8 @@
 #include "../src/control_mode_enum.h"
 #include <Eigen/Dense>
 
-class OpenLoopIntegrationTest : public ::testing::Test {
+class OpenLoopIntegrationTest : public ::testing::Test
+{
 public:
     OpenLoopIntegrationTest()
     {
@@ -17,9 +18,7 @@ public:
     void SetUp()
     {
         while (!IsNodeReady())
-        {
             ros::spinOnce();
-        }
     }
 
     void Publish(int forward, int right, int down, int tilt_up, int turn_right)
@@ -37,12 +36,15 @@ public:
     void WaitForMessage()
     {
         while (!message_received)
-        {
             ros::spinOnce();
-        }
     }
 
-    Eigen::Matrix<double,6,1> u;
+    double F_A;
+    double F_B;
+    double F_C;
+    double F_D;
+    double F_E;
+    double F_F;
 
  private:
     ros::NodeHandle nh;
@@ -52,12 +54,12 @@ public:
 
     void Callback(const maelstrom_msgs::ThrusterForces& msg)
     {
-        u(0) = msg.F1;
-        u(1) = msg.F2;
-        u(2) = msg.F3;
-        u(3) = msg.F4;
-        u(4) = msg.F5;
-        u(5) = msg.F6;
+        F_A = msg.F1;
+        F_B = msg.F2;
+        F_C = msg.F3;
+        F_D = msg.F4;
+        F_E = msg.F5;
+        F_F = msg.F6;
         message_received = true;
     }
 
@@ -78,12 +80,12 @@ TEST_F(OpenLoopIntegrationTest, Forward)
     Publish(1,0,0,0,0);
     WaitForMessage();
 
-    EXPECT_TRUE(u(0) > 0);
-    EXPECT_TRUE(u(1) > 0);
-    EXPECT_TRUE(u(2) < 0);
-    EXPECT_TRUE(u(3) < 0);
-    EXPECT_TRUE(u(4) < 0);
-    EXPECT_TRUE(u(5) > 0);
+    EXPECT_TRUE(F_A < 0);
+    EXPECT_TRUE(F_B > 0);
+    EXPECT_TRUE(F_C < 0);
+    EXPECT_TRUE(F_D > 0);
+    EXPECT_TRUE(F_E > 0);
+    EXPECT_TRUE(F_F < 0);
 }
 
 int main(int argc, char **argv)

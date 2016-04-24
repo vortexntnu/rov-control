@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
-  State.msg
   ThrusterForces.msg
   SensorRaw.msg
   PwmRequests.msg

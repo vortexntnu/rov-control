@@ -46,13 +46,13 @@ public:
             ROS_INFO("setpoint_processing: Sending position hold setpoints.");
             // Todo: Actually populate the pose message with values
             geometry_msgs::Pose setpoint_msg;
-            setpoint_msg.position.x    = 0;
-            setpoint_msg.position.y    = 0;
-            setpoint_msg.position.z    = 0;
+            setpoint_msg.position.x    = msg.forward;
+            setpoint_msg.position.y    = msg.right;
+            setpoint_msg.position.z    = msg.down;
             setpoint_msg.orientation.x = 0;
             setpoint_msg.orientation.y = 0;
             setpoint_msg.orientation.z = 0;
-            setpoint_msg.orientation.w = 0;
+            setpoint_msg.orientation.w = 1;
             posePub.publish(setpoint_msg);
         }
         else

@@ -4,8 +4,8 @@
 #include "ros/ros.h"
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
-#include "../eigen_typedefs.h"
 #include "maelstrom_msgs/ThrusterForces.h"
+#include "../eigen_typedefs.h"
 
 class LagrangeAllocator
 {
@@ -18,7 +18,6 @@ private:
     ros::Subscriber sub;
     ros::Publisher  pub;
 
-    // Move to param server
     static const unsigned int n = 5; // Number of control forces (length of tau)
     static const unsigned int r = 6; // Number of control inputs (length of u)
 

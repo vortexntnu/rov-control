@@ -61,9 +61,7 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
     u = K_inverse * T_geninverse * tau;
 
     if (isFucked(K_inverse))
-    {
         ROS_WARN("K is not invertible");
-    }
 
     maelstrom_msgs::ThrusterForces uMsg;
     uMsg.F1 = u(0);
@@ -79,8 +77,8 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
 
 void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
 {
-    bool correctDimensions = ( W_new.rows() == r && W_new.cols() == r );
-    if (!correctDimensions)
+    bool isCorrectDimensions = ( W_new.rows() == r && W_new.cols() == r );
+    if (!isCorrectDimensions)
     {
         ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".");
         return;
@@ -103,20 +101,12 @@ void LagrangeAllocator::computeGeneralizedInverse()
     // printMatrix6(K_inverse);
 
     if (isFucked(T_geninverse))
-    {
         ROS_WARN("T_geninverse NAN");
-    }
-
     if (isFucked( W.inverse() ))
-    {
         ROS_WARN("W is not invertible");
-    }
-
     if (isFucked( (T*W.inverse()*T.transpose()).inverse() ) )
-    {
         ROS_WARN("T * W_inv * T transposed is not invertible");
-    }
-} 
+}
 
 
 // Worlds worst print function :DDD

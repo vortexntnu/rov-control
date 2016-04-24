@@ -13,8 +13,11 @@
 #include "MPU6050/MPU6050.h"
 #include "MS5803_14BA.h"
 #include <Wire.h>
-#include "maelstrom_msgs/SensorRaw.h"
 #include <geometry_msgs/Vector3.h>
+#include "sensor_msgs/Imu.h"
+#include "sensor_msgs/MagneticField.h"
+#include "sensor_msgs/Temperature.h"
+#include "sensor_msgs/FluidPressure.h"
 
 #define MPU9150_I2C_ADDR 0x69
 MPU6050 accelgyro(MPU9150_I2C_ADDR);
@@ -23,9 +26,12 @@ MS5803_14BA depthSensor;
 
 ros::NodeHandle nh;
 
+sensor_msgs::Imu imu_raw_msg;
+sensor_msgs::MagneticField compass_msg;
+sensor_msgs::Temperature temperature_msg;
+sensor_msgs::FluidPressure pressure_msg;
 
-maelstrom_msgs::SensorRaw sensor_raw_msg;
-ros::Publisher pub_imu("sensor_raw", &sensor_raw_msg);
+ros::Publisher pub_imu("sensor_raw", &imu_raw_msg);
 
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;
@@ -144,8 +150,6 @@ void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   dbg_count = 0;
   
   pwm_status_pub.publish( &pwm_status_msg );
-    
-  
 }
 
 ros::Subscriber<maelstrom_msgs::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
@@ -269,28 +273,26 @@ void lesSensorer() {
 
   accelgyro.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
 
-  //Accelerometerdata enhet: [g]
-  sensor_raw_msg.acceleration.x = ax / AccelLsbSens;
-  sensor_raw_msg.acceleration.y = ay / AccelLsbSens;
-  sensor_raw_msg.acceleration.z = az / AccelLsbSens;
+  //Accelerometerdata enhet: [m/s^2]
+  imu_raw_msg.linear_acceleration.x = ax / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
+  imu_raw_msg.linear_acceleration.y = ay / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
+  imu_raw_msg.linear_acceleration.z = az / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
 
-  //Gyrodata: enhet [deg/s]
-  sensor_raw_msg.gyro.x = gx / GyroLsbSens;
-  sensor_raw_msg.gyro.y = gy / GyroLsbSens;
-  sensor_raw_msg.gyro.z = gz / GyroLsbSens;
+  //Gyrodata: enhet [rad/s]
+  imu_raw_msg.angular_velocity.x = gx / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
+  imu_raw_msg.angular_velocity.y = gy / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
+  imu_raw_msg.angular_velocity.z = gz / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
 
-  //Kompass enhent [µT]
-  //TODO fin ut om 0.3 er riktig skalerinsfaktor
-  sensor_raw_msg.compass.x = mx * 0.3;
-  sensor_raw_msg.compass.y = my * 0.3;
-  sensor_raw_msg.compass.z = mz * 0.3;
+  // Kompass, enhet [T]
+  // TODO finn ut om 0.3 er riktig skaleringsfaktor
+  compass_msg.magnetic_field.x = mx * 0.3; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
+  compass_msg.magnetic_field.y = my * 0.3; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
+  compass_msg.magnetic_field.z = mz * 0.3; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
 
-  sensor_raw_msg.temperature = ( (double)accelgyro.getTemperature() + 12412.0) / 340.0;
+  temperature_msg.temperature = ( (double)accelgyro.getTemperature() + 12412.0) / 340.0;
 
   depthSensor.read();
-  sensor_raw_msg.pressure = depthSensor.getPreassure();
-
-  
+  pressure_msg.pressure = depthSensor.getPreassure(); // OBS! MÅ VÆRE I PASCAL
 }
 
 void loop(){
@@ -298,15 +300,13 @@ void loop(){
 
   nh.spinOnce();
 
-  
+
   if( millis() - PrevoiusSensorReadMillis >= SensorReadDelay ) {
     PrevoiusSensorReadMillis = millis();
-  
+
     lesSensorer();
     //nh.spinOnce();
-    pub_imu.publish(&sensor_raw_msg);
-     
-    
+    pub_imu.publish(&imu_raw_msg);
   }
   
   
@@ -321,5 +321,5 @@ void loop(){
   nh.spinOnce();
   */
 
-  
+
 }

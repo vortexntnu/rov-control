@@ -141,7 +141,6 @@ int main(int argc, char** argv)
     ROS_INFO("Launching node integration_filter.");
     ros::NodeHandle nh;
 
-
     double frequency = 100;
     IntegrationFilter filter(frequency);
 
@@ -154,4 +153,5 @@ int main(int argc, char** argv)
         filter.update();
         rate.sleep();
     }
+    return 0;
 }

@@ -7,13 +7,13 @@
 #include <eigen_conversions/eigen_msg.h>
 #include "uranus_dp/ResetIntegrationFilter.h"
 
-class IntegrationFilterTest : public ::testing::Test
+class StateEstimatorTest : public ::testing::Test
 {
 public:
-    IntegrationFilterTest()
+    StateEstimatorTest()
     {
         pub = nh.advertise<sensor_msgs::Imu>("sensor_raw", 10);
-        sub = nh.subscribe("state_estimate", 10, &IntegrationFilterTest::Callback, this);
+        sub = nh.subscribe("state_estimate", 10, &StateEstimatorTest::Callback, this);
         client = nh.serviceClient<uranus_dp::ResetIntegrationFilter>("reset_integration_filter");
         message_received = false;
     }
@@ -87,12 +87,12 @@ public:
     }
 };
 
-TEST_F(IntegrationFilterTest, CheckResponsivenes)
+TEST_F(StateEstimatorTest, CheckResponsivenes)
 {
     WaitForMessage();
 }
 
-TEST_F(IntegrationFilterTest, CorrectInitialization)
+TEST_F(StateEstimatorTest, CorrectInitialization)
 {
     ResetFilter();
     WaitForMessage();
@@ -115,7 +115,7 @@ TEST_F(IntegrationFilterTest, CorrectInitialization)
     EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
 
-TEST_F(IntegrationFilterTest, OnlyGravity)
+TEST_F(StateEstimatorTest, OnlyGravity)
 {
     ResetFilter();
     Publish(0,0,STANDARD_GRAVITY,0,0,0);
@@ -129,7 +129,7 @@ TEST_F(IntegrationFilterTest, OnlyGravity)
     EXPECT_NEAR(v(2), 0, MAX_ERROR);
 }
 
-TEST_F(IntegrationFilterTest, ForwardAcceleration)
+TEST_F(StateEstimatorTest, ForwardAcceleration)
 {
     ResetFilter();
     Publish(1,0,STANDARD_GRAVITY,0,0,0);
@@ -143,7 +143,7 @@ TEST_F(IntegrationFilterTest, ForwardAcceleration)
     EXPECT_NEAR(v(2), 0, 0.01);
 }
 
-TEST_F(IntegrationFilterTest, Rotate)
+TEST_F(StateEstimatorTest, Rotate)
 {
     ResetFilter();
     Publish(0,0,STANDARD_GRAVITY,0,0,1); // 1 rad/sec in yaw  (I think)
@@ -162,7 +162,7 @@ TEST_F(IntegrationFilterTest, Rotate)
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    ros::init(argc, argv, "integration_filter_test");
+    ros::init(argc, argv, "state_estimator_test");
 
     int ret = RUN_ALL_TESTS();
     ros::shutdown();

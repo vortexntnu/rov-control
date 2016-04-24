@@ -3,7 +3,6 @@
 #include "open_loop_controller.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
-#include "maelstrom_msgs/JoystickMotionCommand.h"
 #include "../control_mode_enum.h"
 
 class Controller
@@ -13,8 +12,8 @@ public:
     {
         frequency = f;
         control_mode = ControlModes::OPEN_LOOP;
-        stationkeeper.disable();
-        openlooper.enable();
+        position_hold_controller.disable();
+        open_loop_controller.enable();
     }
 
     bool setControlMode(uranus_dp::SetControlMode::Request &req, uranus_dp::SetControlMode::Response &resp)
@@ -27,13 +26,13 @@ public:
             {
             case ControlModes::OPEN_LOOP:
                 ROS_INFO("Changing control mode to open loop.");
-                stationkeeper.disable();
-                openlooper.enable();
+                position_hold_controller.disable();
+                open_loop_controller.enable();
                 break;
             case ControlModes::POSITION_HOLD:
                 ROS_INFO("Changing control mode to hold position.");
-                openlooper.disable();
-                stationkeeper.enable();
+                open_loop_controller.disable();
+                position_hold_controller.enable();
                 break;
             default:
                 ROS_WARN("Invalid control mode set.");
@@ -50,17 +49,17 @@ public:
     bool setControllerGains(uranus_dp::SetControllerGains::Request &req, uranus_dp::SetControllerGains::Response &resp)
     {
         ROS_INFO_STREAM("Setting new gains: a = " << req.a << ", b = " << req.b << ", c = " << req.c << ".");
-        stationkeeper.setGains(req.a, req.b, req.c);
+        position_hold_controller.setGains(req.a, req.b, req.c);
     }
 
     void run()
     {
-        ros::Rate loop_late(frequency);
+        ros::Rate rate(frequency);
         while (ros::ok())
         {
             ros::spinOnce();
-            stationkeeper.compute();
-            loop_late.sleep();
+            position_hold_controller.compute();
+            rate.sleep();
         }
     }
 private:
@@ -68,8 +67,8 @@ private:
     unsigned int frequency;
 
     ControlMode control_mode;
-    QuaternionPdController stationkeeper; // I hardly know her.
-    OpenLoopController     openlooper;
+    QuaternionPdController position_hold_controller; // I hardly know her.
+    OpenLoopController     open_loop_controller;
 };
 
 

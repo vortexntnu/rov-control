@@ -18,9 +18,7 @@ public:
     void SetUp()
     {
         while (!IsNodeReady())
-        {
             ros::spinOnce();
-        }
     }
 
     void Publish(double surge, double sway, double heave, double roll, double pitch, double yaw)
@@ -38,9 +36,7 @@ public:
     void WaitForMessage()
     {
         while (!message_received)
-        {
             ros::spinOnce();
-        }
     }
 
     Eigen::Vector6d u;
@@ -60,7 +56,6 @@ public:
         u(3) = msg.F4;
         u(4) = msg.F5;
         u(5) = msg.F6;
-
         message_received = true;
     }
 
@@ -72,10 +67,8 @@ public:
 
 TEST_F(AllocatorTest, CheckResponsiveness)
 {
-    // ros::Duration(0.5).sleep();
     Publish(0, 0, 0, 0, 0, 0);
     WaitForMessage();
-    EXPECT_TRUE(true);
 }
 
 TEST_F(AllocatorTest, ZeroInput)
@@ -100,8 +93,8 @@ TEST_F(AllocatorTest, Forward)
     EXPECT_TRUE(u(1) > 0);
     EXPECT_TRUE(u(2) < 0);
     EXPECT_TRUE(u(3) < 0);
-    EXPECT_TRUE(u(4) < 0); // Negative force 5 pushes front up
-    EXPECT_TRUE(u(5) > 0); // Positive force 6 pushes rear down
+    EXPECT_TRUE(u(4) > 0);
+    EXPECT_TRUE(u(5) < 0);
 }
 
 TEST_F(AllocatorTest, Sideways)

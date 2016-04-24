@@ -292,7 +292,7 @@ void lesSensorer() {
   temperature_msg.temperature = ( (double)accelgyro.getTemperature() + 12412.0) / 340.0;
 
   depthSensor.read();
-  pressure_msg.pressure = depthSensor.getPreassure(); // OBS! MÅ VÆRE I PASCAL
+  pressure_msg.fluid_pressure = depthSensor.getPreassure(); // OBS! MÅ VÆRE I PASCAL
 }
 
 void loop(){

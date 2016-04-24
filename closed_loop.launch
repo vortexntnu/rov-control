@@ -18,9 +18,9 @@
     output="screen"
   />
   <node
-    name="imuintegrationfilter_node"
-    pkg="imuintegrationfilter"
-    type="imuintegrationfilter_node"
+    name="integration_filter"
+    pkg="uranus_dp"
+    type="integration_filter"
     output="screen"
   />
 </launch>

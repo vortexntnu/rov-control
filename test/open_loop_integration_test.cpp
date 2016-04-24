@@ -9,7 +9,7 @@ class OpenLoopIntegrationTest : public ::testing::Test {
 public:
     OpenLoopIntegrationTest()
     {
-        pub = nh.advertise<maelstrom_msgs::JoystickMotionCommand>("joy_input", 10);
+        pub = nh.advertise<maelstrom_msgs::JoystickMotionCommand>("joystick_motion_command", 10);
         sub = nh.subscribe("thruster_forces", 10, &OpenLoopIntegrationTest::Callback, this);
         message_received = false;
     }

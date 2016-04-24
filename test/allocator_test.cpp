@@ -1,10 +1,7 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
-// #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
 #include "maelstrom_msgs/ThrusterForces.h"
-// #include <eigen_conversions/eigen_msg.h>
-// #include "../src/eigen_typedefs.h"
 
 class AllocatorTest : public ::testing::Test {
 public:

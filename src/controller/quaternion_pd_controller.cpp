@@ -38,6 +38,7 @@ void QuaternionPdController::stateCallback(const nav_msgs::Odometry &msg)
     tf::quaternionMsgToEigen(msg.pose.pose.orientation, q);
     tf::twistMsgToEigen(msg.twist.twist, nu);
     R = q.toRotationMatrix();
+
     if (isFucked(p) || isFucked(nu) || isFucked(R))
         ROS_WARN("p, nu, or R is fucked.");
 }
@@ -46,6 +47,7 @@ void QuaternionPdController::setpointCallback(const geometry_msgs::Pose &msg)
 {
     tf::pointMsgToEigen(msg.position, p_d);
     tf::quaternionMsgToEigen(msg.orientation, q_d);
+
     if (isFucked(p_d))
         ROS_WARN("p_d is fucked.");
 }
@@ -68,6 +70,7 @@ void QuaternionPdController::compute()
         updateRestoringForceVector();
 
         tau = - K_D*nu - K_P*z + g;
+
         if (isFucked(tau))
             ROS_WARN("tau is fucked.");
 
@@ -98,9 +101,11 @@ void QuaternionPdController::updateProportionalGainMatrix()
 
 void QuaternionPdController::updateErrorVector()
 {
-    Eigen::Vector3d    p_tilde = p - p_d;
+    Eigen::Vector3d p_tilde = p - p_d;
+
     if (isFucked(p_tilde))
         ROS_WARN("p_tilde is fucked.");
+
     Eigen::Quaterniond q_tilde = q_d.conjugate()*q;
     q_tilde.normalize();
 
@@ -126,9 +131,7 @@ void QuaternionPdController::updateRestoringForceVector()
 int QuaternionPdController::sgn(double x)
 {
     if (x < 0)
-    {
         return -1;
-    }
     return 1;
 }
 

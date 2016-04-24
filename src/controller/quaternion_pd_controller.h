@@ -4,11 +4,11 @@
 #define QUATERNION_PD_CONTROLLER_H
 
 #include "ros/ros.h"
+#include <Eigen/Dense>
+#include <eigen_conversions/eigen_msg.h>
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
-#include <Eigen/Dense>
-#include <eigen_conversions/eigen_msg.h>
 #include "../eigen_typedefs.h"
 
 class QuaternionPdController

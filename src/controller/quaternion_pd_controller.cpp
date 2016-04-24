@@ -37,6 +37,7 @@ void QuaternionPdController::stateCallback(const nav_msgs::Odometry &msg)
     tf::pointMsgToEigen(msg.pose.pose.position, p);
     tf::quaternionMsgToEigen(msg.pose.pose.orientation, q);
     tf::twistMsgToEigen(msg.twist.twist, nu);
+    q.normalize();
     R = q.toRotationMatrix();
 
     if (isFucked(p) || isFucked(nu) || isFucked(R))
@@ -47,6 +48,7 @@ void QuaternionPdController::setpointCallback(const geometry_msgs::Pose &msg)
 {
     tf::pointMsgToEigen(msg.position, p_d);
     tf::quaternionMsgToEigen(msg.orientation, q_d);
+    q_d.normalize();
 
     if (isFucked(p_d))
         ROS_WARN("p_d is fucked.");
@@ -149,14 +151,12 @@ Eigen::Matrix3d QuaternionPdController::skew(const Eigen::Vector3d &v)
 // ROS_INFO_STREAM("p set to [" << p(0) << ", " << p(1) << ", " << p(2) << "].");
 // ROS_INFO_STREAM("q set to [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << "].");
 // ROS_INFO_STREAM("nu set to [" << nu(0) << ", " << nu(1) << ", " << nu(2) << ", " << nu(3) << ", " << nu(4) << ", " << nu(5) << "].");
-
 // ROS_INFO_STREAM("updateRestoringForceVector(): f_g = [" << f_g(0) << ", " << f_g(1) << ", " << f_g(2) << "].");
 // ROS_INFO_STREAM("updateRestoringForceVector(): f_b = [" << f_b(0) << ", " << f_b(1) << ", " << f_b(2) << "].");
-
 // ROS_INFO_STREAM("compute(): nu = [" << nu(0) << ", " << nu(1) << ", " << nu(2) << ", " << nu(3) << ", " << nu(4) << ", " << nu(5) << "].");
 // ROS_INFO_STREAM("compute(): z = [" << z(0) << ", " << z(1) << ", " << z(2) << ", " << z(3) << ", " << z(4) << ", " << z(5) << "].");
 // ROS_INFO_STREAM("compute(): g = [" << g(0) << ", " << g(1) << ", " << g(2) << "].");
 // ROS_INFO_STREAM("tau =  [" << tau(0) << ", " << tau(1) << ", " << tau(2) << ", " << tau(3) << ", " << tau(4) << ", " << tau(5) << "].");
-
 // ROS_INFO_STREAM("p_d set to [" << p_d(0) << ", " << p_d(1) << ", " << p_d(2) << "].");
 // ROS_INFO_STREAM("q_d set to [" << q_d.w() << ", " << q_d.x() << ", " << q_d.y() << ", " << q_d.z() << "].");
+// ROS_INFO_STREAM("z = [" << z(0) << "," << z(1) << "," << z(2) << "," << z(3) << "," << z(4) << "," << z(5) << "]");

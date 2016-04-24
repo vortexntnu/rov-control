@@ -7,7 +7,8 @@
 #include <eigen_conversions/eigen_msg.h>
 #include "uranus_dp/ResetIntegrationFilter.h"
 
-class IntegrationFilterTest : public ::testing::Test {
+class IntegrationFilterTest : public ::testing::Test
+{
 public:
     IntegrationFilterTest()
     {

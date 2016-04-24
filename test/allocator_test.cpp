@@ -3,7 +3,8 @@
 #include "geometry_msgs/Wrench.h"
 #include "maelstrom_msgs/ThrusterForces.h"
 
-class AllocatorTest : public ::testing::Test {
+class AllocatorTest : public ::testing::Test
+{
 public:
     AllocatorTest()
     {

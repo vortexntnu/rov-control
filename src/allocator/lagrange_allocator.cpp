@@ -73,7 +73,7 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
     uMsg.F5 = u(4);
     uMsg.F6 = u(5);
     pub.publish(uMsg);
-
+    ROS_INFO("lagrange_allocator: Publishing thruster forces.");
     // ROS_INFO_STREAM("lagrange_allocator: Sending " << u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
 }
 

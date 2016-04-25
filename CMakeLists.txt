@@ -22,7 +22,7 @@ add_service_files(
   FILES
   SetControlMode.srv
   SetControllerGains.srv
-  ResetIntegrationFilter.srv
+  ResetStateEstimator.srv
 )
 
 generate_messages()

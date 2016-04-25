@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include "../src/eigen_typedefs.h"
 #include <eigen_conversions/eigen_msg.h>
-#include "uranus_dp/ResetIntegrationFilter.h"
+#include "uranus_dp/ResetStateEstimator.h"
 
 class StateEstimatorTest : public ::testing::Test
 {
@@ -14,7 +14,7 @@ public:
     {
         pub = nh.advertise<sensor_msgs::Imu>("sensor_raw", 10);
         sub = nh.subscribe("state_estimate", 10, &StateEstimatorTest::Callback, this);
-        client = nh.serviceClient<uranus_dp::ResetIntegrationFilter>("reset_integration_filter");
+        client = nh.serviceClient<uranus_dp::ResetStateEstimator>("reset_state_estimator");
         message_received = false;
     }
 
@@ -53,7 +53,7 @@ public:
 
     void ResetFilter()
     {
-        uranus_dp::ResetIntegrationFilter srv;
+        uranus_dp::ResetStateEstimator srv;
         client.call(srv);
     }
 

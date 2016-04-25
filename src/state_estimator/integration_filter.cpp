@@ -19,7 +19,7 @@ IntegrationFilter::IntegrationFilter(double frequency)
     g_n << 0, 0, 9.80665;
 }
 
-bool IntegrationFilter::reset(uranus_dp::ResetIntegrationFilter::Request &req, uranus_dp::ResetIntegrationFilter::Response &resp)
+bool IntegrationFilter::reset(uranus_dp::ResetStateEstimator::Request &req, uranus_dp::ResetStateEstimator::Response &resp)
 {
     ROS_INFO("integration_filter: Resetting...");
     a_imu << 0, 0, 9.80665;

@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     double frequency = 100;
     IntegrationFilter estimator(frequency);
 
-    ros::ServiceServer ss = nh.advertiseService("reset_integration_filter", &IntegrationFilter::reset, &estimator);
+    ros::ServiceServer ss = nh.advertiseService("reset_state_estimator", &IntegrationFilter::reset, &estimator);
 
     ros::Rate rate(frequency);
     while (ros::ok())

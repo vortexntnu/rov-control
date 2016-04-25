@@ -20,6 +20,12 @@ public:
 
     void callback(const maelstrom_msgs::JoystickMotionCommand& msg)
     {
+        if (!healthyMessage(msg))
+        {
+            ROS_WARN("setpoint_processing: Joystick motion command message out of range, ignoring...");
+            return;
+        }
+
         if (msg.control_mode != control_mode)
         {
             control_mode = static_cast<ControlMode>(msg.control_mode);
@@ -29,35 +35,40 @@ public:
                 ROS_ERROR_STREAM("Failed to call service set_control_mode. New mode " << control_mode << " not activated.");
         }
 
-        if (control_mode == ControlModes::OPEN_LOOP)
+        switch (control_mode)
         {
-            ROS_INFO("setpoint_processing: Sending open loop setpoints.");
-            geometry_msgs::Wrench setpoint_msg;
-            setpoint_msg.force.x  = msg.forward * MAX_FORCE;
-            setpoint_msg.force.y  = msg.right   * MAX_FORCE;
-            setpoint_msg.force.z  = msg.down    * MAX_FORCE;
-            setpoint_msg.torque.x = 0;
-            setpoint_msg.torque.y = msg.tilt_up    * MAX_TORQUE;
-            setpoint_msg.torque.z = msg.turn_right * MAX_TORQUE;
-            wrenchPub.publish(setpoint_msg);
-        }
-        else if (control_mode == ControlModes::POSITION_HOLD)
-        {
-            ROS_INFO("setpoint_processing: Sending position hold setpoints.");
-            // Todo: Actually populate the pose message with values
-            geometry_msgs::Pose setpoint_msg;
-            setpoint_msg.position.x    = msg.forward;
-            setpoint_msg.position.y    = msg.right;
-            setpoint_msg.position.z    = msg.down;
-            setpoint_msg.orientation.x = 0;
-            setpoint_msg.orientation.y = 0;
-            setpoint_msg.orientation.z = 0;
-            setpoint_msg.orientation.w = 1;
-            posePub.publish(setpoint_msg);
-        }
-        else
-        {
-            ROS_ERROR_STREAM("Invalid mode " << control_mode << " detected. Will not send setpoint message.");
+            case ControlModes::OPEN_LOOP:
+            {
+                ROS_INFO("setpoint_processing: Sending OPEN_LOOP setpoints.");
+                geometry_msgs::Wrench open_loop_msg;
+                open_loop_msg.force.x  = msg.forward * MAX_FORCE;
+                open_loop_msg.force.y  = msg.right   * MAX_FORCE;
+                open_loop_msg.force.z  = msg.down    * MAX_FORCE;
+                open_loop_msg.torque.x = 0;
+                open_loop_msg.torque.y = msg.tilt_up    * MAX_TORQUE;
+                open_loop_msg.torque.z = msg.turn_right * MAX_TORQUE;
+                wrenchPub.publish(open_loop_msg);
+                break;
+            }
+            case ControlModes::POSITION_HOLD:
+            {
+                ROS_INFO("setpoint_processing: Sending POSITION_HOLD setpoints.");
+                // Todo: Actually populate the pose message with values
+                geometry_msgs::Pose position_hold_msg;
+                position_hold_msg.position.x    = msg.forward;
+                position_hold_msg.position.y    = msg.right;
+                position_hold_msg.position.z    = msg.down;
+                position_hold_msg.orientation.x = 0;
+                position_hold_msg.orientation.y = 0;
+                position_hold_msg.orientation.z = 0;
+                position_hold_msg.orientation.w = 1;
+                posePub.publish(position_hold_msg);
+                break;
+            }
+            default:
+            {
+                ROS_WARN("setpoint_processing: Default control mode switch case reached.");
+            }
         }
     }
 
@@ -72,6 +83,43 @@ private:
 
     static const double MAX_FORCE  = 10; // Scale forces up to [-10, 10] (Newton)
     static const double MAX_TORQUE = 5;  // Scale torques up to [-5, 5] (Newton meters)
+
+    bool healthyMessage(const maelstrom_msgs::JoystickMotionCommand& msg)
+    {
+        if (abs(msg.forward) > 1)
+        {
+            ROS_WARN("setpoint_processing: Forward motion command out of range");
+            return false;
+        }
+        if (abs(msg.right) > 1)
+        {
+            ROS_WARN("setpoint_processing: Right motion command out of range");
+            return false;
+        }
+        if (abs(msg.down) > 1)
+        {
+            ROS_WARN("setpoint_processing: Down motion command out of range.");
+            return false;
+        }
+        if (abs(msg.tilt_up) > 1)
+        {
+            ROS_WARN("setpoint_processing: Tilt up motion command out of range");
+            return false;
+        }
+        if (abs(msg.turn_right) > 1)
+        {
+            ROS_WARN("setpoint_processing: Turn right motion command out of range");
+            return false;
+        }
+
+        bool validControlMode = (msg.control_mode == ControlModes::OPEN_LOOP || msg.control_mode == ControlModes::POSITION_HOLD);
+        if (!validControlMode)
+        {
+            ROS_WARN("setpoint_processing: Invalid control mode.");
+            return false;
+        }
+        return true;
+    }
 };
 
 int main(int argc, char** argv){

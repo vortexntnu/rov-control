@@ -33,7 +33,7 @@ unsigned long PrevoiusSensorReadMillis = 0;
 int dbg_count = 0;
 
 //Hold orden på pwm-pins og hvilke rigeistre om må settes for å endre on-time
-const int PwmCount = 6;
+const int PwmCount = 6; //      F1 F2 F3  F4  F5  F6
 const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45 };
 int PwmValue[PwmCount];
 

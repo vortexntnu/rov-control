@@ -3,6 +3,7 @@
 #include "geometry_msgs/Pose.h"
 #include <maelstrom_msgs/JoystickMotionCommand.h>
 #include "uranus_dp/SetControlMode.h"
+#include "uranus_dp/ResetStateEstimator.h"
 #include "control_mode_enum.h"
 
 class SetpointProcessing
@@ -14,6 +15,7 @@ public:
         wrenchPub   = nh.advertise<geometry_msgs::Wrench>("wrench_setpoints", 10);
         posePub     = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
         modeClient  = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
+        resetClient = nh.serviceClient<uranus_dp::ResetStateEstimator>("reset_state_estimator");
 
         control_mode = ControlModes::OPEN_LOOP;
     }
@@ -29,6 +31,13 @@ public:
         if (msg.control_mode != control_mode)
         {
             control_mode = static_cast<ControlMode>(msg.control_mode);
+            if (control_mode == ControlModes::POSITION_HOLD)
+            {
+                // Reset estimator when mode changes to position hold
+                uranus_dp::ResetStateEstimator reset_srv;
+                resetClient.call(reset_srv);
+            }
+
             uranus_dp::SetControlMode srv;
             srv.request.mode = control_mode;
             if (!modeClient.call(srv))
@@ -78,6 +87,7 @@ private:
     ros::Publisher     wrenchPub;
     ros::Publisher     posePub;
     ros::ServiceClient modeClient;
+    ros::ServiceClient resetClient;
 
     ControlMode control_mode;
 

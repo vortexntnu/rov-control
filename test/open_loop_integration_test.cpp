@@ -39,6 +39,18 @@ public:
             ros::spinOnce();
     }
 
+    bool HasReceivedMessage()
+    {
+        return message_received;
+    }
+
+    void OneSecondSpin()
+    {
+        ros::Time start = ros::Time::now();
+        while (ros::Time::now() < start + ros::Duration(1))
+            ros::spinOnce();
+    }
+
     double F_A;
     double F_B;
     double F_C;
@@ -75,6 +87,7 @@ TEST_F(OpenLoopIntegrationTest, CheckResponsiveness)
     WaitForMessage();
 }
 
+// Command forward motion, assure correct forces for each thruster.
 TEST_F(OpenLoopIntegrationTest, Forward)
 {
     Publish(1,0,0,0,0);
@@ -86,6 +99,14 @@ TEST_F(OpenLoopIntegrationTest, Forward)
     EXPECT_TRUE(F_D > 0);
     EXPECT_TRUE(F_E > 0);
     EXPECT_TRUE(F_F < 0);
+}
+
+// Publish message with out of range value, assure no reply.
+TEST_F(OpenLoopIntegrationTest, OutOfRange)
+{
+    Publish(0,0,-2,0,0);
+    OneSecondSpin();
+    EXPECT_TRUE(!HasReceivedMessage());
 }
 
 int main(int argc, char **argv)

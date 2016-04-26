@@ -4,6 +4,11 @@ def read_ps3_into_control_msg(device, model):
 
     for event in device.read_loop():
         input = ps3_code_map(event.code)
+
+        ######################
+        ######################
+        ######################
+        ## MOTION
         if input == 'X1':
             if event.value != 0:
                 model.strafe_X = deadzone(event.value)
@@ -17,25 +22,6 @@ def read_ps3_into_control_msg(device, model):
             if event.value != 0:
                 model.turn_Y = deadzone(event.value)
 
-        elif input == 'R1':
-            model.lights_increase = (event.value == 1)
-        elif input == 'L1':
-            model.lights_decrease = (event.value == 1)
-
-        elif input == 'TRIANGLE':
-            model.lights_on = (event.value == 1)
-        elif input == 'SQUARE':
-            model.lights_off = (event.value == 1)
-        elif input == 'CIRCLE':
-            model.arm_grip_open = (event.value == 1)
-        elif input == 'X':
-            model.arm_grip_close = (event.value == 1)
-
-        elif input == 'DY':
-            model.arm_base = event.value
-        elif input == 'DX':
-            model.arm_rot = event.value
-
         elif input == 'L2':
             model.ascend = event.value
         elif input == 'R2':
@@ -45,6 +31,41 @@ def read_ps3_into_control_msg(device, model):
             model.free_roam = (event.value == 1)
         elif input == 'SELECT':
             model.hold_position = (event.value == 1)
+
+
+        ######################
+        ######################
+        ######################
+        ## LIGHTS
+        elif input == 'R1':
+            model.lights_increase = (event.value == 1)
+        elif input == 'L1':
+            model.lights_decrease = (event.value == 1)
+
+        elif input == 'TRIANGLE':
+            model.lights_on = (event.value == 1)
+        elif input == 'SQUARE':
+            model.lights_off = (event.value == 1)
+
+
+        ######################
+        ######################
+        ######################
+        ## ARM
+        elif input == 'CIRCLE':
+            model.arm_grip_open = (event.value == 1)
+        elif input == 'X':
+            model.arm_grip_close = (event.value == 1)
+
+        elif input == 'DY':
+            model.arm_base_up = (event.value == 1)
+            model.arm_base_down = (event.value == -1)
+
+        elif input == 'DX':
+            model.arm_rot_left = (event.value == 1)
+            model.arm_rot_right = (event.value == -1)
+
+
 
 def read_xbox_into_control_msg(device, model):
 

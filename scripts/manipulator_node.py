@@ -4,21 +4,23 @@
 
 import RPi.GPIO as GPIO
 import rospy
-from maelstrom_msgs.msg import Joystick
+from maelstrom_msgs.msg import JoystickArmCommand
 
 
 class ManipulatorNode():
 
     max_soft_value = 255
-    arm_increment_value = 20
+
+    base_angle_increment = 5
+    rot_angle_increment  = 5
+    grip_angle_increment = 5
 
     def __init__(self):
-        self.model = Joystick()
 
         rospy.init_node('manipulator_node', anonymous=True)
 
-	self.grip_angle = 0
 	self.base_angle = 0
+	self.grip_angle = 0
 	self.rot_angle = 0
 
 	GPIO.setwarnings(False)
@@ -41,10 +43,13 @@ class ManipulatorNode():
 
         def callback(data):
 	    print data
+            if(data.arm_base_up):
+                base_angle = base_angle + base_angle_increment 
+
             self.model = data
             self.update_manipulator()
 
-        rospy.Subscriber("joystick", Joystick, callback)
+        rospy.Subscriber("joystick_arm_command", JoystickArmCommand, callback)
         rospy.spin()
 
     def update_manipulator(self):

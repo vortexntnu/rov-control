@@ -18,9 +18,9 @@
     output="screen"
   />
   <node
-    name="integration_filter"
+    name="state_estimator"
     pkg="uranus_dp"
-    type="integration_filter"
+    type="state_estimator"
     output="screen"
   />
 </launch>

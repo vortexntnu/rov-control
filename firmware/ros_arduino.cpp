@@ -19,6 +19,9 @@
 #include "sensor_msgs/Temperature.h"
 #include "sensor_msgs/FluidPressure.h"
 
+#define STANDARD_GRAVITY 9.08665  // [m/s^2]
+#define RAD_PER_DEG 0.01745329252 // [1/deg]
+
 #define MPU9150_I2C_ADDR 0x69
 MPU6050 accelgyro(MPU9150_I2C_ADDR);
 
@@ -273,14 +276,14 @@ void lesSensorer() {
   accelgyro.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
 
   //Accelerometerdata enhet: [m/s^2]
-  imu_raw_msg.linear_acceleration.x = ax / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
-  imu_raw_msg.linear_acceleration.y = ay / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
-  imu_raw_msg.linear_acceleration.z = az / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
+  imu_raw_msg.linear_acceleration.x = (ax * STANDARD_GRAVITY) / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
+  imu_raw_msg.linear_acceleration.y = (ay * STANDARD_GRAVITY) / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
+  imu_raw_msg.linear_acceleration.z = (az * STANDARD_GRAVITY) / AccelLsbSens; // OBS! MÅ VÆRE m/s^2!
 
   //Gyrodata: enhet [rad/s]
-  imu_raw_msg.angular_velocity.x = gx / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
-  imu_raw_msg.angular_velocity.y = gy / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
-  imu_raw_msg.angular_velocity.z = gz / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
+  imu_raw_msg.angular_velocity.x = (gx * RAD_PER_DEG) / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
+  imu_raw_msg.angular_velocity.y = (gy * RAD_PER_DEG) / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
+  imu_raw_msg.angular_velocity.z = (gz * RAD_PER_DEG) / GyroLsbSens; // OBS! MÅ VÆRE RAD/SEC
 
   // Kompass, enhet [T]
   // TODO finn ut om 0.3 er riktig skaleringsfaktor

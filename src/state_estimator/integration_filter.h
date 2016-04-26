@@ -21,6 +21,8 @@ private:
     ros::Subscriber sub;
     ros::Publisher  pub;
 
+    int messages_received;
+
     // Time step
     double dt;
 

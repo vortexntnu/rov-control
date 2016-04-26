@@ -16,7 +16,13 @@ IntegrationFilter::IntegrationFilter(double frequency)
     w.setZero();
     v_dot.setZero();
     q_dot.setZero();
-    g_n << 0, 0, 9.80665;
+
+    messages_received = 0;
+
+    while (messages_received < 100)
+        ros::spinOnce();
+
+    calibrate();
 }
 
 bool IntegrationFilter::reset(uranus_dp::ResetStateEstimator::Request &req, uranus_dp::ResetStateEstimator::Response &resp)
@@ -34,10 +40,19 @@ bool IntegrationFilter::reset(uranus_dp::ResetStateEstimator::Request &req, uran
     return true;
 }
 
+void IntegrationFilter::calibrate()
+{
+    ROS_INFO("integration_filter: Calibrating...");
+    // read acceleration a few times and average
+    // set g_n equal to it (or with axes fixed)
+    g_n << a_imu;
+}
+
 void IntegrationFilter::callback(const sensor_msgs::Imu& msg)
 {
     tf::vectorMsgToEigen(msg.linear_acceleration, a_imu);
     tf::vectorMsgToEigen(msg.angular_velocity, w_imu);
+    messages_received++;
         // ROS_INFO("Callback!");
         // ROS_INFO_STREAM("a_imu = [" << a_imu(0) << ", " << a_imu(1) << ", " << a_imu(2) << "]");
         // ROS_INFO_STREAM("w_imu = [" << w_imu(0) << ", " << w_imu(1) << ", " << w_imu(2) << "]");

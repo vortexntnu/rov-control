@@ -10,8 +10,12 @@ bool lights_off
 bool lights_increase
 bool lights_decrease
 
-int32 arm_base
-int32 arm_rot
+bool arm_base_up
+bool arm_base_down
+
+bool arm_rot_left
+bool arm_rot_right
+
 bool arm_grip_open
 bool arm_grip_close
 

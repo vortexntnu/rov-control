@@ -19,8 +19,8 @@ add_message_files(
   PwmRequests.msg
   Joystick.msg
   LightInput.msg
-  ArmInput.msg
   JoystickMotionCommand.msg
+  JoystickArmCommand.msg
 )
 
 generate_messages(

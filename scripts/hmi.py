@@ -50,14 +50,14 @@ class HmiNode:
         ######################
         ######################
         ## MANIPULATOR
-        self.arm_input.arm_grip_open        =       joystick.arm_grip_open
-        self.arm_input.arm_grip_close       =       joystick.arm_grip_close
+        self.arm_input.grip_open        =       joystick.arm_grip_open
+        self.arm_input.grip_close       =       joystick.arm_grip_close
 
-        self.arm_input.arm_base_up          =       joystick.arm_base_up
-        self.arm_input.arm_base_down        =       joystick.arm_base_down
+        self.arm_input.base_up          =       joystick.arm_base_up
+        self.arm_input.base_down        =       joystick.arm_base_down
 
-        self.arm_input.arm_rot_left         =       joystick.arm_rot_left
-        self.arm_input.arm_rot_right        =       joystick.arm_rot_right
+        self.arm_input.rot_left         =       joystick.arm_rot_left
+        self.arm_input.rot_right        =       joystick.arm_rot_right
 
         self.manipulator_publisher.publish(self.arm_input)
 

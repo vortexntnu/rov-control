@@ -8,13 +8,13 @@ int ForceToPwm(float force)
 
 int ForceToMicroSec(float force)
 {
-  double us = PwmUpperMicroSec;
+  double us = PulseWidthMax;
   for (int i = 0; i < ForceLookupSize; ++i)
   {
     if (force < ForceLookup[i])
     {
-      double us_prev = PwmLowerMicroSec + PwmIncremetMicroSec*(i-1);
-      double us_next = PwmLowerMicroSec + PwmIncremetMicroSec*i;
+      double us_prev = PulseWidthMin + PulseWidthIncrement*(i-1);
+      double us_next = PulseWidthMin + PulseWidthIncrement*i;
       double us_diff = us_next - us_prev;
       double force_diff = ForceLookup[i] - ForceLookup[i-1];
       double force_offset = force - ForceLookup[i-1];
@@ -27,5 +27,5 @@ int ForceToMicroSec(float force)
 
 int MicroSecToPwmValue(int us)
 {
-  return map(us, PwmLowerMicroSec, PwmUpperMicroSec, PwmLowerValue, PwmUpperValue);
+  return map(us, PulseWidthMin, PulseWidthMax, PwmLowerValue, PwmUpperValue);
 }

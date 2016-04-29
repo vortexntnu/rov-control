@@ -6,9 +6,9 @@ int ForceToPwm(float force);
 int ForceToMicroSec(float force);
 int MicroSecToPwmValue(int us);
 
-const int PwmLowerMicroSec = 1300;
-const int PwmUpperMicroSec = 1700;
-const int PwmIncremetMicroSec = 10;
+const int PulseWidthMin = 1300;
+const int PulseWidthMax = 1700;
+const int PulseWidthIncrement = 10;
 
 const int PwmLowerValue = 162;
 const int PwmUpperValue = 214;

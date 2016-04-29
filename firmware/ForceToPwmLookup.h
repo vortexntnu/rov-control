@@ -1,23 +1,21 @@
 #ifndef FORCETOPWMLOOKUP_H
 #define FORCETOPWMLOOKUP_H
 
-
 int ForceToPwm(float force);
 
 int ForceToMicroSec(float force);
 int MicroSecToPwmValue(int us);
 
-
-const int PwmLowerMicroSec = 1300;
-const int PwmUpperMicroSec = 1700;
-const int PwmIncremetMicroSec = 10;
+const int PulseWidthMin = 1300;
+const int PulseWidthMax = 1700;
+const int PulseWidthIncrement = 10;
 
 const int PwmLowerValue = 162;
 const int PwmUpperValue = 214;
 
-const int FoceToPwmLookupTableSize = 40;
-const float FoceToPwmLookupTable[FoceToPwmLookupTableSize] = {
+const int ForceLookupSize = 40;
   //kraft i Newton
+const float ForceLookup[ForceLookupSize] = {
   -5.7056872745,
   -5.2153547745,
   -4.6358709118,
@@ -58,7 +56,6 @@ const float FoceToPwmLookupTable[FoceToPwmLookupTableSize] = {
   7.8898956863,
   8.6476822745,
   9.450044549, //indeks 39
-  
 };
 
 #endif /* FORCETOPWMLOOKUP_H  */

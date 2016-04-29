@@ -31,7 +31,7 @@ sensor_msgs::MagneticField compass_msg;
 sensor_msgs::Temperature temperature_msg;
 sensor_msgs::FluidPressure pressure_msg;
 
-ros::Publisher pub_imu("sensor_raw", &imu_raw_msg);
+ros::Publisher pub_imu("imu/data_raw", &imu_raw_msg);
 
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;

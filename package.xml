@@ -6,6 +6,7 @@
   <description>The manipulator node package</description>
 
   <maintainer email="hakongimse@gmail.com">hawkon</maintainer>
+  <maintainer email="peteraaser@gmail.com">peter</maintainer>
 
   <license>MIT</license>
 
@@ -19,5 +20,6 @@
   <run_depend>rospy</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>maelstrom_msgs</run_depend>
+  <run_depend>messgage_generation</run_depend>
 
 </package>

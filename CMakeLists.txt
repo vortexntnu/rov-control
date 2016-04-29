@@ -9,15 +9,15 @@ find_package(catkin REQUIRED COMPONENTS
   maelstrom_msgs
 )
 
-#add_message_files(
-#   FILES
-#   Joystick.msg
-#)
-#
-#generate_messages(
-#  DEPENDENCIES
-#  std_msgs
-#)
+add_message_files(
+   FILES
+   ArmState.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 catkin_package(
   CATKIN_DEPENDS 

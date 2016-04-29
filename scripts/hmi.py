@@ -33,9 +33,15 @@ class HmiNode:
         ######################
         ######################
         ## MOTION
-        self.directional_input.forward      =       -joystick.strafe_Y                      /   XBOX_JOYSTICK_RANGE
-        self.directional_input.right        =       joystick.strafe_X                       /   XBOX_JOYSTICK_RANGE
-        self.directional_input.turn_right   =       joystick.turn_X                         /   XBOX_JOYSTICK_RANGE
+        # self.directional_input.forward      =       -joystick.strafe_Y                      /   XBOX_JOYSTICK_RANGE
+        # self.directional_input.right        =       joystick.strafe_X                       /   XBOX_JOYSTICK_RANGE
+        # self.directional_input.turn_right   =       joystick.turn_X                         /   XBOX_JOYSTICK_RANGE
+        # self.directional_input.tilt_up      =       joystick.turn_Y                         /   XBOX_JOYSTICK_RANGE
+        # self.directional_input.down         =       (joystick.descend - joystick.ascend)    /   XBOX_TRIGGER_RANGE
+
+        self.directional_input.forward      =       joystick.turn_X                      /   XBOX_JOYSTICK_RANGE
+        self.directional_input.right        =       -joystick.strafe_X                       /   XBOX_JOYSTICK_RANGE
+        self.directional_input.turn_right   =       joystick.strafe_Y                         /   XBOX_JOYSTICK_RANGE
         self.directional_input.tilt_up      =       joystick.turn_Y                         /   XBOX_JOYSTICK_RANGE
         self.directional_input.down         =       (joystick.descend - joystick.ascend)    /   XBOX_TRIGGER_RANGE
 

@@ -23,9 +23,9 @@ def read_ps3_into_control_msg(device, model):
                 model.turn_Y = deadzone(event.value)
 
         elif input == 'L2':
-            model.ascend = event.value
+            model.ascend = trigger_deadzone(event.value)
         elif input == 'R2':
-            model.descend = event.value
+            model.descend = trigger_deadzone(event.value)
 
         elif input == 'START':
             model.free_roam = (event.value == 1)
@@ -106,9 +106,15 @@ def read_xbox_into_control_msg(device, model):
 
 
 def deadzone(value):
-    if abs(value) < 3200:
+    if abs(value) < 6553:
         return 0
-    return value
+    offset = -8191.0662521457 if value > 0 else 8191.062521457
+    return value*1.249971390
+
+def trigger_deadzone(value):
+    if value < 40:
+        return 0
+    return value*1.186 - 47.442
 
 
 def ps3_code_map(code):

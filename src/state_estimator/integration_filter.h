@@ -22,29 +22,29 @@ private:
     ros::Publisher  pub;
 
     int messages_received;
+    bool is_calibrated;
 
     // Time step
     double dt;
 
     // Measurements
-    Eigen::Vector3d a_imu; // Accelerometer
-    Eigen::Vector3d w_imu; // Gyro
+    Eigen::Vector3d    a_imu; // Accelerometer
+    Eigen::Vector3d    w_imu; // Gyro
+    Eigen::Quaterniond q_imu; // Fused orientation
 
     // State estimates
-    Eigen::Vector3d    p;
-    Eigen::Quaterniond q;
-    Eigen::Vector3d    v;
-    Eigen::Vector3d    w;
+    Eigen::Vector3d p;
+    Eigen::Vector3d v;
+    Eigen::Vector3d w;
 
     // Intermediate variables
     Eigen::Vector3d v_dot;
-    Eigen::Vector4d q_dot;
 
     // Gravity vector in NED frame
     Eigen::Vector3d g_n;
 
+    void calibrate();
     Eigen::Matrix<double,4,3> Tmatrix();
-
     Eigen::Matrix3d skew(const Eigen::Vector3d &v);
 };
 

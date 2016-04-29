@@ -2,7 +2,7 @@
 
 IntegrationFilter::IntegrationFilter(double frequency)
 {
-    sub = nh.subscribe("sensor_raw", 10, &IntegrationFilter::callback, this);
+    sub = nh.subscribe("imu/data", 10, &IntegrationFilter::callback, this);
     pub = nh.advertise<nav_msgs::Odometry>("state_estimate", 10);
 
     dt = 1/frequency;

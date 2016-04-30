@@ -9,6 +9,7 @@
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
+
 #include "../eigen_typedefs.h"
 
 class QuaternionPdController

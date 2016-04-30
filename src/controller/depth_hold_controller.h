@@ -1,7 +1,3 @@
-/*
- * This controller keeps the ROV at a given depth.
- */
-
 #ifndef DEPTH_HOLD_CONTROLLER_H
 #define DEPTH_HOLD_CONTROLLER_H
 

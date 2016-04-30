@@ -1,7 +1,3 @@
-/*
- * This 'controller' passes control force setpoints directly to the allocator.
- */
-
 #ifndef OPEN_LOOP_CONTROLLER_H
 #define OPEN_LOOP_CONTROLLER_H
 

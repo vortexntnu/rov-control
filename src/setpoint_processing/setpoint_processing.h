@@ -1,8 +1,12 @@
+#ifndef SETPOINT_PROCESSING_H
+#define SETPOINT_PROCESSING_H
+
 #include "ros/ros.h"
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
 #include "sensor_msgs/FluidPressure.h"
-#include <maelstrom_msgs/JoystickMotionCommand.h>
+
+#include "maelstrom_msgs/JoystickMotionCommand.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/ResetStateEstimator.h"
 #include "../control_mode_enum.h"
@@ -34,3 +38,5 @@ private:
     void updateDepthHold(const maelstrom_msgs::JoystickMotionCommand& msg);
     bool healthyMessage(const maelstrom_msgs::JoystickMotionCommand& msg);
 };
+
+#endif

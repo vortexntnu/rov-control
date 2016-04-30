@@ -1,6 +1,7 @@
 #include "ros/ros.h"
-#include "quaternion_pd_controller.h"
 #include "open_loop_controller.h"
+#include "depth_hold_controller.h"
+#include "quaternion_pd_controller.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
 #include "../control_mode_enum.h"
@@ -13,6 +14,7 @@ public:
         frequency = f;
         control_mode = ControlModes::OPEN_LOOP;
         position_hold_controller.disable();
+        depth_hold_controller.disable();
         open_loop_controller.enable();
     }
 
@@ -25,18 +27,29 @@ public:
             switch (control_mode)
             {
             case ControlModes::OPEN_LOOP:
-                ROS_INFO("Changing control mode to open loop.");
-                position_hold_controller.disable();
-                open_loop_controller.enable();
-                break;
+            ROS_INFO("Changing control mode to OPEN LOOP.");
+            position_hold_controller.disable();
+            depth_hold_controller.disable();
+            open_loop_controller.enable();
+            break;
+
             case ControlModes::POSITION_HOLD:
-                ROS_INFO("Changing control mode to hold position.");
-                open_loop_controller.disable();
-                position_hold_controller.enable();
-                break;
+            ROS_INFO("Changing control mode to POSITION HOLD.");
+            open_loop_controller.disable();
+            depth_hold_controller.disable();
+            position_hold_controller.enable();
+            break;
+
+            case ControlModes::DEPTH_HOLD:
+            ROS_INFO("Changing control mode to DEPTH HOLD.");
+            open_loop_controller.disable();
+            position_hold_controller.disable();
+            depth_hold_controller.enable();
+            break;
+
             default:
-                ROS_WARN("Invalid control mode set.");
-                break;
+            ROS_WARN("Invalid control mode set.");
+            break;
             }
         }
         else
@@ -59,6 +72,7 @@ public:
         {
             ros::spinOnce();
             position_hold_controller.compute();
+            depth_hold_controller.compute();
             rate.sleep();
         }
     }
@@ -67,8 +81,9 @@ private:
     unsigned int frequency;
 
     ControlMode control_mode;
-    QuaternionPdController position_hold_controller; // I hardly know her.
     OpenLoopController     open_loop_controller;
+    QuaternionPdController position_hold_controller;
+    DepthHoldController    depth_hold_controller;
 };
 
 

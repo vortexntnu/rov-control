@@ -35,6 +35,7 @@ sensor_msgs::Temperature temperature_msg;
 sensor_msgs::FluidPressure pressure_msg;
 
 ros::Publisher pub_imu("imu/data_raw", &imu_raw_msg);
+ros::Publisher pub_pressure("imu/pressure", &pressure_msg);
 
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;
@@ -309,6 +310,7 @@ void loop(){
     lesSensorer();
     //nh.spinOnce();
     pub_imu.publish(&imu_raw_msg);
+    pub_pressure.publish(&pressure_msg);
   }
   
   

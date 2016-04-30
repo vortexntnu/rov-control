@@ -47,7 +47,8 @@ int dbg_count = 0;
 
 //Hold orden på pwm-pins til motor og lys
 const int PwmCount = 7;
-const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45,      10};
+// const int PwmPins[PwmCount] = { 7, 8, 12, 13, 44, 45,      10};
+const int PwmPins[PwmCount] = {13, 45, 44,  7,  8, 12, 10};
 const int LigthPwmPin = PwmPins[PwmCount-1]; //pin 10 er på Timer / Counter 2
 int PwmValue[PwmCount];
 

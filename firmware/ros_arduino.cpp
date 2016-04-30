@@ -21,6 +21,7 @@
 
 #define STANDARD_GRAVITY 9.08665  // [m/s^2]
 #define RAD_PER_DEG 0.01745329252 // [1/deg]
+#define PASCAL_PER_MILLIBAR 0.01  // [Pa/mbar]
 
 #define MPU9150_I2C_ADDR 0x69
 MPU6050 accelgyro(MPU9150_I2C_ADDR);
@@ -295,7 +296,7 @@ void lesSensorer() {
   temperature_msg.temperature = ( (double)accelgyro.getTemperature() + 12412.0) / 340.0;
 
   depthSensor.read();
-  pressure_msg.fluid_pressure = depthSensor.getPreassure(); // OBS! MÅ VÆRE I PASCAL
+  pressure_msg.fluid_pressure = depthSensor.getPreassure() * PASCAL_PER_MILLIBAR; // OBS! MÅ VÆRE I PASCAL
 }
 
 void loop(){

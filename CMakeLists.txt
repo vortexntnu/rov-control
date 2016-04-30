@@ -52,12 +52,14 @@ include_directories(
   ${GTEST_INCLUDE_DIRS}
 )
 
-add_executable(setpoint_processing src/setpoint_processing.cpp
+add_executable(setpoint_processing src/setpoint_processing/setpoint_processing_node.cpp
+                                   src/setpoint_processing/setpoint_processing.cpp
 )
 
 add_executable(controller src/controller/controller.cpp
-                          src/controller/quaternion_pd_controller.cpp
                           src/controller/open_loop_controller.cpp
+                          src/controller/depth_hold_controller.cpp
+                          src/controller/quaternion_pd_controller.cpp
 )
 
 add_executable(allocator src/allocator/allocator.cpp

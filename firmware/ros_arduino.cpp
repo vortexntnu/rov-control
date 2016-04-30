@@ -8,8 +8,7 @@
 
 #include "ForceToPwmLookup.h"
 
-
-//incleder for IMU og trykksensor
+//includer for IMU og trykksensor
 #include "MPU6050/MPU6050.h"
 #include "MS5803_14BA.h"
 #include <Wire.h>
@@ -19,9 +18,10 @@
 #include "sensor_msgs/Temperature.h"
 #include "sensor_msgs/FluidPressure.h"
 
-#define STANDARD_GRAVITY 9.08665  // [m/s^2]
-#define RAD_PER_DEG 0.01745329252 // [1/deg]
-#define PASCAL_PER_MILLIBAR 0.01  // [Pa/mbar]
+#define STANDARD_GRAVITY 9.08665      // [m/s^2]
+#define RAD_PER_DEG 0.01745329252     // [1/deg]
+#define PASCAL_PER_MILLIBAR 0.01      // [Pa/mbar]
+#define MICROTESLA_PER_TESLA 0.000001 // [uT/T]
 
 #define MPU9150_I2C_ADDR 0x69
 MPU6050 accelgyro(MPU9150_I2C_ADDR);
@@ -36,7 +36,9 @@ sensor_msgs::Temperature temperature_msg;
 sensor_msgs::FluidPressure pressure_msg;
 
 ros::Publisher pub_imu("imu/data_raw", &imu_raw_msg);
+ros::Publisher pub_mag("imu/mag", &compass_msg);
 ros::Publisher pub_pressure("imu/pressure", &pressure_msg);
+ros::Publisher pub_temperature("imu/temperature", &temperature_msg);
 
 const int SensorReadDelay = 83;
 unsigned long PrevoiusSensorReadMillis = 0;
@@ -50,7 +52,7 @@ const int LigthPwmPin = PwmPins[PwmCount-1]; //pin 10 er på Timer / Counter 2
 int PwmValue[PwmCount];
 
 
-//Sett opp topics til debugmeldinger
+//Sett opp debugmeldinger
 maelstrom_msgs::PwmRequests  pwm_status_msg;
 std_msgs::String arduino_dbg_msg;
 
@@ -99,7 +101,7 @@ void InitPwm() {
   for(int i = 0; i < PwmCount; i++)
     pinMode(PwmPins[i], OUTPUT);
 
-  //initialiser Timer/Counter 3, 4 og 5
+  //initialiser Timer/Counter 1, 4 og 5
   TCCR1A |= (1<<COM1B1) | (1<<COM1C1)  | (1<<WGM11) | (1<<WGM10);
   TCCR4A |= (1<<COM4B1) | (1<<COM4C1)  | (1<<WGM41) | (1<<WGM40);
   TCCR5A |= (1<<COM5B1) | (1<<COM5C1)  | (1<<WGM51) | (1<<WGM50);
@@ -121,7 +123,7 @@ void InitPwm() {
     PwmValue[i] = ForceToPwm(0);
     WritePwm(PwmPins[i], PwmValue[i]);
   }
-  //og så av lys
+  //og slå av lys
   PwmValue[LigthPwmPin] = 0;
   WritePwm(LigthPwmPin, 0);
   
@@ -224,7 +226,6 @@ void getFsRangeAndSetLsbSensisivity() {
     break;  
   };
 
-  
 }
 
 void setup() {
@@ -237,9 +238,14 @@ void setup() {
   nh.advertise(pwm_status_pub);
   nh.advertise(arduino_dbg_pub);
   
-  nh.advertise(pub_imu);  
+  nh.advertise(pub_imu);
+  nh.advertise(pub_mag);
+  nh.advertise(pub_temperature);
+  nh.advertise(pub_pressure);
+  
   nh.subscribe(pwm_input_sub);
   nh.subscribe(light_pwm_input_sub);
+  
   nh.spinOnce();
   
   // Initialize the 'Wire' class for the I2C-bus.
@@ -260,7 +266,6 @@ void setup() {
   arduino_dbg_pub.publish( &arduino_dbg_msg );
 
   nh.spinOnce();
-
 
 }
 
@@ -285,21 +290,20 @@ void lesSensorer() {
 
   // Kompass, enhet [T]
   // TODO finn ut om 0.3 er riktig skaleringsfaktor
-  compass_msg.magnetic_field.x = mx * 0.3; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
-  compass_msg.magnetic_field.y = my * 0.3; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
-  compass_msg.magnetic_field.z = mz * 0.3; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
+  compass_msg.magnetic_field.x = mx * 0.3 * MICROTESLA_PER_TESLA; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
+  compass_msg.magnetic_field.y = my * 0.3 * MICROTESLA_PER_TESLA; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
+  compass_msg.magnetic_field.z = mz * 0.3 * MICROTESLA_PER_TESLA; // OBS! MÅ VÆRE TESLA! (IKKE MILLI/MICRO)
 
   temperature_msg.temperature = ( (double)accelgyro.getTemperature() + 12412.0) / 340.0;
 
   depthSensor.read();
   pressure_msg.fluid_pressure = depthSensor.getPreassure() * PASCAL_PER_MILLIBAR; // OBS! MÅ VÆRE I PASCAL
+
 }
 
 void loop(){
 
-
   nh.spinOnce();
-
 
   if( millis() - PrevoiusSensorReadMillis >= SensorReadDelay ) {
     PrevoiusSensorReadMillis = millis();
@@ -307,7 +311,9 @@ void loop(){
     lesSensorer();
     //nh.spinOnce();
     pub_imu.publish(&imu_raw_msg);
-    pub_pressure.publish(&pressure_msg);
+    pub_mag.publish(&compass_msg);
+    pub_pressure.publish(&pressure_msg);  
+    pub_temperature.publish(&temperature_msg);
   }
   
   

@@ -158,8 +158,6 @@ void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   publishPwmStatus();
 }
 
-ros::Subscriber<maelstrom_msgs::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
-
 void LightPwmUpdate( const maelstrom_msgs::LightInput &light_msg) {
   PwmValue[6] = light_msg.light_intensity;
 
@@ -168,6 +166,7 @@ void LightPwmUpdate( const maelstrom_msgs::LightInput &light_msg) {
   publishPwmStatus();
 }
 
+ros::Subscriber<maelstrom_msgs::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
 ros::Subscriber<maelstrom_msgs::LightInput> light_pwm_input_sub("LightPwm", &LightPwmUpdate );
 
 
@@ -248,6 +247,8 @@ void setup() {
   Wire.begin();
   accelgyro.initialize();
   getFsRangeAndSetLsbSensisivity();
+  //Sett lavpassfilter se http://www.i2cdevlib.com/docs/html/class_m_p_u6050.html#a9f2737fe22955fd85b2575ba8da874c6
+  accelgyro.setDHPFMode(3); //acc 44Hz 4.9ms, gyro 42Hz 4.8ms
 
   depthSensor.initialize(false);
 

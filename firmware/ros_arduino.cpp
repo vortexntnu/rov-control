@@ -50,6 +50,14 @@ const int LigthPwmPin = PwmPins[PwmCount-1]; //pin 10 er på Timer / Counter 2
 int PwmValue[PwmCount];
 
 
+//Sett opp topics til debugmeldinger
+maelstrom_msgs::PwmRequests  pwm_status_msg;
+std_msgs::String arduino_dbg_msg;
+
+ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
+ros::Publisher arduino_dbg_pub("arduino_dbg", &arduino_dbg_msg);
+
+
 void WritePwm(int pin, uint8_t value) {
   switch(pin) {
     //LYS
@@ -119,14 +127,18 @@ void InitPwm() {
   
 }
 
-maelstrom_msgs::PwmRequests  pwm_status_msg;
-ros::Publisher pwm_status_pub("pwm_status", &pwm_status_msg);
+void publishPwmStatus() {
+  //Send PWM-verdiene tilbake som debugoutput
+  pwm_status_msg.pwm1 = PwmValue[0];
+  pwm_status_msg.pwm2 = PwmValue[1];
+  pwm_status_msg.pwm3 = PwmValue[2];
+  pwm_status_msg.pwm4 = PwmValue[3];
+  pwm_status_msg.pwm5 = PwmValue[4];
+  pwm_status_msg.pwm6 = PwmValue[5];
+  pwm_status_msg.pwm7 = PwmValue[6];
 
-
-std_msgs::String arduino_dbg_msg;
-ros::Publisher arduino_dbg_pub("arduino_dbg", &arduino_dbg_msg);
-
-
+  pwm_status_pub.publish( &pwm_status_msg );
+}
 
 void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   
@@ -140,20 +152,10 @@ void pwm_update( const maelstrom_msgs::ThrusterForces& force_input ){
   for(int i = 0; i < PwmCount; i++) {
     WritePwm(PwmPins[i], PwmValue[i]);
   }
-  
-  
-  //Send PWM-verdiene tilbake som debugoutput
-  pwm_status_msg.pwm1 = PwmValue[0];
-  pwm_status_msg.pwm2 = PwmValue[1];
-  pwm_status_msg.pwm3 = PwmValue[2];
-  pwm_status_msg.pwm4 = PwmValue[3];
-  pwm_status_msg.pwm5 = PwmValue[4];
-  pwm_status_msg.pwm6 = PwmValue[5];
-  pwm_status_msg.pwm7 = PwmValue[6];
-  
+    
   dbg_count = 0;
-  
-  pwm_status_pub.publish( &pwm_status_msg );
+
+  publishPwmStatus();
 }
 
 ros::Subscriber<maelstrom_msgs::ThrusterForces> pwm_input_sub("thruster_forces", &pwm_update );
@@ -163,14 +165,7 @@ void LightPwmUpdate( const maelstrom_msgs::LightInput &light_msg) {
 
   WritePwm(LigthPwmPin, PwmValue[6]);
 
-  pwm_status_msg.pwm1 = PwmValue[0];
-  pwm_status_msg.pwm2 = PwmValue[1];
-  pwm_status_msg.pwm3 = PwmValue[2];
-  pwm_status_msg.pwm4 = PwmValue[3];
-  pwm_status_msg.pwm5 = PwmValue[4];
-  pwm_status_msg.pwm6 = PwmValue[5];
-  pwm_status_msg.pwm7 = PwmValue[6];
-  pwm_status_pub.publish( &pwm_status_msg );
+  publishPwmStatus();
 }
 
 ros::Subscriber<maelstrom_msgs::LightInput> light_pwm_input_sub("LightPwm", &LightPwmUpdate );

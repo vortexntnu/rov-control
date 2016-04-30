@@ -1,0 +1,4 @@
+<launch>
+  <node name="controller" pkg="uranus_dp" type="controller" output="screen"/>
+  <test test-name="depth_hold_test" pkg="uranus_dp" type="depth_hold_test"/>
+</launch>

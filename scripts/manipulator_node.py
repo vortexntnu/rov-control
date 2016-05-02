@@ -10,17 +10,17 @@ from manipulator.msg import ArmState
 
 class ManipulatorNode():
 
-    grip_increment_value = 10
-    base_increment_value = 10
-    rot_increment_value = 10
+    grip_increment_value = 30
+    base_increment_value = 1
+    rot_increment_value = 15
 
-    grip_max =  180
+    grip_max =  90
     grip_min =  0
 
     base_max =  180
     base_min =  0
 
-    rot_max  =  180
+    rot_max  =  240
     rot_min  =  0
 
     def __init__(self):
@@ -29,27 +29,46 @@ class ManipulatorNode():
 
         self.state_publisher = rospy.Publisher('arm_state', ArmState, queue_size=10)
         self.ideal = ArmState()
-        self.ideal_grip_angle = 0
+        self.ideal_grip_angle = 80
         self.ideal_base_angle = 0
         self.ideal_rot_angle  = 0
 
+        self.ideal_base1 = 0
+        self.ideal_base2 = 0
+
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
+
         # Control signal from pin 11, 13 and 15
-        pwmpin_grip, pwmpin_base1, pwmpin_base2, pwmpin_rot = 11, 15, 16, 13
-        GPIO.setup(pwmpin_grip, GPIO.OUT)
+
+
+        # pwmpin_grip     = 11
+        # pwmpin_base1    = 15 
+        # pwmpin_base2    = 16 
+        # pwmpin_rot      = 13
+
+
+        pwmpin_grip     = 11
+        pwmpin_base1    = 15 
+        pwmpin_base2    = 16 
+        pwmpin_rot      = 13
+
+        # GPIO.setup(pwmpin_grip, GPIO.OUT)
+        # self.pwm_grip_control = GPIO.PWM(pwmpin_grip, 100)
+        # self.pwm_grip_control.start(0)
+
         GPIO.setup(pwmpin_base1, GPIO.OUT)
-        GPIO.setup(pwmpin_base2, GPIO.OUT)
-        GPIO.setup(pwmpin_rot, GPIO.OUT)
-        # create an object for PWM control at 100 Hz
-        self.pwm_grip_control = GPIO.PWM(pwmpin_grip, 100)
         self.pwm_base1_control = GPIO.PWM(pwmpin_base1, 100)
-        self.pwm_base2_control = GPIO.PWM(pwmpin_base2, 100)
-        self.pwm_rot_control = GPIO.PWM(pwmpin_rot, 100)
-        self.pwm_grip_control.start(0)
         self.pwm_base1_control.start(0)
+
+        GPIO.setup(pwmpin_base2, GPIO.OUT)
+        self.pwm_base2_control = GPIO.PWM(pwmpin_base2, 100)
         self.pwm_base2_control.start(0)
-        self.pwm_rot_control.start(0)
+
+        # GPIO.setup(pwmpin_rot, GPIO.OUT)
+        # self.pwm_rot_control = GPIO.PWM(pwmpin_rot, 100)
+        # self.pwm_rot_control.start(0)
+
         self.control_listener()
 
     def control_listener(self):
@@ -78,18 +97,31 @@ class ManipulatorNode():
 
     def update_manipulator(self):
         # Grip
-        grip_duty = (float(self.ideal_grip_angle) / 10.0) + 2.5
-        self.pwm_grip_control.ChangeDutyCycle(grip_duty)
+        # grip_duty = (float(self.ideal_grip_angle) / 10.0) + 2.5
+        # self.pwm_grip_control.ChangeDutyCycle(grip_duty)
+        # print("grip duty")
+        # print(grip_duty)
 
-        # Base
-        base1_duty = (float(self.ideal_base_angle) /10.0) + 2.5
-        base2_duty = (float(180 - self.ideal_base_angle) /10.0) + 2.5
+        # Base1
+        base1_normalized = get_base1_offset(self.ideal_base_angle)
+        base1_duty = (float(base1_normalized) /10.0) + 2.5
         self.pwm_base1_control.ChangeDutyCycle(base1_duty)
+        # print("Base 1 duty")
+        # print(base1_duty)
+
+        # Base2
+        base2_normalized = get_base2_offset(self.ideal_base_angle)
+        base2_duty = (float(180 - self.ideal_base_angle + 18) /10.0) + 2.5
         self.pwm_base2_control.ChangeDutyCycle(base2_duty)
+        # print("Base 2 duty")
+        # print(base2_duty)
 
         # Rotation
-        rot_duty = (float(self.ideal_rot_angle) / 10.0) + 2.5
-        self.pwm_rot_control.ChangeDutyCycle(rot_duty)
+        # rot_duty = (float(self.ideal_rot_angle) / 10.0) + 2.5
+        # self.pwm_rot_control.ChangeDutyCycle(rot_duty)
+        # print("rot duty")
+        # print(rot_duty)
+
 
 def to_range(minv, maxv, v):
     if (v < minv): 
@@ -97,6 +129,17 @@ def to_range(minv, maxv, v):
     if (v > maxv):
         return maxv
     return v
+
+
+base1_offset = 40
+base2_offset = 18
+
+def get_base1_offset(ideal):
+    return ideal + base1_offset
+
+def get_base2_offset(ideal):
+    return ideal + base2_offset
+
 
 if __name__ == '__main__':
     manipulator_node = ManipulatorNode()

@@ -7,18 +7,8 @@ int main(int argc, char **argv)
     ROS_INFO("Launching node state_estimator.");
 
     ros::NodeHandle nh;
-
-    double frequency = 100;
-    IntegrationFilter estimator(frequency);
-
+    IntegrationFilter estimator;
     ros::ServiceServer ss = nh.advertiseService("reset_state_estimator", &IntegrationFilter::reset, &estimator);
-
-    ros::Rate rate(frequency);
-    while (ros::ok())
-    {
-        ros::spinOnce();
-        estimator.update();
-        rate.sleep();
-    }
+    ros::spin();
     return 0;
 }

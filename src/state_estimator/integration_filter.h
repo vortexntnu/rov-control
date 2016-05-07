@@ -12,40 +12,31 @@
 class IntegrationFilter
 {
 public:
-    IntegrationFilter(double frequency);
+    IntegrationFilter();
     bool reset(uranus_dp::ResetStateEstimator::Request &req, uranus_dp::ResetStateEstimator::Response &resp);
     void callback(const sensor_msgs::Imu& msg);
-    void update();
+    void update(double dt);
+    void publish();
 private:
     ros::NodeHandle nh;
     ros::Subscriber sub;
     ros::Publisher  pub;
 
-    int messages_received;
-    bool is_calibrated;
+    bool is_initialized;
+    ros::Time prev_time;
 
-    // Time step
-    double dt;
+    Eigen::Vector3d    a_mn_m; // [m/s^2] Acceleration of {m} wrt. {n} in {m}
+    Eigen::Vector3d    a_mn_b; // [m/s^2] Acceleration of {m} wrt. {n} in {b}
+    Eigen::Vector3d    v_mn_b; // [m/s] Velocity estimate of {m} wrt. {n} in {b}
+    Eigen::Vector3d    v_bn_b; // [m/s] Velocity estimate of {b} wrt. {n} in {b}
+    Eigen::Vector3d    p_mn_b; // [m] Position estimate of {m} wrt. {n} in {b}
+    Eigen::Vector3d    w_bn_b; // [rad/s] Ang. velocity of {b} wrt. {n} in {b}
+    Eigen::Quaterniond q_nm;   // [1] Quaternion orientation from {n} to {m}
+    Eigen::Quaterniond q_nb;   // [1] Quaternion orientation from {n} to {b}
+    Eigen::Vector3d    r_m_b;  // [m] Position of {m} relative to {b}
+    Eigen::Matrix3d    R_m_b;  // [?] Rotation matrix from {m} to {b}
 
-    // Measurements
-    Eigen::Vector3d    a_imu; // Accelerometer
-    Eigen::Vector3d    w_imu; // Gyro
-    Eigen::Quaterniond q_imu; // Fused orientation
-
-    // State estimates
-    Eigen::Vector3d p;
-    Eigen::Vector3d v;
-    Eigen::Vector3d w;
-
-    // Intermediate variables
-    Eigen::Vector3d v_dot;
-
-    // Gravity vector in NED frame
-    Eigen::Vector3d g_n;
-
-    void calibrate();
-    Eigen::Matrix<double,4,3> Tmatrix();
-    Eigen::Matrix3d skew(const Eigen::Vector3d &v);
+    Eigen::Matrix3d skew(const Eigen::Vector3d& v);
 };
 
 #endif

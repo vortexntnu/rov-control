@@ -13,12 +13,6 @@ from maelstrom_msgs.msg import ThrusterForces
 from maelstrom_msgs.msg import PwmRequests
 
 
-# Initialise the PCA9685 using the default address (0x40).
-pwm = Adafruit_PCA9685.PCA9685()
-#sett frekvensen
-pwm.set_pwm_freq(260)
-
-
 def callback_arm(data):
     #
     #
@@ -43,20 +37,42 @@ def callback_thruster(ForceInput):
     pwm.set_pwm(3, 0, PwmStatusMsg.pwm4)
     pwm.set_pwm(4, 0, PwmStatusMsg.pwm5)
     pwm.set_pwm(5, 0, PwmStatusMsg.pwm6) 
+
+
+def init_pwm():
+    # Initialise the PCA9685 using the default address (0x40).
+    pwm = Adafruit_PCA9685.PCA9685()
+    #sett frekvensen
+    pwm.set_pwm_freq(260)
+
+    #Til å sende debugmeldinger 
+    PwmStatusMsg = PwmRequests()
     
+    #sett alle motorene til 0 newton
+    pwm_null_newton = int(ForceToPwmLookup.ForceToPwm(0))
+
+    pwm.set_pwm(0, 0, pwm_null_newton)
+    pwm.set_pwm(1, 0, pwm_null_newton)
+    pwm.set_pwm(2, 0, pwm_null_newton)
+    pwm.set_pwm(3, 0, pwm_null_newton)
+    pwm.set_pwm(4, 0, pwm_null_newton)
+    pwm.set_pwm(5, 0, pwm_null_newton)
     
 
 if __name__ == '__main__':
     
     rospy.init_node('PwmNode', anonymous=True)
-
-    PwmStatusMsg = PwmRequests()
+    init_pwm()
+    
     
     PwmStatusPub = rospy.Publisher('pwm_status', PwmRequests, queue_size=10)
     
     
     #rospy.Subscriber("joystick_arm_command", JoystickArmCommand, callback)
     rospy.Subscriber("thruster_forces", ThrusterForces, callback_thruster)
+
+    print "PwmNode er klar"
+    
     rospy.spin()
     
         

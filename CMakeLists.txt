@@ -8,4 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   maelstrom_msgs
 )
 
+add_message_files(
+  FILES
+  Joystick.msg
+)
+
 catkin_package(CATKIN_DEPENDS rospy message_runtime maelstrom_msgs)

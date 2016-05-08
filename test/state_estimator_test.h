@@ -18,9 +18,7 @@ public:
     void Publish(double ax, double ay, double az, double wx, double wy, double wz, double qx, double qy, double qz, double qw);
     void OneSecondPublish(double ax, double ay, double az, double wx, double wy, double wz, double qx, double qy, double qz, double qw);
     void WaitForMessage();
-    void OneSecondSpin();
     void ResetFilter();
-    bool GetMessageReceived();
 
     Eigen::Vector3d    p;
     Eigen::Quaterniond q;

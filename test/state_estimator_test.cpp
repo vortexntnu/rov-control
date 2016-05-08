@@ -36,7 +36,6 @@ TEST_F(StateEstimatorTest, LinearAcceleration)
 {
     ResetFilter();
     OneSecondPublish(1,-0.2,0.8, 0,0,0, 0,0,0,1);
-    ros::spinOnce();
 
     EXPECT_NEAR(p(0),  0.5, MAX_ERROR);
     EXPECT_NEAR(p(1), -0.1, MAX_ERROR);
@@ -105,9 +104,8 @@ void StateEstimatorTest::OneSecondPublish(double ax, double ay, double az,
     while (numPublished < frequency)
     {
         Publish(ax,ay,az, wx,wy,wz, qx,qy,qz,qw);
-        ros::spinOnce();
         rate.sleep();
-        // ros::spinOnce();
+        ros::spinOnce();
         numPublished++;
     }
 }
@@ -118,22 +116,10 @@ void StateEstimatorTest::WaitForMessage()
         ros::spinOnce();
 }
 
-void StateEstimatorTest::OneSecondSpin()
-{
-    ros::Time start = ros::Time::now();
-    while (ros::Time::now() < start + ros::Duration(1))
-        ros::spinOnce();
-}
-
 void StateEstimatorTest::ResetFilter()
 {
     uranus_dp::ResetStateEstimator srv;
     client.call(srv);
-}
-
-bool StateEstimatorTest::GetMessageReceived()
-{
-    return message_received;
 }
 
 void StateEstimatorTest::Callback(const nav_msgs::Odometry& msg)

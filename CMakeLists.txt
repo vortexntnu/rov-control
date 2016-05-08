@@ -15,7 +15,6 @@ add_message_files(
   DIRECTORY msg
   FILES
   ThrusterForces.msg
-  SensorRaw.msg
   LightInput.msg
   JoystickMotionCommand.msg
   JoystickArmCommand.msg

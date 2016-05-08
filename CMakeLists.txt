@@ -15,11 +15,11 @@ add_message_files(
   DIRECTORY msg
   FILES
   ThrusterForces.msg
-  PwmRequests.msg
-  Joystick.msg
+  SensorRaw.msg
   LightInput.msg
-  ArmInput.msg
   JoystickMotionCommand.msg
+  JoystickArmCommand.msg
+  ArmDutyCycle.msg
 )
 
 generate_messages(

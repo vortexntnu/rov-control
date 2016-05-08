@@ -30,8 +30,11 @@ private:
     double depth_setpoint;
     ros::Time depth_setpoint_time;
 
-    static const double MAX_FORCE  = 10; // Scale forces up to [-10, 10] (Newton)
-    static const double MAX_TORQUE = 5;  // Scale torques up to [-5, 5] (Newton meters)
+    static const double MAX_FORCE_X  = 33.5; // [N]  Maximum possible force along x axis
+    static const double MAX_FORCE_Y  = 33.5; // [N]  Maximum possible force along y axis
+    static const double MAX_FORCE_Z  = 11.4; // [N]  Maximum possible force along z axis
+    static const double MAX_TORQUE_X = 2.4;  // [Nm] Maximum possible torque around x axis
+    static const double MAX_TORQUE_Z = 3.4;  // [Nm] Maximum possible torque around z axis
 
     void updateOpenLoop(const maelstrom_msgs::JoystickMotionCommand& msg);
     void updatePositionHold(const maelstrom_msgs::JoystickMotionCommand& msg);

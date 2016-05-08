@@ -90,9 +90,7 @@ public:
     void SetUp()
     {
         while (!IsNodeReady())
-        {
             ros::spinOnce();
-        }
     }
 
     void PublishSetpoint(Eigen::Vector3d p, Eigen::Quaterniond q)
@@ -116,9 +114,7 @@ public:
     void WaitForMessage()
     {
         while (!message_received)
-        {
             ros::spinOnce();
-        }
     }
 
     ros::ServiceClient modeClient;

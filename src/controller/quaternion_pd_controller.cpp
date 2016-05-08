@@ -24,12 +24,12 @@ QuaternionPdController::QuaternionPdController()
     g.setZero();
     R = q.toRotationMatrix();
 
-    // Gains etc. (temporary values from paper)
-    setGains(1,30,200);
-    r_g.setZero();
-    r_b.setZero();
-    W = 185*9.8;
-    B = 185*9.8;
+    // Gains etc.
+    setGains(0.1, 3.0, 20.0);
+    r_g << 0, 0, -0.05; // Center of gravity estimated 5 cm below origin of body frame
+    r_b << 0, 0,  0.10; // Center of buoyancy estimated 10 cm above origin of body frame
+    W = 15*9.80665;     // Weight in water estimated to 15 kg
+    B = 16*9.80665;     // Buoyancy estimated to 16 kg
 }
 
 void QuaternionPdController::stateCallback(const nav_msgs::Odometry &msg)
@@ -145,18 +145,3 @@ Eigen::Matrix3d QuaternionPdController::skew(const Eigen::Vector3d &v)
          -v(1),  v(0),  0   ;
     return S;
 }
-
-
-
-// ROS_INFO_STREAM("p set to [" << p(0) << ", " << p(1) << ", " << p(2) << "].");
-// ROS_INFO_STREAM("q set to [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << "].");
-// ROS_INFO_STREAM("nu set to [" << nu(0) << ", " << nu(1) << ", " << nu(2) << ", " << nu(3) << ", " << nu(4) << ", " << nu(5) << "].");
-// ROS_INFO_STREAM("updateRestoringForceVector(): f_g = [" << f_g(0) << ", " << f_g(1) << ", " << f_g(2) << "].");
-// ROS_INFO_STREAM("updateRestoringForceVector(): f_b = [" << f_b(0) << ", " << f_b(1) << ", " << f_b(2) << "].");
-// ROS_INFO_STREAM("compute(): nu = [" << nu(0) << ", " << nu(1) << ", " << nu(2) << ", " << nu(3) << ", " << nu(4) << ", " << nu(5) << "].");
-// ROS_INFO_STREAM("compute(): z = [" << z(0) << ", " << z(1) << ", " << z(2) << ", " << z(3) << ", " << z(4) << ", " << z(5) << "].");
-// ROS_INFO_STREAM("compute(): g = [" << g(0) << ", " << g(1) << ", " << g(2) << "].");
-// ROS_INFO_STREAM("tau =  [" << tau(0) << ", " << tau(1) << ", " << tau(2) << ", " << tau(3) << ", " << tau(4) << ", " << tau(5) << "].");
-// ROS_INFO_STREAM("p_d set to [" << p_d(0) << ", " << p_d(1) << ", " << p_d(2) << "].");
-// ROS_INFO_STREAM("q_d set to [" << q_d.w() << ", " << q_d.x() << ", " << q_d.y() << ", " << q_d.z() << "].");
-// ROS_INFO_STREAM("z = [" << z(0) << "," << z(1) << "," << z(2) << "," << z(3) << "," << z(4) << "," << z(5) << "]");

@@ -32,45 +32,26 @@ TEST_F(StateEstimatorTest, CorrectInitialization)
     EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
 
-TEST_F(StateEstimatorTest, ForwardAcceleration)
+TEST_F(StateEstimatorTest, LinearAcceleration)
 {
     ResetFilter();
-    OneSecondPublish(1,0,0, 0,0,0, 0,0,0,1);
+    OneSecondPublish(1,-0.2,0.8, 0,0,0, 0,0,0,1);
     ros::spinOnce();
 
-    EXPECT_NEAR(p(0), 0.5, MAX_ERROR);
-    EXPECT_NEAR(p(1), 0, MAX_ERROR);
-    EXPECT_NEAR(p(2), 0, MAX_ERROR);
+    EXPECT_NEAR(p(0),  0.5, MAX_ERROR);
+    EXPECT_NEAR(p(1), -0.1, MAX_ERROR);
+    EXPECT_NEAR(p(2),  0.4, MAX_ERROR);
     EXPECT_NEAR(q.x(), 0, MAX_ERROR);
     EXPECT_NEAR(q.y(), 0, MAX_ERROR);
     EXPECT_NEAR(q.z(), 0, MAX_ERROR);
     EXPECT_NEAR(q.w(), 1, MAX_ERROR);
-    EXPECT_NEAR(v(0), 1, MAX_ERROR);
-    EXPECT_NEAR(v(1), 0, MAX_ERROR);
-    EXPECT_NEAR(v(2), 0, MAX_ERROR);
+    EXPECT_NEAR(v(0),  1.0, MAX_ERROR);
+    EXPECT_NEAR(v(1), -0.2, MAX_ERROR);
+    EXPECT_NEAR(v(2),  0.8, MAX_ERROR);
     EXPECT_NEAR(w(0), 0, MAX_ERROR);
     EXPECT_NEAR(w(1), 0, MAX_ERROR);
     EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
-
-// TEST_F(StateEstimatorTest, Rotate)
-// {
-//     ResetFilter();
-//     // Publish(0,0,STANDARD_GRAVITY,0,0,1); // 1 rad/sec in yaw  (I think)
-//     Publish(0,0,0,0,0,1);
-//     OneSecondSpin();
-
-//     EXPECT_NEAR(p(0), 0, 0.01);
-//     EXPECT_NEAR(p(1), 0, 0.01);
-//     EXPECT_NEAR(p(2), 0, 0.01);
-
-//     EXPECT_NEAR(q.w(), 0.877582561890373, 0.01);
-//     EXPECT_NEAR(q.x(), 0, 0.01);
-//     EXPECT_NEAR(q.y(), 0, 0.01);
-//     EXPECT_NEAR(q.z(), 0.479425538604203, 0.01);
-// }
-
-
 
 StateEstimatorTest::StateEstimatorTest()
 {
@@ -110,7 +91,7 @@ void StateEstimatorTest::OneSecondPublish(double ax, double ay, double az,
                                           double qx, double qy, double qz, double qw)
 {
     // Set publishing frequency etc.
-    int frequency = 5;
+    int frequency = 100;
     ros::Rate rate(frequency);
     int numPublished = 0;
 

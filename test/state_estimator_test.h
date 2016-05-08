@@ -27,8 +27,7 @@ public:
     Eigen::Vector3d    v;
     Eigen::Vector3d    w;
 
-    static const double MAX_ERROR = 1e-3;
-    static const double STANDARD_GRAVITY = 9.80665;
+    static const double MAX_ERROR = 0.01;
     bool message_received;
     ros::ServiceClient client;
 

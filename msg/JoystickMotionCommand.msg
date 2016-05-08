@@ -25,5 +25,5 @@ float64 turn_right
 
 # Control mode
 # Set to 0 for open loop
-# Set to 1 for stationkeeping
+# Set to 1 for position hold
 int32 control_mode

@@ -72,29 +72,29 @@ add_executable(state_estimator src/state_estimator/state_estimator.cpp
 )
 
 add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})
-add_dependencies(controller ${PROJECT_NAME}_generate_messages_cpp)
-add_dependencies(allocator ${PROJECT_NAME}_generate_messages_cpp)
-add_dependencies(state_estimator ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(controller          ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(allocator           ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(state_estimator     ${PROJECT_NAME}_generate_messages_cpp)
 
 target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
-target_link_libraries(controller ${catkin_LIBRARIES})
-target_link_libraries(allocator ${catkin_LIBRARIES})
-target_link_libraries(state_estimator ${catkin_LIBRARIES})
+target_link_libraries(controller          ${catkin_LIBRARIES})
+target_link_libraries(allocator           ${catkin_LIBRARIES})
+target_link_libraries(state_estimator     ${catkin_LIBRARIES})
 
 #############
 ## Testing ##
 #############
 
-catkin_add_gtest(allocator_test test/allocator_test.cpp)
-catkin_add_gtest(controller_test test/controller_test.cpp)
-catkin_add_gtest(state_estimator_test test/state_estimator_test.cpp)
-catkin_add_gtest(open_loop_integration_test test/open_loop_integration_test.cpp)
+catkin_add_gtest(controller_test              test/controller_test.cpp)
+catkin_add_gtest(depth_hold_test              test/depth_hold_test.cpp)
+catkin_add_gtest(allocator_test               test/allocator_test.cpp)
+catkin_add_gtest(state_estimator_test         test/state_estimator_test.cpp)
+catkin_add_gtest(open_loop_integration_test   test/open_loop_integration_test.cpp)
 catkin_add_gtest(closed_loop_integration_test test/closed_loop_integration_test.cpp)
-catkin_add_gtest(depth_hold_test test/depth_hold_test.cpp)
 
-target_link_libraries(allocator_test ${catkin_LIBRARIES})
-target_link_libraries(controller_test ${catkin_LIBRARIES})
-target_link_libraries(state_estimator_test ${catkin_LIBRARIES})
-target_link_libraries(open_loop_integration_test ${catkin_LIBRARIES})
+target_link_libraries(allocator_test               ${catkin_LIBRARIES})
+target_link_libraries(controller_test              ${catkin_LIBRARIES})
+target_link_libraries(depth_hold_test              ${catkin_LIBRARIES})
+target_link_libraries(state_estimator_test         ${catkin_LIBRARIES})
+target_link_libraries(open_loop_integration_test   ${catkin_LIBRARIES})
 target_link_libraries(closed_loop_integration_test ${catkin_LIBRARIES})
-target_link_libraries(depth_hold_test ${catkin_LIBRARIES})

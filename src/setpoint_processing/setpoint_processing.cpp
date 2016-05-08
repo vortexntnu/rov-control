@@ -6,7 +6,7 @@ SetpointProcessing::SetpointProcessing()
     wrenchPub   = nh.advertise<geometry_msgs::Wrench>("wrench_setpoints", 10);
     posePub     = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
     modeClient  = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
-    resetClient = nh.serviceClient<uranus_dp::ResetStateEstimator>("reset_state_estimator");
+    resetClient = nh.serviceClient<uranus_dp::ResetIntegrationFilter>("reset_integration_filter");
 
     control_mode = ControlModes::OPEN_LOOP;
     depth_setpoint = 0.5; // [m]
@@ -26,7 +26,7 @@ void SetpointProcessing::callback(const maelstrom_msgs::JoystickMotionCommand& m
         if (control_mode == ControlModes::POSITION_HOLD)
         {
                 // Reset estimator when mode changes to position hold
-            uranus_dp::ResetStateEstimator reset_srv;
+            uranus_dp::ResetIntegrationFilter reset_srv;
             resetClient.call(reset_srv);
         }
 

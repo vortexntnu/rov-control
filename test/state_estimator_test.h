@@ -8,12 +8,12 @@
 #include <Eigen/Dense>
 #include "../src/eigen_typedefs.h"
 #include <eigen_conversions/eigen_msg.h>
-#include "uranus_dp/ResetStateEstimator.h"
+#include "uranus_dp/ResetIntegrationFilter.h"
 
-class StateEstimatorTest : public ::testing::Test
+class IntegrationFilterTest : public ::testing::Test
 {
 public:
-    StateEstimatorTest();
+    IntegrationFilterTest();
     void SetUp();
     void Publish(double ax, double ay, double az, double wx, double wy, double wz, double qx, double qy, double qz, double qw);
     void OneSecondPublish(double ax, double ay, double az, double wx, double wy, double wz, double qx, double qy, double qz, double qw);

@@ -6,14 +6,14 @@
 #include <eigen_conversions/eigen_msg.h>
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
-#include "uranus_dp/ResetStateEstimator.h"
+#include "uranus_dp/ResetIntegrationFilter.h"
 #include "../eigen_typedefs.h"
 
 class IntegrationFilter
 {
 public:
     IntegrationFilter();
-    bool reset(uranus_dp::ResetStateEstimator::Request &req, uranus_dp::ResetStateEstimator::Response &resp);
+    bool reset(uranus_dp::ResetIntegrationFilter::Request &req, uranus_dp::ResetIntegrationFilter::Response &resp);
     void callback(const sensor_msgs::Imu& msg);
     void update(double dt);
     void publish();

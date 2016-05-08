@@ -2,10 +2,5 @@
   <node name="setpoint_processing" pkg="uranus_dp" type="setpoint_processing" output="screen"/>
   <node name="controller"          pkg="uranus_dp" type="controller"          output="screen"/>
   <node name="allocator"           pkg="uranus_dp" type="allocator"           output="screen"/>
-  <node name="state_estimator"     pkg="uranus_dp" type="state_estimator"     output="screen"/>
-
-  <param name="imu_filter_node/use_mag"              value="false"/>
-  <param name="imu_filter_node/publish_tf"           value="false"/>
-  <param name="imu_filter_node/publish_debug_topics" value="false"/>
-  <node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node" output="screen"/>
+  <node name="integration_filter"  pkg="uranus_dp" type="integration_filter"  output="screen"/>
 </launch>

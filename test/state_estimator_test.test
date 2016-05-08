@@ -1,4 +1,4 @@
 <launch>
-  <node name="state_estimator" pkg="uranus_dp" type="state_estimator" output="screen"/>
-  <test test-name="state_estimator_test" pkg="uranus_dp" type="state_estimator_test"/>
+  <node name="integration_filter" pkg="uranus_dp" type="integration_filter" output="screen"/>
+  <test test-name="integration_filter_test" pkg="uranus_dp" type="integration_filter_test"/>
 </launch>

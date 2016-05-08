@@ -1,6 +1,6 @@
-#include "state_estimator_test.h"
+#include "integration_filter_test.h"
 
-TEST_F(StateEstimatorTest, CheckResponsivenes)
+TEST_F(IntegrationFilterTest, CheckResponsivenes)
 {
     // First message only gives the filter an initial timestamp. From the second
     // message onward the filter can calculate a time difference between input
@@ -10,7 +10,7 @@ TEST_F(StateEstimatorTest, CheckResponsivenes)
     WaitForMessage();
 }
 
-TEST_F(StateEstimatorTest, CorrectInitialization)
+TEST_F(IntegrationFilterTest, CorrectInitialization)
 {
     ResetFilter();
     Publish(0,0,0, 0,0,0, 0,0,0,1);
@@ -32,7 +32,7 @@ TEST_F(StateEstimatorTest, CorrectInitialization)
     EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
 
-TEST_F(StateEstimatorTest, LinearAcceleration)
+TEST_F(IntegrationFilterTest, LinearAcceleration)
 {
     ResetFilter();
     OneSecondPublish(1,-0.2,0.8, 0,0,0, 0,0,0,1);
@@ -52,21 +52,21 @@ TEST_F(StateEstimatorTest, LinearAcceleration)
     EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
 
-StateEstimatorTest::StateEstimatorTest()
+IntegrationFilterTest::IntegrationFilterTest()
 {
     pub = nh.advertise<sensor_msgs::Imu>("imu/data", 10);
-    sub = nh.subscribe("state_estimate", 10, &StateEstimatorTest::Callback, this);
-    client = nh.serviceClient<uranus_dp::ResetStateEstimator>("reset_state_estimator");
+    sub = nh.subscribe("state_estimate", 10, &IntegrationFilterTest::Callback, this);
+    client = nh.serviceClient<uranus_dp::ResetIntegrationFilter>("reset_integration_filter");
     message_received = false;
 }
 
-void StateEstimatorTest::SetUp()
+void IntegrationFilterTest::SetUp()
 {
     while (!IsNodeReady())
         ros::spinOnce();
 }
 
-void StateEstimatorTest::Publish(double ax, double ay, double az,
+void IntegrationFilterTest::Publish(double ax, double ay, double az,
                                  double wx, double wy, double wz,
                                  double qx, double qy, double qz, double qw)
 {
@@ -85,7 +85,7 @@ void StateEstimatorTest::Publish(double ax, double ay, double az,
     pub.publish(msg);
 }
 
-void StateEstimatorTest::OneSecondPublish(double ax, double ay, double az,
+void IntegrationFilterTest::OneSecondPublish(double ax, double ay, double az,
                                           double wx, double wy, double wz,
                                           double qx, double qy, double qz, double qw)
 {
@@ -110,19 +110,19 @@ void StateEstimatorTest::OneSecondPublish(double ax, double ay, double az,
     }
 }
 
-void StateEstimatorTest::WaitForMessage()
+void IntegrationFilterTest::WaitForMessage()
 {
     while (!message_received)
         ros::spinOnce();
 }
 
-void StateEstimatorTest::ResetFilter()
+void IntegrationFilterTest::ResetFilter()
 {
-    uranus_dp::ResetStateEstimator srv;
+    uranus_dp::ResetIntegrationFilter srv;
     client.call(srv);
 }
 
-void StateEstimatorTest::Callback(const nav_msgs::Odometry& msg)
+void IntegrationFilterTest::Callback(const nav_msgs::Odometry& msg)
 {
     tf::pointMsgToEigen(msg.pose.pose.position, p);
     tf::quaternionMsgToEigen(msg.pose.pose.orientation, q);
@@ -131,7 +131,7 @@ void StateEstimatorTest::Callback(const nav_msgs::Odometry& msg)
     message_received = true;
 }
 
-bool StateEstimatorTest::IsNodeReady()
+bool IntegrationFilterTest::IsNodeReady()
 {
     return (pub.getNumSubscribers() > 0) && (sub.getNumPublishers() > 0);
 }
@@ -141,7 +141,7 @@ bool StateEstimatorTest::IsNodeReady()
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    ros::init(argc, argv, "state_estimator_test");
+    ros::init(argc, argv, "integration_filter_test");
 
     int ret = RUN_ALL_TESTS();
     ros::shutdown();

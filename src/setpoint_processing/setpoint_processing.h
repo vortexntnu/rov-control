@@ -8,7 +8,7 @@
 
 #include "maelstrom_msgs/JoystickMotionCommand.h"
 #include "uranus_dp/SetControlMode.h"
-#include "uranus_dp/ResetStateEstimator.h"
+#include "uranus_dp/ResetIntegrationFilter.h"
 #include "../control_mode_enum.h"
 
 class SetpointProcessing

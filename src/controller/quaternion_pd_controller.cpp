@@ -13,7 +13,6 @@ QuaternionPdController::QuaternionPdController()
     controlPub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
     enabled = false;
 
-    // Initialize all values to zero/identity
     p.setZero();
     q.setIdentity();
     nu.setZero();
@@ -24,12 +23,11 @@ QuaternionPdController::QuaternionPdController()
     g.setZero();
     R = q.toRotationMatrix();
 
-    // Gains etc.
-    setGains(0.1, 3.0, 20.0);
-    r_g << 0, 0, -0.05; // Center of gravity estimated 5 cm below origin of body frame
-    r_b << 0, 0,  0.10; // Center of buoyancy estimated 10 cm above origin of body frame
-    W = 15*9.80665;     // Weight in water estimated to 15 kg
-    B = 16*9.80665;     // Buoyancy estimated to 16 kg
+    setGains(0.1, 3.0, 20.0); // Gains taken from paper and divided by 10 (our ROV is rougly a tenth the size of the one in the paper)
+    r_g << 0, 0, -0.05;       // Center of gravity estimated 5 cm below origin of body frame
+    r_b << 0, 0,  0.10;       // Center of buoyancy estimated 10 cm above origin of body frame
+    W = 15*9.80665;           // Weight in water estimated to 15 kg
+    B = 16*9.80665;           // Buoyancy estimated to 16 kg
 }
 
 void QuaternionPdController::stateCallback(const nav_msgs::Odometry &msg)

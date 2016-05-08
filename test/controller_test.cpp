@@ -4,7 +4,8 @@
 #include <eigen_conversions/eigen_msg.h>
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
-#include "maelstrom_msgs/State.h"
+#include "nav_msgs/Odometry.h"
+
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
 #include "../src/control_mode_enum.h"
@@ -78,7 +79,7 @@ public:
     QuaternionPdControllerTest()
     {
         setpointPub = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
-        statePub    = nh.advertise<maelstrom_msgs::State>("state_estimate", 10);
+        statePub    = nh.advertise<nav_msgs::Odometry>("state_estimate", 10);
         sub         = nh.subscribe("rov_forces", 10, &QuaternionPdControllerTest::Callback, this);
         modeClient  = nh.serviceClient<uranus_dp::SetControlMode>("set_control_mode");
         gainClient  = nh.serviceClient<uranus_dp::SetControllerGains>("set_controller_gains");
@@ -104,11 +105,11 @@ public:
 
     void PublishState(Eigen::Vector3d p, Eigen::Quaterniond q, Eigen::Vector3d v, Eigen::Vector3d omega)
     {
-        maelstrom_msgs::State msg;
-        tf::pointEigenToMsg(p, msg.pose.position);
-        tf::quaternionEigenToMsg(q, msg.pose.orientation);
-        tf::vectorEigenToMsg(v, msg.twist.linear);
-        tf::vectorEigenToMsg(omega, msg.twist.angular);
+        nav_msgs::Odometry msg;
+        tf::pointEigenToMsg(p, msg.pose.pose.position);
+        tf::quaternionEigenToMsg(q, msg.pose.pose.orientation);
+        tf::vectorEigenToMsg(v, msg.twist.twist.linear);
+        tf::vectorEigenToMsg(omega, msg.twist.twist.angular);
         statePub.publish(msg);
     }
 

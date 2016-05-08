@@ -49,8 +49,6 @@ PulseWidthMin = 1300
 PulseWidthMax = 1700
 PulseWidthIncrement = 10
 
-PwmLowerValue = 1000
-PwmUpperValue = 2120
 
 def ForceToMicroSec(force):
     us = PulseWidthMax

@@ -2,66 +2,55 @@
 
 TEST_F(StateEstimatorTest, CheckResponsivenes)
 {
-    while (!GetMessageReceived())
-    {
-        Publish(0,0,0,0,0,0);
-        ros::spinOnce();
-    }
+    // First message only gives the filter an initial timestamp. From the second
+    // message onward the filter can calculate a time difference between input
+    // messages, and thus also calculate an output.
+    Publish(0,0,0, 0,0,0, 1,0,0,0);
+    Publish(0,0,0, 0,0,0, 1,0,0,0);
+    WaitForMessage();
 }
 
 TEST_F(StateEstimatorTest, CorrectInitialization)
 {
     ResetFilter();
-
-    while (!GetMessageReceived())
-    {
-        Publish(0,0,0,0,0,0);
-        ros::spinOnce();
-    }
-
-    EXPECT_NEAR(p_0(0), 0, MAX_ERROR);
-    EXPECT_NEAR(p_0(1), 0, MAX_ERROR);
-    EXPECT_NEAR(p_0(2), 0, MAX_ERROR);
-
-    q_0.normalize();
-    EXPECT_NEAR(q_0.w(), 1, MAX_ERROR);
-    EXPECT_NEAR(q_0.x(), 0, MAX_ERROR);
-    EXPECT_NEAR(q_0.y(), 0, MAX_ERROR);
-    EXPECT_NEAR(q_0.z(), 0, MAX_ERROR);
-
-    EXPECT_NEAR(v_0(0), 0, MAX_ERROR);
-    EXPECT_NEAR(v_0(1), 0, MAX_ERROR);
-    EXPECT_NEAR(v_0(2), 0, MAX_ERROR);
-
-    EXPECT_NEAR(w_0(0), 0, MAX_ERROR);
-    EXPECT_NEAR(w_0(1), 0, MAX_ERROR);
-    EXPECT_NEAR(w_0(2), 0, MAX_ERROR);
-}
-
-TEST_F(StateEstimatorTest, OnlyGravity)
-{
-    ResetFilter();
-    OneSecondPublish(0,0,STANDARD_GRAVITY,0,0,0);
+    Publish(0,0,0, 0,0,0, 0,0,0,1);
+    Publish(0,0,0, 0,0,0, 0,0,0,1);
+    WaitForMessage();
 
     EXPECT_NEAR(p(0), 0, MAX_ERROR);
     EXPECT_NEAR(p(1), 0, MAX_ERROR);
     EXPECT_NEAR(p(2), 0, MAX_ERROR);
+    EXPECT_NEAR(q.x(), 0, MAX_ERROR);
+    EXPECT_NEAR(q.y(), 0, MAX_ERROR);
+    EXPECT_NEAR(q.z(), 0, MAX_ERROR);
+    EXPECT_NEAR(q.w(), 1, MAX_ERROR);
     EXPECT_NEAR(v(0), 0, MAX_ERROR);
     EXPECT_NEAR(v(1), 0, MAX_ERROR);
     EXPECT_NEAR(v(2), 0, MAX_ERROR);
+    EXPECT_NEAR(w(0), 0, MAX_ERROR);
+    EXPECT_NEAR(w(1), 0, MAX_ERROR);
+    EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
 
 TEST_F(StateEstimatorTest, ForwardAcceleration)
 {
     ResetFilter();
-    OneSecondPublish(1,0,STANDARD_GRAVITY,0,0,0);
+    OneSecondPublish(1,0,0, 0,0,0, 0,0,0,1);
+    ros::spinOnce();
 
-    EXPECT_NEAR(p(0), 0.5, 0.01);
-    EXPECT_NEAR(p(1), 0, 0.01);
-    EXPECT_NEAR(p(2), 0, 0.01);
-    EXPECT_NEAR(v(0), 1, 0.01);
-    EXPECT_NEAR(v(1), 0, 0.01);
-    EXPECT_NEAR(v(2), 0, 0.01);
+    EXPECT_NEAR(p(0), 0.5, MAX_ERROR);
+    EXPECT_NEAR(p(1), 0, MAX_ERROR);
+    EXPECT_NEAR(p(2), 0, MAX_ERROR);
+    EXPECT_NEAR(q.x(), 0, MAX_ERROR);
+    EXPECT_NEAR(q.y(), 0, MAX_ERROR);
+    EXPECT_NEAR(q.z(), 0, MAX_ERROR);
+    EXPECT_NEAR(q.w(), 1, MAX_ERROR);
+    EXPECT_NEAR(v(0), 1, MAX_ERROR);
+    EXPECT_NEAR(v(1), 0, MAX_ERROR);
+    EXPECT_NEAR(v(2), 0, MAX_ERROR);
+    EXPECT_NEAR(w(0), 0, MAX_ERROR);
+    EXPECT_NEAR(w(1), 0, MAX_ERROR);
+    EXPECT_NEAR(w(2), 0, MAX_ERROR);
 }
 
 // TEST_F(StateEstimatorTest, Rotate)
@@ -85,7 +74,7 @@ TEST_F(StateEstimatorTest, ForwardAcceleration)
 
 StateEstimatorTest::StateEstimatorTest()
 {
-    pub = nh.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
+    pub = nh.advertise<sensor_msgs::Imu>("imu/data", 10);
     sub = nh.subscribe("state_estimate", 10, &StateEstimatorTest::Callback, this);
     client = nh.serviceClient<uranus_dp::ResetStateEstimator>("reset_state_estimator");
     message_received = false;
@@ -97,16 +86,49 @@ void StateEstimatorTest::SetUp()
         ros::spinOnce();
 }
 
-void StateEstimatorTest::Publish(double ax, double ay, double az, double wx, double wy, double wz)
+void StateEstimatorTest::Publish(double ax, double ay, double az,
+                                 double wx, double wy, double wz,
+                                 double qx, double qy, double qz, double qw)
 {
     sensor_msgs::Imu msg;
-    msg.linear_acceleration.x  = ax;
-    msg.linear_acceleration.y  = ay;
-    msg.linear_acceleration.z  = az;
-    msg.angular_velocity.x = wx;
-    msg.angular_velocity.y = wy;
-    msg.angular_velocity.z = wz;
+    msg.header.stamp = ros::Time::now();
+    msg.linear_acceleration.x = ax;
+    msg.linear_acceleration.y = ay;
+    msg.linear_acceleration.z = az;
+    msg.angular_velocity.x    = wx;
+    msg.angular_velocity.y    = wy;
+    msg.angular_velocity.z    = wz;
+    msg.orientation.x         = qx;
+    msg.orientation.y         = qy;
+    msg.orientation.z         = qz;
+    msg.orientation.w         = qw;
     pub.publish(msg);
+}
+
+void StateEstimatorTest::OneSecondPublish(double ax, double ay, double az,
+                                          double wx, double wy, double wz,
+                                          double qx, double qy, double qz, double qw)
+{
+    // Set publishing frequency etc.
+    int frequency = 5;
+    ros::Rate rate(frequency);
+    int numPublished = 0;
+
+    // First publish once to initialize
+    Publish(0,0,0, 0,0,0, 0,0,0,1);
+    ros::spinOnce();
+    rate.sleep();
+
+    // If publishing at a frequency of x Hz, then we should loop until we have
+    // published x times in order to publish one full second.
+    while (numPublished < frequency)
+    {
+        Publish(ax,ay,az, wx,wy,wz, qx,qy,qz,qw);
+        ros::spinOnce();
+        rate.sleep();
+        // ros::spinOnce();
+        numPublished++;
+    }
 }
 
 void StateEstimatorTest::WaitForMessage()
@@ -120,24 +142,6 @@ void StateEstimatorTest::OneSecondSpin()
     ros::Time start = ros::Time::now();
     while (ros::Time::now() < start + ros::Duration(1))
         ros::spinOnce();
-}
-
-void StateEstimatorTest::OneSecondPublish(double ax, double ay, double az, double wx, double wy, double wz)
-{
-    ros::Time start = ros::Time::now();
-    while (ros::Time::now() < start + ros::Duration(1))
-    {
-        sensor_msgs::Imu msg;
-        msg.linear_acceleration.x  = ax;
-        msg.linear_acceleration.y  = ay;
-        msg.linear_acceleration.z  = az;
-        msg.angular_velocity.x = wx;
-        msg.angular_velocity.y = wy;
-        msg.angular_velocity.z = wz;
-        pub.publish(msg);
-        ros::spinOnce();
-        ros::Duration(0.01).sleep();
-    }
 }
 
 void StateEstimatorTest::ResetFilter()
@@ -157,15 +161,6 @@ void StateEstimatorTest::Callback(const nav_msgs::Odometry& msg)
     tf::quaternionMsgToEigen(msg.pose.pose.orientation, q);
     tf::vectorMsgToEigen(msg.twist.twist.linear, v);
     tf::vectorMsgToEigen(msg.twist.twist.angular, w);
-
-    if (!message_received)
-    {
-        tf::pointMsgToEigen(msg.pose.pose.position, p_0);
-        tf::quaternionMsgToEigen(msg.pose.pose.orientation, q_0);
-        tf::vectorMsgToEigen(msg.twist.twist.linear, v_0);
-        tf::vectorMsgToEigen(msg.twist.twist.angular, w_0);
-    }
-
     message_received = true;
 }
 

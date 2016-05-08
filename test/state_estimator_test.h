@@ -15,10 +15,10 @@ class StateEstimatorTest : public ::testing::Test
 public:
     StateEstimatorTest();
     void SetUp();
-    void Publish(double ax, double ay, double az, double wx, double wy, double wz);
+    void Publish(double ax, double ay, double az, double wx, double wy, double wz, double qx, double qy, double qz, double qw);
+    void OneSecondPublish(double ax, double ay, double az, double wx, double wy, double wz, double qx, double qy, double qz, double qw);
     void WaitForMessage();
     void OneSecondSpin();
-    void OneSecondPublish(double ax, double ay, double az, double wx, double wy, double wz);
     void ResetFilter();
     bool GetMessageReceived();
 
@@ -26,11 +26,6 @@ public:
     Eigen::Quaterniond q;
     Eigen::Vector3d    v;
     Eigen::Vector3d    w;
-
-    Eigen::Vector3d    p_0;
-    Eigen::Quaterniond q_0;
-    Eigen::Vector3d    v_0;
-    Eigen::Vector3d    w_0;
 
     static const double MAX_ERROR = 1e-3;
     static const double STANDARD_GRAVITY = 9.80665;

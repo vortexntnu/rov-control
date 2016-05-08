@@ -20,34 +20,39 @@ IntegrationFilter::IntegrationFilter()
 
 bool IntegrationFilter::reset(uranus_dp::ResetStateEstimator::Request &req, uranus_dp::ResetStateEstimator::Response &resp)
 {
-    // Reset integrator outputs
+    ROS_INFO("Resetting integration filter.");
     p_mn_b.setZero();
     v_mn_b.setZero();
-    is_initialized = false; // Necessary?
+    is_initialized = false;
     return true;
 }
 
 void IntegrationFilter::callback(const sensor_msgs::Imu& msg)
 {
+    // ROS_INFO("Integration filter: callback()");
     ros::Time curr_time = msg.header.stamp;
     if (!is_initialized)
     {
         prev_time = curr_time;
         is_initialized = true;
+        ROS_INFO("Initialized integration filter.");
         return;
     }
 
     tf::vectorMsgToEigen(msg.linear_acceleration, a_mn_m);
     tf::vectorMsgToEigen(msg.angular_velocity, w_bn_b);
     tf::quaternionMsgToEigen(msg.orientation, q_nm);
+    q_nm.normalize();
 
     double dt = (curr_time - prev_time).toSec();
+    prev_time = curr_time;
     update(dt);
     publish();
 }
 
 void IntegrationFilter::update(double dt)
 {
+    ROS_INFO_STREAM("Integration filter: update with dt = " << dt << ".");
     a_mn_b = R_m_b*a_mn_m;
     v_mn_b += dt*a_mn_b;
     p_mn_b += dt*v_mn_b;
@@ -55,8 +60,12 @@ void IntegrationFilter::update(double dt)
 
 void IntegrationFilter::publish()
 {
+    // ROS_INFO("Integration filter: publish()");
     v_bn_b = v_mn_b + skew(r_m_b)*w_bn_b;
     q_nb = q_nm;
+
+    ROS_INFO_STREAM("v_mn_b = [" << v_mn_b(0) << ", " << v_mn_b(1) << ", " << v_mn_b(2) << "]");
+    ROS_INFO_STREAM("p_mn_b = [" << p_mn_b(0) << ", " << p_mn_b(1) << ", " << p_mn_b(2) << "]");
 
     nav_msgs::Odometry msg;
     tf::pointEigenToMsg(p_mn_b, msg.pose.pose.position);

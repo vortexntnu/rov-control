@@ -30,7 +30,7 @@ class HmiNode:
             rospy.spin()
 
     def joystick_callback(self, joystick):
-        
+
         ######################
         ######################
         ## MOTION
@@ -46,11 +46,13 @@ class HmiNode:
         # self.directional_input.tilt_up      =       joystick.turn_Y                         /   XBOX_JOYSTICK_RANGE
         # self.directional_input.down         =       (joystick.descend - joystick.ascend)    /   XBOX_TRIGGER_RANGE
 
-        if(joystick.free_roam): 
+        if(joystick.free_roam):
             self.directional_input.control_mode = 0
 
-        if(joystick.hold_position): 
+        if(joystick.hold_position):
             self.directional_input.control_mode = 1
+
+        self.directional_input.header.stamp = rospy.get_rostime()
 
         self.uranus_publisher.publish(self.directional_input)
 
@@ -70,7 +72,7 @@ class HmiNode:
 
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     try:
         print("ready to fuck up")
         hmi_node = HmiNode()

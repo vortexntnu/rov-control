@@ -52,8 +52,8 @@ class HmiNode:
         if(joystick.hold_position):
             self.directional_input.control_mode = 1
 
-        if(joystick.depth_hold):
-            self.directional_input.control_mode = 2
+        if(joystick.combined_control_mode):
+            self.directional_input.control_mode = 3
 
         self.directional_input.header.stamp = rospy.get_rostime()
 

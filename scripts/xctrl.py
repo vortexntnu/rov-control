@@ -43,7 +43,7 @@ def read_ps3_into_control_msg(device, model):
             model.lights_decrease = (event.value == 1)
 
         elif input == 'TRIANGLE':
-            model.depth_hold = (event.value == 1)
+            model.combined_control_mode = (event.value == 1)
         elif input == 'SQUARE':
             model.lights_off = (event.value == 1)
 

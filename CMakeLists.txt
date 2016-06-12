@@ -20,6 +20,7 @@ add_message_files(
   JoystickArmCommand.msg
   ArmDutyCycle.msg
   EulerOrientations.msg
+  Debug.msg
 )
 
 generate_messages(

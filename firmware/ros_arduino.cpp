@@ -79,6 +79,7 @@ void setup() {
     nh.advertise(pub_imu);
     nh.advertise(pub_mag);
     nh.advertise(pub_calibration);
+    nh.advertise(pub_euler);
 
     // Initialize the 'Wire' class for communicating over i2c
     Wire.begin();
@@ -236,9 +237,9 @@ void getCalibrationStatus(){
 void getEuler()
 {
     imu::Vector<3> euler = bno055.getVector(bno055.VECTOR_EULER);
-    euler_msg.x = euler.x();
-    euler_msg.y = euler.y();
-    euler_msg.z = euler.z();
+    euler_msg.x = euler[0];
+    euler_msg.y = euler[1];
+    euler_msg.z = euler[2];
     pub_euler.publish(&euler_msg);
 }
 

@@ -117,7 +117,7 @@ void setupIMU() {
     */
 
     id = bno055.begin(bno055.OPERATION_MODE_CONFIG);
-    bno055.setAxisSign(bno055.REMAP_SIGN_P4);
+    DBG_AXIS_SIGN_VALUE = bno055.setAxisSign(bno055.REMAP_SIGN_P4);
     bno055.setMode(bno055.OPERATION_MODE_IMUPLUS);
 }
 

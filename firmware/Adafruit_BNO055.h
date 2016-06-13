@@ -285,6 +285,7 @@ public:
 #endif
     int  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
+    void  setAxisSign         (adafruit_bno055_axis_remap_sign_t sign);
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
     void  setExtCrystalUse    ( boolean usextal );
@@ -317,6 +318,7 @@ private:
     uint8_t _address;
     int32_t _sensorID;
     adafruit_bno055_opmode_t _mode;
+    adafruit_bno055_axis_remap_sign_t _sign;
 };
 
 #endif

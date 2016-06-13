@@ -114,8 +114,9 @@ void setupIMU() {
         NDOF    |    X    |   X    |   X  |       -        |     X
     */
 
-    id = bno055.begin(bno055.OPERATION_MODE_IMUPLUS);
+    id = bno055.begin(bno055.OPERATION_MODE_CONFIG);
     bno055.setAxisSign(bno055.REMAP_SIGN_P4);
+    bno055.setMode(bno055.OPERATION_MODE_IMUPLUS);
 }
 
 

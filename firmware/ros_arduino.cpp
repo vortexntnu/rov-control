@@ -144,7 +144,7 @@ void getBarometerTemp() {
         baro_counter = 0;
     }
 
-    float temp = barometer.temperature();
+    // float temp = barometer.temperature();
     imu_temperature_msg.temperature = DBG_AXIS_SIGN_VALUE;
 
     pub_imu_temperature.publish(&imu_temperature_msg);
@@ -165,8 +165,8 @@ void getDallasTemp() {
     }
 
     sensors.requestTemperatures();
-    float temp = sensors.getTempCByIndex(0);
-    sensor_temperature_msg.temperature = temp;
+    // float temp = sensors.getTempCByIndex(0);
+    sensor_temperature_msg.temperature = DBG_AXIS_SIGN_VALUE;
 
     pub_sensor_temperature.publish(&sensor_temperature_msg);
 

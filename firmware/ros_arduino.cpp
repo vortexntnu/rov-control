@@ -33,6 +33,8 @@ sensor_msgs::FluidPressure pressure_msg;
 
 std_msgs::String calibration;
 
+geometry_msgs::Vector3 euler_msg;
+
 ros::Publisher pub_imu("imu/data", &imu_raw_msg);
 ros::Publisher pub_mag("imu/mag", &compass_msg);
 
@@ -41,6 +43,8 @@ ros::Publisher pub_imu_temperature("imu/temperature", &imu_temperature_msg);
 ros::Publisher pub_sensor_temperature("sensor/temperature", &sensor_temperature_msg);
 
 ros::Publisher pub_calibration("imu/calibration", &calibration);
+
+ros::Publisher pub_euler("imu/euler", &euler_msg);
 
 
 // float DBG_AXIS_SIGN_VALUE = -1.0;
@@ -229,6 +233,15 @@ void getCalibrationStatus(){
 
 }
 
+void getEuler()
+{
+    imu::Vector<3> euler = bno055.getVector(bno055.VECTOR_EULER);
+    euler_msg.x = euler.x();
+    euler_msg.y = euler.y();
+    euler_msg.z = euler.z();
+    pub_euler.publish(&euler_msg);
+}
+
 void loop(){
 
     nh.spinOnce();
@@ -258,6 +271,9 @@ void loop(){
 
 
         getCalibrationStatus();
+        nh.spinOnce();
+
+        getEuler();
         nh.spinOnce();
 
     }

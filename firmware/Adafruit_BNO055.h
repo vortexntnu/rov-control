@@ -283,9 +283,10 @@ public:
 #else
     Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS_A );
 #endif
-    int  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
+    int   begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
-    float setAxisSign         ( adafruit_bno055_axis_remap_sign_t sign );
+    void  setAxisSign         ( adafruit_bno055_axis_remap_sign_t sign );
+    void  setAxisConfig       ( adafruit_bno055_axis_remap_config_t config );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
     void  setExtCrystalUse    ( boolean usextal );
@@ -318,7 +319,6 @@ private:
     uint8_t _address;
     int32_t _sensorID;
     adafruit_bno055_opmode_t _mode;
-    adafruit_bno055_axis_remap_sign_t _sign;
 };
 
 #endif

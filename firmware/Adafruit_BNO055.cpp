@@ -132,12 +132,16 @@ void Adafruit_BNO055::setMode(adafruit_bno055_opmode_t mode)
     delay(30);
 }
 
-float Adafruit_BNO055::setAxisSign(adafruit_bno055_axis_remap_sign_t sign)
+void Adafruit_BNO055::setAxisSign(adafruit_bno055_axis_remap_sign_t sign)
 {
-    _sign = sign;
-    write8(BNO055_AXIS_MAP_SIGN_ADDR, _sign);
+    write8(BNO055_AXIS_MAP_SIGN_ADDR, sign);
     delay(30);
-    return (float)_sign;
+}
+
+void Adafruit_BNO055::setAxisConfig(adafruit_bno055_axis_remap_config_t config)
+{
+    write8(BNO055_AXIS_MAP_CONFIG_ADDR, config);
+    delay(30);
 }
 
 /**************************************************************************/

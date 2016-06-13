@@ -285,7 +285,7 @@ public:
 #endif
     int  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
-    float  setAxisSign         (adafruit_bno055_axis_remap_sign_t sign);
+    float setAxisSign         ( adafruit_bno055_axis_remap_sign_t sign );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
     void  setExtCrystalUse    ( boolean usextal );

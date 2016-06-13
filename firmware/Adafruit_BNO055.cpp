@@ -137,7 +137,9 @@ void Adafruit_BNO055::setAxisSign(adafruit_bno055_axis_remap_sign_t sign)
 
     adafruit_bno055_opmode_t current_mode = _mode;
     delay(30);
+    setMode(OPERATION_MODE_CONFIG);
     _sign = sign;
+    delay(30);
     write8(BNO055_AXIS_MAP_SIGN_ADDR, _sign);
     delay(30);
     setMode(current_mode);

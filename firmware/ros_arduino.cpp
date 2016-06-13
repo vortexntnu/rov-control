@@ -61,7 +61,7 @@ DallasTemperature sensors(&oneWire);
 void setupIMU();
 
 void setup() {
-  
+
     //start ROS-node
     nh.initNode();
 
@@ -85,10 +85,10 @@ void setup() {
 
 void setupIMU() {
 
-    /* 
+    /*
         Sets opmode to NDOF by default
-        
-        From Adafruit_BNO055.h: 
+
+        From Adafruit_BNO055.h:
 
         OPERATION_MODE_CONFIG                                   = 0X00,
         OPERATION_MODE_ACCONLY                                  = 0X01,
@@ -106,7 +106,7 @@ void setupIMU() {
 
 
                     ACCEL   MAG     GYRO    RELATIVE        ABSOLUTE
-                                            ORIENTATION     ORIENTATION              
+                                            ORIENTATION     ORIENTATION
         ---------------------------------------------------------------
         IMU     |    X    |   -    |   X  |       X        |     -
         COMPASS |    X    |   X    |   -  |       -        |     X
@@ -115,7 +115,7 @@ void setupIMU() {
     */
 
     id = bno055.begin(bno055.OPERATION_MODE_IMUPLUS);
-
+    bno055.setAxisSign(bno055.REMAP_SIGN_P4);
 }
 
 
@@ -140,12 +140,12 @@ void getBarometerTemp() {
     else{
         baro_counter = 0;
     }
-    
+
     float temp = barometer.temperature();
     imu_temperature_msg.temperature = temp;
 
     pub_imu_temperature.publish(&imu_temperature_msg);
-    
+
 }
 
 
@@ -166,7 +166,7 @@ void getDallasTemp() {
     sensor_temperature_msg.temperature = temp;
 
     pub_sensor_temperature.publish(&sensor_temperature_msg);
-    
+
 
 }
 
@@ -179,7 +179,7 @@ void getRawIMU() {
     imu_raw_msg.linear_acceleration.x = gyro[0];
     imu_raw_msg.linear_acceleration.y = gyro[1];
     imu_raw_msg.linear_acceleration.z = gyro[2];
-                                        
+
 
     imu::Vector<3> lin_acc = bno055.getVector(bno055.VECTOR_LINEARACCEL);
     imu_raw_msg.angular_velocity.x = lin_acc[0];

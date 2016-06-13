@@ -43,6 +43,8 @@ ros::Publisher pub_sensor_temperature("sensor/temperature", &sensor_temperature_
 ros::Publisher pub_calibration("imu/calibration", &calibration);
 
 
+float DBG_AXIS_SIGN_VALUE = -1.0;
+
 const int SensorReadDelay = 40;
 unsigned long PrevoiusSensorReadMillis = 0;
 
@@ -115,7 +117,7 @@ void setupIMU() {
     */
 
     id = bno055.begin(bno055.OPERATION_MODE_IMUPLUS);
-    bno055.setAxisSign(bno055.REMAP_SIGN_P4);
+    DBG_AXIS_SIGN_VALUE = bno055.setAxisSign(bno055.REMAP_SIGN_P4);
 }
 
 
@@ -142,7 +144,7 @@ void getBarometerTemp() {
     }
 
     float temp = barometer.temperature();
-    imu_temperature_msg.temperature = temp;
+    imu_temperature_msg.temperature = DBG_AXIS_SIGN_VALUE;
 
     pub_imu_temperature.publish(&imu_temperature_msg);
 

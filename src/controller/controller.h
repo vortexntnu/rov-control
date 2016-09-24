@@ -13,18 +13,18 @@
 class Controller
 {
 public:
-    Controller(unsigned int f);
-    bool setControlMode(uranus_dp::SetControlMode::Request &req, uranus_dp::SetControlMode::Response &resp);
-    bool setControllerGains(uranus_dp::SetControllerGains::Request &req, uranus_dp::SetControllerGains::Response &resp);
-    void spin();
+  Controller(unsigned int f);
+  bool setControlMode(uranus_dp::SetControlMode::Request &req, uranus_dp::SetControlMode::Response &resp);
+  bool setControllerGains(uranus_dp::SetControllerGains::Request &req, uranus_dp::SetControllerGains::Response &resp);
+  void spin();
 private:
-    ros::NodeHandle nh;
-    unsigned int frequency;
+  ros::NodeHandle nh;
+  unsigned int frequency;
 
-    ControlMode control_mode;
-    OpenLoopController     open_loop_controller;
-    QuaternionPdController position_hold_controller;
-    DepthHoldController    depth_hold_controller;
+  ControlMode control_mode;
+  OpenLoopController     open_loop_controller;
+  QuaternionPdController position_hold_controller;
+  DepthHoldController    depth_hold_controller;
 };
 
 #endif

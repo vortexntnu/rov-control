@@ -7,15 +7,15 @@
 class OpenLoopController
 {
 public:
-    OpenLoopController();
-    void callback(const geometry_msgs::Wrench &msg);
-    void enable();
-    void disable();
+  OpenLoopController();
+  void callback(const geometry_msgs::Wrench &msg);
+  void enable();
+  void disable();
 private:
-    ros::NodeHandle nh;
-    ros::Subscriber sub;
-    ros::Publisher  pub;
-    bool enabled;
+  ros::NodeHandle nh;
+  ros::Subscriber sub;
+  ros::Publisher  pub;
+  bool enabled;
 };
 
 #endif

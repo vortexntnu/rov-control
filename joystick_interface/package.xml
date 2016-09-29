@@ -4,8 +4,7 @@
   <name>joystick_interface</name>
   <version>0.1.0</version>
   <description>Get joystick signals from topside, multiplex to channels.</description>
-  <maintainer email="peter@gmail.com">peter</maintainer>
-  <maintainer email="hakongimse@gmail.com">Haakon Gimse</maintainer>
+  <maintainer email="morten.fyhn.amundsen@gmail.com">Morten Fyhn Amundsen</maintainer>
   <license>MIT</license>
   <url type="website">http://vortexntnu.no/</url>
 

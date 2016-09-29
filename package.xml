@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>uranus_dp</name>
+  <version>0.0.1</version>
+  <description>The uranus_dp package, containing the ROV motion control system.</description>
+  <maintainer email="mortenfyhnamundsen@gmail.com">Morten Fyhn Amundsen</maintainer>
+  <maintainer email="peteraaser@gmail.com">Peter Aaser</maintainer>
+  <url type="website">http://vortexntnu.no/</url>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>maelstrom_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+
+  <run_depend>cmake_modules</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>message_generation</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+  <run_depend>maelstrom_msgs</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+
+</package>

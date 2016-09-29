@@ -1,0 +1,4 @@
+<launch>
+  <node name="integration_filter" pkg="uranus_dp" type="integration_filter" output="screen"/>
+  <test test-name="integration_filter_test" pkg="uranus_dp" type="integration_filter_test"/>
+</launch>

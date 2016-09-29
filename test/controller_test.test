@@ -1,0 +1,13 @@
+<launch>
+  <test
+    test-name="controller_test"
+    pkg="uranus_dp"
+    type="controller_test"
+  />
+  <node
+    pkg="uranus_dp"
+    type="controller"
+    name="controller"
+    output="screen"
+  />
+</launch>

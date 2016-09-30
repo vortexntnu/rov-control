@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     # message_generation
     # geometry_msgs
     std_msgs
-    maelstrom_msgs
+    vortex_msgs
     sensor_msgs
 )
 

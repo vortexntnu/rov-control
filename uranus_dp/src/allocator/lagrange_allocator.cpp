@@ -10,7 +10,7 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
 LagrangeAllocator::LagrangeAllocator()
 {
   sub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::callback, this);
-  pub = nh.advertise<maelstrom_msgs::ThrusterForces>("thruster_forces", 10);
+  pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 10);
 
   W.setIdentity(); // Default to identity (i.e. equal weights)
   K.setIdentity(); // Scaling is done on Arduino, so this can be identity
@@ -39,7 +39,7 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
   if (isFucked(K_inverse))
     ROS_WARN("K is not invertible");
 
-  maelstrom_msgs::ThrusterForces uMsg;
+  vortex_msgs::ThrusterForces uMsg;
   uMsg.F1 = u(0);
   uMsg.F2 = u(1);
   uMsg.F3 = u(2);

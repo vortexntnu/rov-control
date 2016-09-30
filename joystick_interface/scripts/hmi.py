@@ -4,8 +4,8 @@ import rospy
 from std_msgs.msg import Int32
 from joystick.msg import Joystick
 
-from maelstrom_msgs.msg import JoystickMotionCommand
-from maelstrom_msgs.msg import JoystickArmCommand
+from vortex_msgs.msg import JoystickMotionCommand
+from vortex_msgs.msg import JoystickArmCommand
 
 XBOX_JOYSTICK_RANGE = 32768.0
 XBOX_TRIGGER_RANGE  = 255.0

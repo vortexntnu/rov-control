@@ -6,7 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   message_generation
   eigen_conversions
-  maelstrom_msgs
+  vortex_msgs
   nav_msgs
   sensor_msgs
 )
@@ -37,7 +37,7 @@ catkin_package(
   roscpp
   message_generation
   eigen_conversions
-  maelstrom_msgs
+  vortex_msgs
   nav_msgs
   sensor_msgs
 )

@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
 #include "geometry_msgs/Wrench.h"
-#include "maelstrom_msgs/ThrusterForces.h"
+#include "vortex_msgs/ThrusterForces.h"
 
 class AllocatorTest : public ::testing::Test
 {
@@ -52,7 +52,7 @@ public:
     ros::Subscriber sub;
     bool message_received;
 
-    void Callback(const maelstrom_msgs::ThrusterForces& msg)
+    void Callback(const vortex_msgs::ThrusterForces& msg)
     {
         F1 = msg.F1;
         F2 = msg.F2;

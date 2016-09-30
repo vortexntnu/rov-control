@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 #include "sensor_msgs/Imu.h"
-#include "maelstrom_msgs/JoystickMotionCommand.h"
-#include "maelstrom_msgs/ThrusterForces.h"
+#include "vortex_msgs/JoystickMotionCommand.h"
+#include "vortex_msgs/ThrusterForces.h"
 #include "../src/control_mode_enum.h"
 #include "../src/eigen_typedefs.h"
 
@@ -12,7 +12,7 @@ class ClosedLoopIntegrationTest : public ::testing::Test
 public:
     ClosedLoopIntegrationTest()
     {
-        joyPub = nh.advertise<maelstrom_msgs::JoystickMotionCommand>("joystick_motion_command", 10);
+        joyPub = nh.advertise<vortex_msgs::JoystickMotionCommand>("joystick_motion_command", 10);
         imuPub = nh.advertise<sensor_msgs::Imu>("sensor_raw", 10);
         sub = nh.subscribe("thruster_forces", 10, &ClosedLoopIntegrationTest::Callback, this);
         message_received = false;
@@ -26,7 +26,7 @@ public:
 
     void JoystickPublish(double forward, double right, double down, double tilt_up, double turn_right, ControlMode control_mode)
     {
-        maelstrom_msgs::JoystickMotionCommand msg;
+        vortex_msgs::JoystickMotionCommand msg;
         msg.forward    = forward;
         msg.right      = right;
         msg.down       = down;
@@ -79,7 +79,7 @@ private:
     ros::Subscriber sub;
     bool message_received;
 
-    void Callback(const maelstrom_msgs::ThrusterForces& msg)
+    void Callback(const vortex_msgs::ThrusterForces& msg)
     {
         F_A = msg.F1;
         F_B = msg.F2;

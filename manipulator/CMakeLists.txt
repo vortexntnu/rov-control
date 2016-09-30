@@ -6,7 +6,7 @@ project(manipulator)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   message_generation
-  maelstrom_msgs
+  vortex_msgs
 )
 
 add_message_files(
@@ -20,8 +20,8 @@ generate_messages(
 )
 
 catkin_package(
-  CATKIN_DEPENDS 
-  rospy 
-  message_runtime 
-  maelstrom_msgs
+  CATKIN_DEPENDS
+  rospy
+  message_runtime
+  vortex_msgs
 )

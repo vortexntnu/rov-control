@@ -4,7 +4,7 @@ project(joystick_interface)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   message_generation
-  maelstrom_msgs
+  vortex_msgs
 )
 
 add_message_files(
@@ -17,4 +17,4 @@ generate_messages(
   std_msgs
 )
 
-catkin_package(CATKIN_DEPENDS rospy message_runtime maelstrom_msgs)
+catkin_package(CATKIN_DEPENDS rospy message_runtime vortex_msgs)

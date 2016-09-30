@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include "geometry_msgs/Wrench.h"
 
-#include "maelstrom_msgs/ThrusterForces.h"
+#include "vortex_msgs/ThrusterForces.h"
 #include "../eigen_typedefs.h"
 
 class LagrangeAllocator

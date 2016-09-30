@@ -4,7 +4,7 @@
 
 import RPi.GPIO as GPIO
 import rospy
-from maelstrom_msgs.msg import JoystickArmCommand
+from vortex_msgs.msg import JoystickArmCommand
 from manipulator.msg import ArmState
 
 
@@ -43,14 +43,14 @@ class ManipulatorNode():
 
 
         # pwmpin_grip     = 11
-        # pwmpin_base1    = 15 
-        # pwmpin_base2    = 16 
+        # pwmpin_base1    = 15
+        # pwmpin_base2    = 16
         # pwmpin_rot      = 13
 
 
         pwmpin_grip     = 11
-        pwmpin_base1    = 15 
-        pwmpin_base2    = 16 
+        pwmpin_base1    = 15
+        pwmpin_base2    = 16
         pwmpin_rot      = 13
 
         # GPIO.setup(pwmpin_grip, GPIO.OUT)
@@ -124,7 +124,7 @@ class ManipulatorNode():
 
 
 def to_range(minv, maxv, v):
-    if (v < minv): 
+    if (v < minv):
         return minv
     if (v > maxv):
         return maxv

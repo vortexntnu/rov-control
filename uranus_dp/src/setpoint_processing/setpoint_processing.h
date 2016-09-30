@@ -6,7 +6,7 @@
 #include "geometry_msgs/Pose.h"
 #include "sensor_msgs/FluidPressure.h"
 
-#include "maelstrom_msgs/JoystickMotionCommand.h"
+#include "vortex_msgs/JoystickMotionCommand.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/ResetIntegrationFilter.h"
 #include "../control_mode_enum.h"
@@ -15,7 +15,7 @@ class SetpointProcessing
 {
 public:
   SetpointProcessing();
-  void callback(const maelstrom_msgs::JoystickMotionCommand& msg);
+  void callback(const vortex_msgs::JoystickMotionCommand& msg);
 private:
   ros::NodeHandle    nh;
   ros::Subscriber    joystickSub;
@@ -36,10 +36,10 @@ private:
   static const double MAX_TORQUE_X = 2.4;  // [Nm] Maximum possible torque around x axis
   static const double MAX_TORQUE_Z = 3.4;  // [Nm] Maximum possible torque around z axis
 
-  void updateOpenLoop(const maelstrom_msgs::JoystickMotionCommand& msg);
-  void updatePositionHold(const maelstrom_msgs::JoystickMotionCommand& msg);
-  void updateDepthHold(const maelstrom_msgs::JoystickMotionCommand& msg);
-  bool healthyMessage(const maelstrom_msgs::JoystickMotionCommand& msg);
+  void updateOpenLoop(const vortex_msgs::JoystickMotionCommand& msg);
+  void updatePositionHold(const vortex_msgs::JoystickMotionCommand& msg);
+  void updateDepthHold(const vortex_msgs::JoystickMotionCommand& msg);
+  bool healthyMessage(const vortex_msgs::JoystickMotionCommand& msg);
 };
 
 #endif

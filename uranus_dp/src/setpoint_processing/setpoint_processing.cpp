@@ -12,7 +12,7 @@ SetpointProcessing::SetpointProcessing()
   depth_setpoint = 0.5; // [m]
 }
 
-void SetpointProcessing::callback(const maelstrom_msgs::JoystickMotionCommand& msg)
+void SetpointProcessing::callback(const vortex_msgs::JoystickMotionCommand& msg)
 {
   if (!healthyMessage(msg))
   {
@@ -55,7 +55,7 @@ void SetpointProcessing::callback(const maelstrom_msgs::JoystickMotionCommand& m
   }
 }
 
-void SetpointProcessing::updateOpenLoop(const maelstrom_msgs::JoystickMotionCommand& msg)
+void SetpointProcessing::updateOpenLoop(const vortex_msgs::JoystickMotionCommand& msg)
 {
   ROS_INFO("setpoint_processing: Sending OPEN_LOOP setpoints.");
   geometry_msgs::Wrench open_loop_msg;
@@ -68,7 +68,7 @@ void SetpointProcessing::updateOpenLoop(const maelstrom_msgs::JoystickMotionComm
   wrenchPub.publish(open_loop_msg);
 }
 
-void SetpointProcessing::updatePositionHold(const maelstrom_msgs::JoystickMotionCommand& msg)
+void SetpointProcessing::updatePositionHold(const vortex_msgs::JoystickMotionCommand& msg)
 {
   ROS_INFO("setpoint_processing: Sending POSITION_HOLD setpoints.");
   // Todo: Actually populate the pose message with values
@@ -83,7 +83,7 @@ void SetpointProcessing::updatePositionHold(const maelstrom_msgs::JoystickMotion
   posePub.publish(position_hold_msg);
 }
 
-void SetpointProcessing::updateDepthHold(const maelstrom_msgs::JoystickMotionCommand& msg)
+void SetpointProcessing::updateDepthHold(const vortex_msgs::JoystickMotionCommand& msg)
 {
   ROS_INFO("setpoint_processing: Sending DEPTH_HOLD setpoints.");
 
@@ -108,7 +108,7 @@ void SetpointProcessing::updateDepthHold(const maelstrom_msgs::JoystickMotionCom
   depth_setpoint_time = curr_time;
 }
 
-bool SetpointProcessing::healthyMessage(const maelstrom_msgs::JoystickMotionCommand& msg)
+bool SetpointProcessing::healthyMessage(const vortex_msgs::JoystickMotionCommand& msg)
 {
   if (abs(msg.forward) > 1)
   {

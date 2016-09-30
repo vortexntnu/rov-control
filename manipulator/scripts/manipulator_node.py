@@ -5,7 +5,7 @@
 import RPi.GPIO as GPIO
 import rospy
 from vortex_msgs.msg import JoystickArmCommand
-from manipulator.msg import ArmState
+from vortex_msgs.msg import ArmState
 
 
 class ManipulatorNode():

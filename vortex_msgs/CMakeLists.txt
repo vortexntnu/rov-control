@@ -19,6 +19,7 @@ add_message_files(
   Joystick.msg
   JoystickMotionCommand.msg
   JoystickArmCommand.msg
+  ArmState.msg
   ArmDutyCycle.msg
   EulerOrientations.msg
   Debug.msg

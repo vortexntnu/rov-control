@@ -7,7 +7,7 @@
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 #include "uranus_dp/ResetIntegrationFilter.h"
-#include "../eigen_typedefs.h"
+#include "uranus_dp/eigen_typedefs.h"
 
 class IntegrationFilter
 {

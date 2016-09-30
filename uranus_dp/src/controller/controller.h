@@ -8,7 +8,7 @@
 #include "quaternion_pd_controller.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
-#include "../control_mode_enum.h"
+#include "uranus_dp/control_mode_enum.h"
 
 class Controller
 {

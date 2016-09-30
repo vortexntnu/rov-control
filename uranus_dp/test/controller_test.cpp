@@ -8,7 +8,7 @@
 
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
-#include "../src/control_mode_enum.h"
+#include "uranus_dp/control_mode_enum.h"
 
 class OpenLoopControllerTest : public ::testing::Test
 {

@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include "vortex_msgs/JoystickMotionCommand.h"
 #include "vortex_msgs/ThrusterForces.h"
-#include "../src/control_mode_enum.h"
+#include "uranus_dp/control_mode_enum.h"
 #include <Eigen/Dense>
 
 class OpenLoopIntegrationTest : public ::testing::Test

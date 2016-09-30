@@ -6,7 +6,7 @@
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
 #include <Eigen/Dense>
-#include "../src/eigen_typedefs.h"
+#include "uranus_dp/eigen_typedefs.h"
 #include <eigen_conversions/eigen_msg.h>
 #include "uranus_dp/ResetIntegrationFilter.h"
 

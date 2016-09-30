@@ -5,8 +5,8 @@
 #include "geometry_msgs/Wrench.h"
 #include "sensor_msgs/FluidPressure.h"
 
-#include "../src/eigen_typedefs.h"
-#include "../src/control_mode_enum.h"
+#include "uranus_dp/eigen_typedefs.h"
+#include "uranus_dp/control_mode_enum.h"
 #include "uranus_dp/SetControlMode.h"
 
 class DepthHoldTest : public ::testing::Test

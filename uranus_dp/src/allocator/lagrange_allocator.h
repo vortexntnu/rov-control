@@ -6,7 +6,7 @@
 #include "geometry_msgs/Wrench.h"
 
 #include "vortex_msgs/ThrusterForces.h"
-#include "../eigen_typedefs.h"
+#include "uranus_dp/eigen_typedefs.h"
 
 class LagrangeAllocator
 {

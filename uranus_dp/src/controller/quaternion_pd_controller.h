@@ -10,7 +10,7 @@
 #include "geometry_msgs/Wrench.h"
 #include "geometry_msgs/Pose.h"
 
-#include "../eigen_typedefs.h"
+#include "uranus_dp/eigen_typedefs.h"
 
 class QuaternionPdController
 {

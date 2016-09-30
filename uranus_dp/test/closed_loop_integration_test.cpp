@@ -4,8 +4,8 @@
 #include "sensor_msgs/Imu.h"
 #include "vortex_msgs/JoystickMotionCommand.h"
 #include "vortex_msgs/ThrusterForces.h"
-#include "../src/control_mode_enum.h"
-#include "../src/eigen_typedefs.h"
+#include "uranus_dp/control_mode_enum.h"
+#include "uranus_dp/eigen_typedefs.h"
 
 class ClosedLoopIntegrationTest : public ::testing::Test
 {

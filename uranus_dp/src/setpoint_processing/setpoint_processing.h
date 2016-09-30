@@ -9,7 +9,7 @@
 #include "vortex_msgs/JoystickMotionCommand.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/ResetIntegrationFilter.h"
-#include "../control_mode_enum.h"
+#include "uranus_dp/control_mode_enum.h"
 
 class SetpointProcessing
 {

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>ros_arduino</name>
+  <name>sensor_interface</name>
   <version>0.0.0</version>
-  <description>The ros_arduino package</description>
+  <description>The sensor_interface package</description>
 
   <maintainer email="oystein.havstad@vortexntnu.no">oystein</maintainer>
   <license>MIT</license>

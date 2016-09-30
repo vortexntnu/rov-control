@@ -8,14 +8,14 @@ include_directories(${ROS_LIB_DIR})
 
 
 
-generate_arduino_firmware(ros_arduino
-    SRCS ros_arduino.cpp I2Cdev/I2Cdev.cpp MS5837.cpp Adafruit_BNO055.h Adafruit_BNO055.cpp ${ROS_LIB_DIR}/time.cpp
+generate_arduino_firmware(sensor_interface
+    SRCS sensor_interface.cpp I2Cdev/I2Cdev.cpp MS5837.cpp Adafruit_BNO055.h Adafruit_BNO055.cpp ${ROS_LIB_DIR}/time.cpp
     BOARD mega2560
     PORT /dev/ttyACM0
 
 #    SRCS hello.cpp ${ROS_LIB_DIR}/time.cpp
 #       SRCS hello.cpp ${ROS_LIB_DIR}/time.cpp
-#	ros_arduino.cpp
+#	sensor_interface.cpp
 #	I2Cdev/I2Cdev.cpp
 #	MS5837.cpp
 )

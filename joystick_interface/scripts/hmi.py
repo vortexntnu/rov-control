@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import Int32
-from joystick.msg import Joystick
+from vortex_msgs.msg import Joystick
 
 from vortex_msgs.msg import JoystickMotionCommand
 from vortex_msgs.msg import JoystickArmCommand

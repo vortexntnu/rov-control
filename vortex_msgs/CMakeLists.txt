@@ -16,6 +16,7 @@ add_message_files(
   FILES
   ThrusterForces.msg
   LightInput.msg
+  Joystick.msg
   JoystickMotionCommand.msg
   JoystickArmCommand.msg
   ArmDutyCycle.msg

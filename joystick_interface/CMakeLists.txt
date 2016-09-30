@@ -7,11 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   vortex_msgs
 )
 
-add_message_files(
-  FILES
-  Joystick.msg
-)
-
 generate_messages(
   DEPENDENCIES
   std_msgs

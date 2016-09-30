@@ -5,7 +5,7 @@ from evdev import InputDevice
 import rospy
 import threading
 
-from joystick.msg import Joystick
+from vortex_msgs.msg import Joystick
 
 import xctrl
 import subprocess

@@ -4,8 +4,6 @@ project(hw_interface)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   vortex_msgs
-  cmake_modules
-  roscpp
   sensor_msgs
 )
 
@@ -14,6 +12,5 @@ catkin_package(
   rospy
   message_runtime
   vortex_msgs
-  roscpp
   sensor_msgs
 )

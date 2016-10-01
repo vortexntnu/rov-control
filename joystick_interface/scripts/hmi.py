@@ -77,7 +77,7 @@ class HmiNode:
 
 if __name__ == '__main__':
     try:
-        print("ready to fuck up")
+        print("joystick_interface: Launching node hmi.")
         hmi_node = HmiNode()
         hmi_node.start_node()
     except rospy.ROSInterruptException:

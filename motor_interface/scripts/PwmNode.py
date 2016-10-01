@@ -8,7 +8,7 @@ import rospy
 from vortex_msgs.msg import ThrusterForces
 from vortex_msgs.msg import ThrusterPwm
 
-def callback_thruster(ForceInput):
+def callback(ForceInput):
     # Calculate PWM signals corresponding to each commanded thruster force
     PwmStatusMsg.pwm1 = int(LookupTable.ForceToPwm(ForceInput.F1))
     PwmStatusMsg.pwm2 = int(LookupTable.ForceToPwm(ForceInput.F2))
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     init_pwm()
 
     PwmStatusPub = rospy.Publisher('pwm_status', ThrusterPwm, queue_size=10)
-    rospy.Subscriber("thruster_forces", ThrusterForces, callback_thruster)
+    rospy.Subscriber("thruster_forces", ThrusterForces, callback)
 
     print "motor_interface: Launching node PwmNode"
     rospy.spin()

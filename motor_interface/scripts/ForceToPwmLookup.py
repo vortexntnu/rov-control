@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 ForceLookup = [
     -5.7056872745,
     -5.2153547745,
@@ -49,25 +48,17 @@ PulseWidthMin = 1300
 PulseWidthMax = 1700
 PulseWidthIncrement = 10
 
-
 def ForceToMicroSec(force):
     us = PulseWidthMax
     for i in range(0, len(ForceLookup)):
         if force < ForceLookup[i]:
-
             us_prev = PulseWidthMin + PulseWidthIncrement*(i-1)
             us_next = PulseWidthMin + PulseWidthIncrement*i
             us_diff = us_next - us_prev
             force_diff = ForceLookup[i] - ForceLookup[i-1]
             force_offset = force - ForceLookup[i-1]
             us = us_prev + us_diff*(force_offset/force_diff)
-
             return us
-
-
-# Configure min and max servo pulse lengths
-servo_min = 150  # Min pulse length out of 4096
-servo_max = 600  # Max pulse length out of 4096
 
 def MicroSecToPwmValue(us):
     pulse = float(us)
@@ -79,7 +70,5 @@ def MicroSecToPwmValue(us):
     pulse /= pulse_length
     return pulse
 
-
 def ForceToPwm(force):
     return MicroSecToPwmValue(ForceToMicroSec(force));
-

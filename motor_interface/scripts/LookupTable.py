@@ -1,6 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+def ForceToMicroSec(force):
+    us = PulseWidthMax
+    for i in range(0, len(ForceLookup)):
+        if force < ForceLookup[i]:
+            us_prev = PulseWidthMin + PulseWidthIncrement*(i-1)
+            us_next = PulseWidthMin + PulseWidthIncrement*i
+            us_diff = us_next - us_prev
+            force_diff = ForceLookup[i] - ForceLookup[i-1]
+            force_offset = force - ForceLookup[i-1]
+            us = us_prev + us_diff*(force_offset/force_diff)
+            return us
+
+def MicroSecToPwmValue(us):
+    pulse = float(us)
+    pulse_length = 1000000.0    # 1,000,000 us per second
+    pulse_length /= 273.0      # 273 Hz (målt frekvens)
+    #print('{0}us per period'.format(pulse_length))
+    pulse_length /= 4096     # 12 bits of resolution
+    #print('{0}us per bit'.format(pulse_length))
+    pulse /= pulse_length
+    return pulse
+
+def ForceToPwm(force):
+    return MicroSecToPwmValue(ForceToMicroSec(force));
+
+PulseWidthMin = 1300
+PulseWidthMax = 1700
+PulseWidthIncrement = 10
+
 ForceLookup = [
     -5.7056872745,
     -5.2153547745,
@@ -43,32 +72,3 @@ ForceLookup = [
     8.6476822745,
     9.450044549
 ]
-
-PulseWidthMin = 1300
-PulseWidthMax = 1700
-PulseWidthIncrement = 10
-
-def ForceToMicroSec(force):
-    us = PulseWidthMax
-    for i in range(0, len(ForceLookup)):
-        if force < ForceLookup[i]:
-            us_prev = PulseWidthMin + PulseWidthIncrement*(i-1)
-            us_next = PulseWidthMin + PulseWidthIncrement*i
-            us_diff = us_next - us_prev
-            force_diff = ForceLookup[i] - ForceLookup[i-1]
-            force_offset = force - ForceLookup[i-1]
-            us = us_prev + us_diff*(force_offset/force_diff)
-            return us
-
-def MicroSecToPwmValue(us):
-    pulse = float(us)
-    pulse_length = 1000000.0    # 1,000,000 us per second
-    pulse_length /= 273.0      # 273 Hz (målt frekvens)
-    #print('{0}us per period'.format(pulse_length))
-    pulse_length /= 4096     # 12 bits of resolution
-    #print('{0}us per bit'.format(pulse_length))
-    pulse /= pulse_length
-    return pulse
-
-def ForceToPwm(force):
-    return MicroSecToPwmValue(ForceToMicroSec(force));

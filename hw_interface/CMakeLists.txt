@@ -17,18 +17,3 @@ catkin_package(
   roscpp
   sensor_msgs
 )
-
-include_directories(./src/IMUNode/I2Cdev/ ./src/IMUNode/MPU6050 ./src/IMUNode/MS5803 )
-
-find_library( bcm2835 bcm2835 )
-
-
-add_executable(IMUNode src/IMUNode/IMUNode.cpp
-                       src/IMUNode/I2Cdev/I2Cdev.cpp
-                       src/IMUNode/MPU6050/MPU6050.cpp
-                       src/IMUNode/MS5803/MS5803.cpp
-)
-
-target_link_libraries(IMUNode ${catkin_LIBRARIES} bcm2835 )
-
-

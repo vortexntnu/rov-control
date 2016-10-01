@@ -13,7 +13,7 @@ XBOX_TRIGGER_RANGE  = 255.0
 class HmiNode:
 
     def __init__(self):
-        rospy.init_node("hmi_node", anonymous=True)
+        rospy.init_node("hmi_node", anonymous=False)
 
         self.directional_input = JoystickMotionCommand()
         self.arm_input = JoystickArmCommand()

@@ -53,5 +53,5 @@ if __name__ == '__main__':
     PwmStatusPub = rospy.Publisher('pwm_status', PwmRequests, queue_size=10)
     rospy.Subscriber("thruster_forces", ThrusterForces, callback_thruster)
 
-    print "PwmNode er klar"
+    print "motor_interface: Launching node PwmNode"
     rospy.spin()

@@ -23,7 +23,7 @@ add_message_files(
   ArmDutyCycle.msg
   EulerOrientations.msg
   Debug.msg
-  PwmRequests.msg
+  ThrusterPwm.msg
 )
 
 generate_messages(

@@ -48,11 +48,11 @@ def init_pwm():
     pwm.set_pwm(5, 0, pwm_zero_newton)
 
 if __name__ == '__main__':
-    rospy.init_node('PwmNode', anonymous=False)
+    rospy.init_node('ThrusterPwmNode', anonymous=False)
     init_pwm()
 
     PwmStatusPub = rospy.Publisher('pwm_status', ThrusterPwm, queue_size=10)
     rospy.Subscriber("thruster_forces", ThrusterForces, callback)
 
-    print "motor_interface: Launching node PwmNode"
+    print "motor_interface: Launching node ThrusterPwmNode"
     rospy.spin()

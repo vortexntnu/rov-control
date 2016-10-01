@@ -6,7 +6,7 @@ import Adafruit_PCA9685
 import rospy
 
 from vortex_msgs.msg import ThrusterForces
-from vortex_msgs.msg import PwmRequests
+from vortex_msgs.msg import ThrusterPwm
 
 def callback_thruster(ForceInput):
     # Publish status message
@@ -35,7 +35,7 @@ def init_pwm():
     pwm.set_pwm_freq(260)
 
     # Til å sende debugmeldinger
-    PwmStatusMsg = PwmRequests()
+    PwmStatusMsg = ThrusterPwm()
 
     # Initialize all thrusters to 0 newton
     pwm_zero_newton = int(ForceToPwmLookup.ForceToPwm(0))
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     rospy.init_node('PwmNode', anonymous=True)
     init_pwm()
 
-    PwmStatusPub = rospy.Publisher('pwm_status', PwmRequests, queue_size=10)
+    PwmStatusPub = rospy.Publisher('pwm_status', ThrusterPwm, queue_size=10)
     rospy.Subscriber("thruster_forces", ThrusterForces, callback_thruster)
 
     print "motor_interface: Launching node PwmNode"

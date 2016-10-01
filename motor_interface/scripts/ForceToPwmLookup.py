@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 
@@ -54,14 +54,14 @@ def ForceToMicroSec(force):
     us = PulseWidthMax
     for i in range(0, len(ForceLookup)):
         if force < ForceLookup[i]:
-    
+
             us_prev = PulseWidthMin + PulseWidthIncrement*(i-1)
             us_next = PulseWidthMin + PulseWidthIncrement*i
             us_diff = us_next - us_prev
             force_diff = ForceLookup[i] - ForceLookup[i-1]
             force_offset = force - ForceLookup[i-1]
             us = us_prev + us_diff*(force_offset/force_diff)
-                      
+
             return us
 
 

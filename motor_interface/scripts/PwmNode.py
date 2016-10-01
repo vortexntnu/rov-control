@@ -47,7 +47,7 @@ def init_pwm():
     pwm.set_pwm(5, 0, pwm_zero_newton)
 
 if __name__ == '__main__':
-    rospy.init_node('PwmNode', anonymous=True)
+    rospy.init_node('PwmNode', anonymous=False)
     init_pwm()
 
     PwmStatusPub = rospy.Publisher('pwm_status', ThrusterPwm, queue_size=10)

@@ -1,4 +1,4 @@
-# hw_interface
+# motor_interface
 Nodes interfacing the hardware connected to the Raspberry Pi
 
 PwmNode:

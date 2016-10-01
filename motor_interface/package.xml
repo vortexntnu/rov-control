@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>hw_interface</name>
+  <name>motor_interface</name>
   <version>0.0.0</version>
   <description>This package provides an interface between the commanded forces for each thruster and the motor controllers.</description>
   <maintainer email="morten.fyhn.amundsen@gmail.com">Morten Fyhn Amundsen</maintainer>

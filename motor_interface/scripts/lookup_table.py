@@ -1,4 +1,4 @@
-thruster_force = [
+thrust = [
     -17.34,
     -16.092,
     -15.468,

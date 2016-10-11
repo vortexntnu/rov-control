@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-def ForceToMicroSec(force):
+def force_to_microsec(force):
     us = PulseWidthMax
     for i in range(0, len(ForceLookup)):
         if force < ForceLookup[i]:
@@ -13,7 +13,7 @@ def ForceToMicroSec(force):
             us = us_prev + us_diff*(force_offset/force_diff)
             return us
 
-def MicroSecToPwmValue(us):
+def microsec_to_pwm(us):
     pulse = float(us)
     pulse_length = 1000000.0    # 1,000,000 us per second
     pulse_length /= 273.0      # 273 Hz (målt frekvens)
@@ -23,8 +23,8 @@ def MicroSecToPwmValue(us):
     pulse /= pulse_length
     return pulse
 
-def ForceToPwm(force):
-    return MicroSecToPwmValue(ForceToMicroSec(force));
+def force_to_pwm(force):
+    return microsec_to_pwm(force_to_microsec(force));
 
 PulseWidthMin = 1300
 PulseWidthMax = 1700

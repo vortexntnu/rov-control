@@ -24,7 +24,7 @@ def microsec_to_pwm(us):
     return pulse
 
 def force_to_pwm(force):
-    return microsec_to_pwm(force_to_microsec(force));
+    return microsec_to_pwm(force_to_microsec(force))
 
 PulseWidthMin = 1300
 PulseWidthMax = 1700

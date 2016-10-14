@@ -12,14 +12,18 @@ BITS_PER_PERIOD               = 4096.0 # 12 bit PWM
 FREQUENCY                     = 260    # Max 500 Hz (min total pulse width 2000 microseconds)
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY
 
+# Initialise the PCA9685 using the default address (0x40)
+pca9685 = Adafruit_PCA9685.PCA9685()
+
+# Create empty PWM state message
+pwm_state = ThrusterPwm()
+
 def pulse_width_in_bits(force):
     pulse_width_in_microseconds = interp(force, lookup_table.thrust, lookup_table.pulse_width)
     normalized_duty_cycle = pulse_width_in_microseconds/PERIOD_LENGTH_IN_MICROSECONDS
     return int(round(BITS_PER_PERIOD * normalized_duty_cycle))
 
 def callback(desired_thrust):
-    pwm_state = ThrusterPwm()
-
     # Calculate PWM signals corresponding to each commanded thruster force
     pwm_state.pwm1 = pulse_width_in_bits(desired_thrust.F1)
     pwm_state.pwm2 = pulse_width_in_bits(desired_thrust.F2)
@@ -40,9 +44,6 @@ def callback(desired_thrust):
     pub.publish(pwm_state)
 
 def init():
-    # Initialise the PCA9685 using the default address (0x40)
-    pca9685 = Adafruit_PCA9685.PCA9685()
-
     # 260 Hz gives a pulse length of roughly 3800 microseconds
     # Our motor controllers require min. 2000 microseconds pulse length
     # Max frequency is 500 Hz

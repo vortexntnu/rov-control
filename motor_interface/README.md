@@ -1,5 +1,5 @@
 # motor_interface
-This package defines the interface between the ROV motor controllers and the control system.
+This package is the interface between the ROV control system running on a Raspberry Pi and the [BlueRobotics ESCs](https://www.bluerobotics.com/store/thrusters/besc-30-r1/).
 
 ## Usage
 Run this package independently with `rosrun motor_interface motor_interface.py`. In most cases it should be run through a ROS launch script.
@@ -9,3 +9,4 @@ Run this package independently with `rosrun motor_interface motor_interface.py`.
 `sudo pip install adafruit-pca9685`
 * [The Python NumPy library](http://www.numpy.org/)
 `sudo apt-get install python-numpy`
+* Working [I2C on the Raspberry Pi](https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=104133)

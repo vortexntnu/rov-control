@@ -11,7 +11,6 @@ from vortex_msgs.msg import ThrusterForces, ThrusterPwm
 BITS_PER_PERIOD               = 4096.0 # 12 bit PWM
 FREQUENCY                     = 260    # Max 500 Hz (min total pulse width 2000 microseconds)
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY
-NEUTRAL_PULSE_WIDTH           = interp(0, lookup_table.thrust, lookup_table.pulse_width)
 
 def pulse_width_in_bits(force):
     pulse_width_in_microseconds = interp(force, lookup_table.thrust, lookup_table.pulse_width)
@@ -50,12 +49,13 @@ def init():
     pca9685.set_pwm_freq(FREQUENCY)
 
     # Set all thrusters to zero
-    pca9685.set_pwm(0, 0, NEUTRAL_PULSE_WIDTH)
-    pca9685.set_pwm(1, 0, NEUTRAL_PULSE_WIDTH)
-    pca9685.set_pwm(2, 0, NEUTRAL_PULSE_WIDTH)
-    pca9685.set_pwm(3, 0, NEUTRAL_PULSE_WIDTH)
-    pca9685.set_pwm(4, 0, NEUTRAL_PULSE_WIDTH)
-    pca9685.set_pwm(5, 0, NEUTRAL_PULSE_WIDTH)
+    neutral_pulse_width = pulse_width_in_bits(0)
+    pca9685.set_pwm(0, 0, neutral_pulse_width)
+    pca9685.set_pwm(1, 0, neutral_pulse_width)
+    pca9685.set_pwm(2, 0, neutral_pulse_width)
+    pca9685.set_pwm(3, 0, neutral_pulse_width)
+    pca9685.set_pwm(4, 0, neutral_pulse_width)
+    pca9685.set_pwm(5, 0, neutral_pulse_width)
 
 if __name__ == '__main__':
     rospy.init_node('motor_interface', anonymous=False)

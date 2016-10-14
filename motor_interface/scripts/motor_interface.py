@@ -5,12 +5,15 @@ import rospy
 import Adafruit_PCA9685
 from numpy import interp
 
-import lookup_table
 from vortex_msgs.msg import ThrusterForces, ThrusterPwm
 
 BITS_PER_PERIOD               = 4096.0 # 12 bit PWM
 FREQUENCY                     = 260    # Max 500 Hz (min total pulse width 2000 microseconds)
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY
+
+# Load thruster characteristics
+T100_thrust      = rospy.get_param('/thrust')
+T100_pulse_width = rospy.get_param('/pulse_width')
 
 # Initialise the PCA9685 using the default address (0x40)
 pca9685 = Adafruit_PCA9685.PCA9685()
@@ -19,7 +22,7 @@ pca9685 = Adafruit_PCA9685.PCA9685()
 pwm_state = ThrusterPwm()
 
 def pulse_width_in_bits(force):
-    pulse_width_in_microseconds = interp(force, lookup_table.thrust, lookup_table.pulse_width)
+    pulse_width_in_microseconds = interp(force, T100_thrust, T100_pulse_width)
     normalized_duty_cycle = pulse_width_in_microseconds/PERIOD_LENGTH_IN_MICROSECONDS
     return int(round(BITS_PER_PERIOD * normalized_duty_cycle))
 

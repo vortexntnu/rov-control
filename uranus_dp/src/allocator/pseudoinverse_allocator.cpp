@@ -7,6 +7,36 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
   return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
 
+Eigen::MatrixXd parseYamlMatrix(ros::NodeHandle nh, std::string matrixName)
+{
+  // TODO: Don't use asserts like this, instead check for validity first and return something if invalid.
+
+  XmlRpc::XmlRpcValue matrix;
+  nh.getParam(matrixName, matrix);
+
+    // The matrix will be an array of arrays. Thus the "outer" data type should be an array.
+  ROS_ASSERT(matrix.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+  const int rows = matrix.size();
+  const int cols = matrix[0].size();
+  Eigen::MatrixXd X(rows,cols);
+
+  for (int i = 0; i < matrix.size(); ++i)
+  {
+        // Each row should also be an array.
+    ROS_ASSERT(matrix[i].getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+    for (int j = 0; j < matrix[i].size(); ++j)
+    {
+            // Each element should be a double (maybe not require this?)
+      ROS_ASSERT(matrix[i][j].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+      X(i,j) = matrix[i][j];
+    }
+  }
+
+  return X;
+}
+
 PseudoinverseAllocator::PseudoinverseAllocator()
 {
   sub = nh.subscribe("rov_forces", 10, &PseudoinverseAllocator::callback, this);

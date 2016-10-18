@@ -19,8 +19,8 @@ private:
   ros::Subscriber sub;
   ros::Publisher  pub;
 
-  static const unsigned int n = 5; // Number of control forces (length of tau)
-  static const unsigned int r = 6; // Number of control inputs (length of u)
+  int n; // Number of control forces (length of tau)
+  int r; // Number of control inputs (length of u)
 
   Eigen::Vector5d tau; // (n) Control forces (forces and moments on the ROV)
   Eigen::Vector6d u;   // (r) Control inputs (forces for each thruster)

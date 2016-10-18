@@ -1,3 +1,5 @@
+num_control_dof: 5
+num_thrusters: 6
 thrust_configuration:
  [[    0.0,  0.7071, -0.7071,    0.0,  0.7071, -0.7071], # Surge
   [    0.0, -0.7071, -0.7071,    0.0,  0.7071,  0.7071], # Sway

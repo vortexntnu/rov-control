@@ -34,6 +34,11 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   sub = nh.subscribe("rov_forces", 10, &PseudoinverseAllocator::callback, this);
   pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 10);
 
+  if (!nh.getParam("/num_control_dof", n))
+    ROS_WARN("Failed to read parameter num_control_dof.");
+  if (!nh.getParam("/num_thrusters", r))
+    ROS_WARN("Failed to read parameter num_thrusters.");
+
   W.setIdentity(); // Default to identity (i.e. equal weights)
   K.setIdentity(); // Scaling is done on Arduino, so this can be identity
 

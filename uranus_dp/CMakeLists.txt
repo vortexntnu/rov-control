@@ -65,7 +65,7 @@ add_executable(controller src/controller/controller_node.cpp
 )
 
 add_executable(allocator src/allocator/allocator.cpp
-                         src/allocator/lagrange_allocator.cpp
+                         src/allocator/pseudoinverse_allocator.cpp
 )
 
 add_executable(integration_filter src/integration_filter/integration_filter_node.cpp

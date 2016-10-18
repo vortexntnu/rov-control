@@ -1,5 +1,5 @@
-#ifndef LAGRANGE_ALLOCATOR_H
-#define LAGRANGE_ALLOCATOR_H
+#ifndef PSEUDOINVERSE_ALLOCATOR_H
+#define PSEUDOINVERSE_ALLOCATOR_H
 
 #include "ros/ros.h"
 #include <Eigen/Dense>
@@ -8,10 +8,10 @@
 #include "vortex_msgs/ThrusterForces.h"
 #include "uranus_dp/eigen_typedefs.h"
 
-class LagrangeAllocator
+class PseudoinverseAllocator
 {
 public:
-  LagrangeAllocator();
+  PseudoinverseAllocator();
   void callback(const geometry_msgs::Wrench& tauMsg);
   void setWeights(const Eigen::MatrixXd &W_new);
 private:
@@ -29,9 +29,9 @@ private:
   Eigen::Matrix6d    K;            // (r*r) Thrust coefficient matrix
   Eigen::Matrix6d    K_inverse;    // (r*r) Inverse of K
   Eigen::Matrix5by6d T;            // (n*r) Thrust configuration matrix
-  Eigen::Matrix6by5d T_geninverse; // (r*n) Generalized inverse of T
+  Eigen::Matrix6by5d T_pseudoinverse; // (r*n) Generalized inverse of T
 
-  void computeGeneralizedInverse();
+  void computePseudoinverse();
 };
 
 #endif

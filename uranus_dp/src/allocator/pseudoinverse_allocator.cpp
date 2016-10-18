@@ -1,5 +1,5 @@
 // See Fossen 2011, chapter 12.3.2
-#include "lagrange_allocator.h"
+#include "pseudoinverse_allocator.h"
 
 template<typename Derived>
 inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
@@ -7,9 +7,9 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
   return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
 
-LagrangeAllocator::LagrangeAllocator()
+PseudoinverseAllocator::PseudoinverseAllocator()
 {
-  sub = nh.subscribe("rov_forces", 10, &LagrangeAllocator::callback, this);
+  sub = nh.subscribe("rov_forces", 10, &PseudoinverseAllocator::callback, this);
   pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 10);
 
   W.setIdentity(); // Default to identity (i.e. equal weights)
@@ -23,10 +23,10 @@ LagrangeAllocator::LagrangeAllocator()
         0     , -0.2143,  0.2143, 0     ,  0.2143, -0.2143; // Yaw
 
   K_inverse = K.inverse();
-  computeGeneralizedInverse();
+  computePseudoinverse();
 }
 
-void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
+void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
 {
   tau << tauMsg.force.x,
          tauMsg.force.y,
@@ -34,7 +34,7 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
          tauMsg.torque.y,
          tauMsg.torque.z;
 
-  u = K_inverse * T_geninverse * tau;
+  u = K_inverse * T_pseudoinverse * tau;
 
   if (isFucked(K_inverse))
     ROS_WARN("K is not invertible");
@@ -47,31 +47,30 @@ void LagrangeAllocator::callback(const geometry_msgs::Wrench& tauMsg)
   uMsg.F5 = u(4);
   uMsg.F6 = u(5);
   pub.publish(uMsg);
-  ROS_INFO("lagrange_allocator: Publishing thruster forces.");
-  // ROS_INFO_STREAM("lagrange_allocator: Sending " << u(0) << ", " << u(1) << ", " << u(2) << ", " << u(3) << ", " << u(4) << ", " << u(5));
+  ROS_INFO("pseudoinverse_allocator: Publishing thruster forces.");
 }
 
-void LagrangeAllocator::setWeights(const Eigen::MatrixXd &W_new)
+void PseudoinverseAllocator::setWeights(const Eigen::MatrixXd &W_new)
 {
   bool isCorrectDimensions = ( W_new.rows() == r && W_new.cols() == r );
   if (!isCorrectDimensions)
   {
-    ROS_WARN_STREAM("Attempt to set weight matrix in LagrangeAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".");
+    ROS_WARN_STREAM("Attempt to set weight matrix in PseudoinverseAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".");
     return;
   }
 
   W = W_new;
 
   // New weights require recomputing the generalized inverse of the thrust config matrix
-  computeGeneralizedInverse();
+  computePseudoinverse();
 }
 
-void LagrangeAllocator::computeGeneralizedInverse()
+void PseudoinverseAllocator::computePseudoinverse()
 {
-  T_geninverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
+  T_pseudoinverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
 
-  if (isFucked(T_geninverse))
-    ROS_WARN("NaN in T_geninverse.");
+  if (isFucked(T_pseudoinverse))
+    ROS_WARN("NaN in T_pseudoinverse.");
   if (isFucked(W.inverse()))
     ROS_WARN("W not invertible.");
   if (isFucked((T*W.inverse()*T.transpose()).inverse()))

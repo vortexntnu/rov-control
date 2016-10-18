@@ -8,7 +8,7 @@ from numpy import interp
 from vortex_msgs.msg import ThrusterForces, ThrusterPwm
 
 BITS_PER_PERIOD               = 4096.0 # 12 bit PWM
-FREQUENCY                     = 260    # Max 500 Hz (min total pulse width 2000 microseconds)
+FREQUENCY                     = 249    # Max 500 Hz (min total pulse width 2000 microseconds)
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY
 
 # Load thruster characteristics

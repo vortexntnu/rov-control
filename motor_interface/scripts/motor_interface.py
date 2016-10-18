@@ -8,7 +8,7 @@ from numpy import interp
 from vortex_msgs.msg import ThrusterForces, ThrusterPwm
 
 BITS_PER_PERIOD               = 4096.0 # 12 bit PWM
-FREQUENCY                     = 249    # Max 500 Hz (min total pulse width 2000 microseconds)
+FREQUENCY                     = 249    # Max 400 Hz
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY
 
 # Load thruster characteristics
@@ -47,12 +47,8 @@ def callback(desired_thrust):
     pub.publish(pwm_state)
 
 def init():
-    # 260 Hz gives a pulse length of roughly 3800 microseconds
-    # Our motor controllers require min. 2000 microseconds pulse length
-    # Max frequency is 500 Hz
     pca9685.set_pwm_freq(FREQUENCY)
 
-    # Set all thrusters to zero
     neutral_pulse_width = pulse_width_in_bits(0)
     pca9685.set_pwm(0, 0, neutral_pulse_width)
     pca9685.set_pwm(1, 0, neutral_pulse_width)

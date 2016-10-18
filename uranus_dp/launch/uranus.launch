@@ -1,4 +1,5 @@
 <launch>
+  <rosparam command="load" file="$(find uranus_dp)/config/maelstrom_parameters.yaml"/>
   <node name="setpoint_processing" pkg="uranus_dp" type="setpoint_processing" output="screen"/>
   <node name="controller"          pkg="uranus_dp" type="controller"          output="screen"/>
   <node name="allocator"           pkg="uranus_dp" type="allocator"           output="screen"/>

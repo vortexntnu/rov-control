@@ -1,2 +1,2 @@
 # Desired force in newtons for each thruster
-float64[] F
+float64[] thrust

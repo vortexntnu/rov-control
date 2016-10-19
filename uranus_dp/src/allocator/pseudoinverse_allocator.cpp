@@ -76,8 +76,11 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
 
   u = K_inv * T_pinv * tau;
 
-  if (isFucked(K_inv))
-    ROS_WARN("K is not invertible");
+  if (isFucked(u))
+  {
+    ROS_WARN("Thruster forces u invalid, will not publish.");
+    return;
+  }
 
   vortex_msgs::ThrusterForces uMsg;
   uMsg.F1 = u(0);

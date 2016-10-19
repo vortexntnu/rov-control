@@ -7,6 +7,7 @@
 
 #include "vortex_msgs/ThrusterForces.h"
 #include "uranus_dp/eigen_typedefs.h"
+#include "uranus_dp/eigen_helper.h"
 
 class PseudoinverseAllocator
 {

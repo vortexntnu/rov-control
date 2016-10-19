@@ -1,11 +1,5 @@
 #include "quaternion_pd_controller.h"
 
-template<typename Derived>
-inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
-{
-  return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
-}
-
 QuaternionPdController::QuaternionPdController()
 {
   stateSub    = nh.subscribe("state_estimate", 10, &QuaternionPdController::stateCallback, this);

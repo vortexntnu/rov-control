@@ -1,12 +1,6 @@
 // See Fossen 2011, chapter 12.3.2
 #include "pseudoinverse_allocator.h"
 
-template<typename Derived>
-inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
-{
-  return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
-}
-
 void printEigen(std::string name, const Eigen::MatrixXd &x)
 {
   std::stringstream ss;

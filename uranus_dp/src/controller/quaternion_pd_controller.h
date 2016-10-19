@@ -11,6 +11,7 @@
 #include "geometry_msgs/Pose.h"
 
 #include "uranus_dp/eigen_typedefs.h"
+#include "uranus_dp/eigen_helper.h"
 
 class QuaternionPdController
 {

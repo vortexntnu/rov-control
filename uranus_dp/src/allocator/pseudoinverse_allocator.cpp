@@ -14,10 +14,10 @@ void printEigen(std::string name, const Eigen::MatrixXd &x)
   ROS_INFO_STREAM(ss.str());
 }
 
-Eigen::MatrixXd parseYamlMatrix(ros::NodeHandle nh, std::string matrixName)
+Eigen::MatrixXd getParamMatrix(ros::NodeHandle nh, std::string name)
 {
   XmlRpc::XmlRpcValue matrix;
-  nh.getParam(matrixName, matrix);
+  nh.getParam(name, matrix);
 
   try
   {
@@ -31,7 +31,7 @@ Eigen::MatrixXd parseYamlMatrix(ros::NodeHandle nh, std::string matrixName)
   }
   catch(...)
   {
-    ROS_WARN("Error in parseYamlMatrix. Returning 1-by-1 identity matrix.");
+    ROS_WARN("Error in getParamMatrix. Returning 1-by-1 identity matrix.");
     return Eigen::MatrixXd::Identity(1,1);
   }
 }
@@ -49,7 +49,7 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   W.setIdentity(); // Default to identity (i.e. equal weights)
   K.setIdentity(); // Scaling is done on Arduino, so this can be identity
 
-  Eigen::MatrixXd T_copy = parseYamlMatrix(nh, "thrust_configuration");
+  Eigen::MatrixXd T_copy = getParamMatrix(nh, "thrust_configuration");
   T = T_copy;
 
   K_inverse = K.inverse();

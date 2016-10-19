@@ -25,11 +25,9 @@ private:
   Eigen::Vector5d tau; // (n) Control forces (forces and moments on the ROV)
   Eigen::Vector6d f;   // (r) Control inputs (forces for each thruster)
 
-  Eigen::Matrix6d    K_inv;    // (r*r) Inverse thrust coefficient matrix
-  Eigen::MatrixXd    T;            // (n*r) Thrust configuration matrix
-  Eigen::Matrix6by5d T_pinv; // (r*n) Generalized inverse of T
-
-  void computePseudoinverse();
+  Eigen::MatrixXd K_inv;  // (r*r) Inverse thrust coefficient matrix
+  Eigen::MatrixXd T;      // (n*r) Thrust configuration matrix
+  Eigen::MatrixXd T_pinv; // (r*n) Generalized inverse of T
 };
 
 #endif

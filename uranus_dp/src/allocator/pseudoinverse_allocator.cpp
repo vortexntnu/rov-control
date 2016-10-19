@@ -36,6 +36,19 @@ Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
   }
 }
 
+Eigen::MatrixXd pinv(const Eigen::MatrixXd &X)
+{
+  Eigen::MatrixXd X_pinv = X.transpose() * ( X*X.transpose() ).inverse();
+
+  if (isFucked(X_pinv))
+  {
+    ROS_WARN("Could not compute pseudoinverse. Returning transpose.");
+    return X.transpose();
+  }
+
+  return X_pinv;
+}
+
 PseudoinverseAllocator::PseudoinverseAllocator()
 {
   sub = nh.subscribe("rov_forces", 10, &PseudoinverseAllocator::callback, this);
@@ -48,7 +61,7 @@ PseudoinverseAllocator::PseudoinverseAllocator()
 
   K_inv.setIdentity(); // Scaling is done on Arduino, so this can be identity
   T = getMatrixParam(nh, "thrust_configuration");
-  computePseudoinverse();
+  T_pinv = pinv(T);
 }
 
 void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
@@ -72,11 +85,4 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
   uMsg.F5 = u(4);
   uMsg.F6 = u(5);
   pub.publish(uMsg);
-}
-
-void PseudoinverseAllocator::computePseudoinverse()
-{
-  T_pinv = T.transpose() * ( T*T.transpose() ).inverse();
-  if (isFucked(T_pinv))
-    ROS_WARN("NaN in T_pinv.");
 }

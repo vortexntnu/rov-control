@@ -13,7 +13,6 @@ class PseudoinverseAllocator
 public:
   PseudoinverseAllocator();
   void callback(const geometry_msgs::Wrench& tauMsg);
-  void setWeights(const Eigen::MatrixXd &W_new);
 private:
   ros::NodeHandle nh;
   ros::Subscriber sub;

@@ -59,7 +59,9 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   if (!nh.getParam("/num_thrusters", r))
     ROS_WARN("Failed to read parameter num_thrusters.");
 
-  K_inv.setIdentity(); // Scaling is done on Arduino, so this can be identity
+  tau.setZero(n);
+  u.setZero(r);
+  K_inv.setIdentity(r,r);
   T = getMatrixParam(nh, "thrust_configuration");
   T_pinv = pinv(T);
 }

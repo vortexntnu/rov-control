@@ -55,9 +55,9 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 10);
 
   if (!nh.getParam("/num_control_dof", n))
-    ROS_WARN("Failed to read parameter num_control_dof.");
+    ROS_FATAL("Failed to read parameter num_control_dof.");
   if (!nh.getParam("/num_thrusters", r))
-    ROS_WARN("Failed to read parameter num_thrusters.");
+    ROS_FATAL("Failed to read parameter num_thrusters.");
 
   tau.setZero(n);
   u.setZero(r);

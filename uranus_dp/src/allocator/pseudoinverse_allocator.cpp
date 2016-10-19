@@ -76,7 +76,6 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
   uMsg.F5 = u(4);
   uMsg.F6 = u(5);
   pub.publish(uMsg);
-  ROS_INFO("pseudoinverse_allocator: Publishing thruster forces.");
 }
 
 void PseudoinverseAllocator::setWeights(const Eigen::MatrixXd &W_new)

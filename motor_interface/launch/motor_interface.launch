@@ -1,4 +1,5 @@
 <launch>
   <rosparam command="load" file="$(find motor_interface)/config/thruster_T100.yaml" />
+  <rosparam command="load" file="$(find uranus_dp)/config/maelstrom_parameters.yaml" />
   <node name="motor_interface" pkg="motor_interface" type="motor_interface.py" output="screen" />
 </launch>

@@ -3,6 +3,7 @@
 
 #include "ros/ros.h"
 #include <Eigen/Dense>
+#include <vector>
 #include "geometry_msgs/Wrench.h"
 
 #include "vortex_msgs/ThrusterForces.h"

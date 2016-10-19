@@ -18,26 +18,20 @@ num_thrusters    = rospy.get_param('/num_thrusters')
 
 # Initialise the PCA9685 using the default address (0x40)
 pca9685 = Adafruit_PCA9685.PCA9685()
-
-# Create empty PWM state message
-pwm_state = ThrusterPwm()
+pwm_state = [None]*num_thrusters
 
 def pulse_width_in_bits(force):
     pulse_width_in_microseconds = interp(force, T100_thrust, T100_pulse_width)
     normalized_duty_cycle = pulse_width_in_microseconds/PERIOD_LENGTH_IN_MICROSECONDS
     return int(round(BITS_PER_PERIOD * normalized_duty_cycle))
 
-def callback(thrust_array):
+def callback(msg):
     for i in range(num_thrusters):
-        pca9685.set_pwm(i, 0, pulse_width_in_bits(thrust_array(i)))
+	pwm_state[i] = pulse_width_in_bits(msg.F[i])
+        pca9685.set_pwm(i, 0, pwm_state[i])
 
-    pwm_state.pwm1 = pulse_width_in_bits(thrust_array(0))
-    pwm_state.pwm2 = pulse_width_in_bits(thrust_array(1))
-    pwm_state.pwm3 = pulse_width_in_bits(thrust_array(2))
-    pwm_state.pwm4 = pulse_width_in_bits(thrust_array(3))
-    pwm_state.pwm5 = pulse_width_in_bits(thrust_array(4))
-    pwm_state.pwm6 = pulse_width_in_bits(thrust_array(5))
-
+    pwm_msg = ThrusterPwm()
+    pwm_msg.pwm = pwm_state
     # Publish outputs for debug
     pub.publish(pwm_state)
 

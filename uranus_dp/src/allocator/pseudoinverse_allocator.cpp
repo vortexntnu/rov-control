@@ -31,8 +31,8 @@ Eigen::MatrixXd getParamMatrix(ros::NodeHandle nh, std::string name)
   }
   catch(...)
   {
-    ROS_WARN("Error in getParamMatrix. Returning 1-by-1 identity matrix.");
-    return Eigen::MatrixXd::Identity(1,1);
+    ROS_ERROR("Error in getParamMatrix. Returning 1-by-1 zero matrix.");
+    return Eigen::MatrixXd::Zero(1,1);
   }
 }
 

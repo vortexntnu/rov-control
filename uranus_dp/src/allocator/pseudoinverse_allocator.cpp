@@ -49,8 +49,7 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   W.setIdentity(); // Default to identity (i.e. equal weights)
   K.setIdentity(); // Scaling is done on Arduino, so this can be identity
 
-  Eigen::MatrixXd T_copy = getMatrixParam(nh, "thrust_configuration");
-  T = T_copy;
+  T = getMatrixParam(nh, "thrust_configuration");
 
   K_inverse = K.inverse();
   computePseudoinverse();

@@ -28,7 +28,7 @@ private:
   Eigen::Matrix6d    W;            // (r*r) Control force weight matrix
   Eigen::Matrix6d    K;            // (r*r) Thrust coefficient matrix
   Eigen::Matrix6d    K_inverse;    // (r*r) Inverse of K
-  Eigen::Matrix5by6d T;            // (n*r) Thrust configuration matrix
+  Eigen::MatrixXd    T;            // (n*r) Thrust configuration matrix
   Eigen::Matrix6by5d T_pseudoinverse; // (r*n) Generalized inverse of T
 
   void computePseudoinverse();

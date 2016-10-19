@@ -14,7 +14,7 @@ void printEigen(std::string name, const Eigen::MatrixXd &x)
   ROS_INFO_STREAM(ss.str());
 }
 
-Eigen::MatrixXd getParamMatrix(ros::NodeHandle nh, std::string name)
+Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
 {
   XmlRpc::XmlRpcValue matrix;
   nh.getParam(name, matrix);
@@ -31,7 +31,7 @@ Eigen::MatrixXd getParamMatrix(ros::NodeHandle nh, std::string name)
   }
   catch(...)
   {
-    ROS_ERROR("Error in getParamMatrix. Returning 1-by-1 zero matrix.");
+    ROS_ERROR("Error in getMatrixParam. Returning 1-by-1 zero matrix.");
     return Eigen::MatrixXd::Zero(1,1);
   }
 }
@@ -49,7 +49,7 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   W.setIdentity(); // Default to identity (i.e. equal weights)
   K.setIdentity(); // Scaling is done on Arduino, so this can be identity
 
-  Eigen::MatrixXd T_copy = getParamMatrix(nh, "thrust_configuration");
+  Eigen::MatrixXd T_copy = getMatrixParam(nh, "thrust_configuration");
   T = T_copy;
 
   K_inverse = K.inverse();

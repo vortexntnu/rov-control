@@ -46,12 +46,8 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   if (!nh.getParam("/num_thrusters", r))
     ROS_WARN("Failed to read parameter num_thrusters.");
 
-  W.setIdentity(); // Default to identity (i.e. equal weights)
-  K.setIdentity(); // Scaling is done on Arduino, so this can be identity
-
+  K_inv.setIdentity(); // Scaling is done on Arduino, so this can be identity
   T = getMatrixParam(nh, "thrust_configuration");
-
-  K_inverse = K.inverse();
   computePseudoinverse();
 }
 
@@ -63,9 +59,9 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
          tauMsg.torque.y,
          tauMsg.torque.z;
 
-  u = K_inverse * T_pseudoinverse * tau;
+  u = K_inv * T_pinv * tau;
 
-  if (isFucked(K_inverse))
+  if (isFucked(K_inv))
     ROS_WARN("K is not invertible");
 
   vortex_msgs::ThrusterForces uMsg;
@@ -78,29 +74,9 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
   pub.publish(uMsg);
 }
 
-void PseudoinverseAllocator::setWeights(const Eigen::MatrixXd &W_new)
-{
-  bool isCorrectDimensions = ( W_new.rows() == r && W_new.cols() == r );
-  if (!isCorrectDimensions)
-  {
-    ROS_WARN_STREAM("Attempt to set weight matrix in PseudoinverseAllocator with wrong dimensions " << W_new.rows() << "*" << W_new.cols() << ".");
-    return;
-  }
-
-  W = W_new;
-
-  // New weights require recomputing the generalized inverse of the thrust config matrix
-  computePseudoinverse();
-}
-
 void PseudoinverseAllocator::computePseudoinverse()
 {
-  T_pseudoinverse = W.inverse()*T.transpose() * (T*W.inverse()*T.transpose()).inverse();
-
-  if (isFucked(T_pseudoinverse))
-    ROS_WARN("NaN in T_pseudoinverse.");
-  if (isFucked(W.inverse()))
-    ROS_WARN("W not invertible.");
-  if (isFucked((T*W.inverse()*T.transpose()).inverse()))
-    ROS_WARN("T * W_inv * T transposed is not invertible.");
+  T_pinv = T.transpose() * ( T*T.transpose() ).inverse();
+  if (isFucked(T_pinv))
+    ROS_WARN("NaN in T_pinv.");
 }

@@ -20,16 +20,14 @@ private:
   ros::Publisher  pub;
 
   int n; // Number of control forces (length of tau)
-  int r; // Number of control inputs (length of u)
+  int r; // Number of control inputs (length of f)
 
   Eigen::Vector5d tau; // (n) Control forces (forces and moments on the ROV)
-  Eigen::Vector6d u;   // (r) Control inputs (forces for each thruster)
+  Eigen::Vector6d f;   // (r) Control inputs (forces for each thruster)
 
-  Eigen::Matrix6d    W;            // (r*r) Control force weight matrix
-  Eigen::Matrix6d    K;            // (r*r) Thrust coefficient matrix
-  Eigen::Matrix6d    K_inverse;    // (r*r) Inverse of K
+  Eigen::Matrix6d    K_inv;    // (r*r) Inverse thrust coefficient matrix
   Eigen::MatrixXd    T;            // (n*r) Thrust configuration matrix
-  Eigen::Matrix6by5d T_pseudoinverse; // (r*n) Generalized inverse of T
+  Eigen::Matrix6by5d T_pinv; // (r*n) Generalized inverse of T
 
   void computePseudoinverse();
 };

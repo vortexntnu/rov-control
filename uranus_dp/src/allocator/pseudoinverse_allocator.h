@@ -22,12 +22,11 @@ private:
   int n; // Number of control forces (length of tau)
   int r; // Number of control inputs (length of f)
 
-  Eigen::VectorXd tau; // (n) Control forces (forces and moments on the ROV)
-  Eigen::VectorXd u;   // (r) Control inputs (forces for each thruster)
-
-  Eigen::MatrixXd K_inv;  // (r*r) Inverse thrust coefficient matrix
+  Eigen::VectorXd tau;    // (n) Control forces (forces and moments on the ROV)
+  Eigen::VectorXd u;      // (r) Control inputs (forces for each thruster)
   Eigen::MatrixXd T;      // (n*r) Thrust configuration matrix
   Eigen::MatrixXd T_pinv; // (r*n) Generalized inverse of T
+  Eigen::MatrixXd K_inv;  // (r*r) Inverse thrust coefficient matrix
 };
 
 #endif

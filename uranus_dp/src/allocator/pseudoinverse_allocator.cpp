@@ -7,6 +7,13 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
   return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
 }
 
+void printEigen(std::string name, const Eigen::MatrixXd &x)
+{
+  std::stringstream ss;
+  ss << name << " = " << std::endl << x;
+  ROS_INFO_STREAM(ss.str());
+}
+
 Eigen::MatrixXd parseYamlMatrix(ros::NodeHandle nh, std::string matrixName)
 {
   XmlRpc::XmlRpcValue matrix;

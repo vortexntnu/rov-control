@@ -2,13 +2,10 @@
 This package is the interface between the ROV control system running on a Raspberry Pi and the sensors attached to the ROV. The sensors are read from an Arduino board, which acts as a ROS node by means of `rosserial_arduino`.
 
 ## Running the code
-### Manually
-Run a translator node on the host (Raspberry Pi):
+* Build and upload the Arduino code
+* Run a translator node on the host (Raspberry Pi):
 `rosrun rosserial_python serial_node.py /dev/ttyUSB0`
 (Note: May also be `/dev/ttyACM0` or something else.)
-### With a launch script
-`roslaunch sensor_interface sensor_interface.launch`
-(Not yet implemented.)
 
 ## Building and uploading the code
 * Build the package

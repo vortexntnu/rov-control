@@ -1,30 +1,26 @@
-This repository holds the code which will run a ROS node on the arduino.
+# sensor_interface
+This package is the interface between the ROV control system running on a Raspberry Pi and the sensors attached to the ROV. The sensors are read from an Arduino board, which acts as a ROS node by means of `rosserial_arduino`.
 
-In order to act as a ROS node a translator node must be running on the host device.
-The translator node is found in the rosserial package which can be installed with
+## Running the code
+### Manually
+Run a translator node on the host (Raspberry Pi):
+`rosrun rosserial_python serial_node.py /dev/ttyUSB0`
+(Note: May also be `/dev/ttyACM0` or something else.)
+### With a launch script
+`roslaunch sensor_interface sensor_interface.launch`
+(Not yet implemented.)
 
- $sudo apt-get install ros-{ROS_VERSION}-rosserial
+## Building and uploading the code
+* Build the package
+`catkin_make` or `catkin_make sensor_interface_firmware_sensor_interface`
+* Upload to Arduino
+`catkin_make sensor_interface_firmware_sensor_interface-upload`
+Make sure that the correct Arduino board and serial port is specified in `firmware/CMakeLists.txt`.
 
-To run the translator node it must also be supplied with an argument which tells it where to look for the arduino.
-For an arduino located at /dev/ttyACM0 we will run the following to bring up the
-translator node:
+## Dependencies
+* [rosserial](http://wiki.ros.org/rosserial)
+`sudo apt-get install ros-kinetic-rosserial`
+* [rosserial_arduino](http://wiki.ros.org/rosserial_arduino)
+`sudo apt-get install ros-kinetic-rosserial-arduino`
 
- $rosrun rosserial_python serial_node.py /dev/ttyACM0
-
-Build instructions:
-In order to compile this sketch you must have the arduino IDE or similar, and rosserial-arduino which you can get with
-
- $sudo apt-get install ros-{ROS_VERSION}-rosserial-arduino
-
-The package should build when your run 'catkin_make'
-If you want to build only this package run 'catkin_make sensor_interface_firmware_sensor_interface'
-
-In order to upload this node to the Arduino run 'catkin_make sensor_interface_firmware_sensor_interface-upload'
-Make sure you specify your arduino board and serial port in 'sensor_interface/firmware/CMakeLists.txt'
-
-
-relevant tutorials:
-
-http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup
-
-http://wiki.ros.org/rosserial_arduino/Tutorials/CMake
+<!-- ## Notes -->

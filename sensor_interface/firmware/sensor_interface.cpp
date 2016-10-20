@@ -1,6 +1,8 @@
 #include <ros.h>
 #include <string.h>
 
+#include <Arduino.h>
+
 #include "MS5837.h"
 #include "Adafruit_BNO055.h"
 #include "Adafruit_Sensor.h"

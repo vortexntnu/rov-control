@@ -7,8 +7,8 @@
 template<typename Derived>
 inline bool isFucked(const Eigen::MatrixBase<Derived>& X)
 {
-  bool has_nan = (X.array() == X.array()).all();
-  bool has_inf = ((X - X).array() == (X - X).array()).all();
+  bool has_nan = !(X.array() == X.array()).all();
+  bool has_inf = !((X - X).array() == (X - X).array()).all();
   return has_nan || has_inf;
 }
 

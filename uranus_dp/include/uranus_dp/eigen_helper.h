@@ -7,7 +7,9 @@
 template<typename Derived>
 inline bool isFucked(const Eigen::MatrixBase<Derived>& X)
 {
-  return !((X.array() == X.array())).all() && !( (X - X).array() == (X - X).array()).all();
+  bool has_nan = (X.array() == X.array()).all();
+  bool has_inf = ((X - X).array() == (X - X).array()).all();
+  return has_nan || has_inf;
 }
 
 inline Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)

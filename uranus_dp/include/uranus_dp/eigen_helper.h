@@ -12,7 +12,7 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& X)
   return has_nan || has_inf;
 }
 
-inline Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
+inline bool getMatrixParam(ros::NodeHandle nh, std::string name, Eigen::MatrixXd &X)
 {
   XmlRpc::XmlRpcValue matrix;
   nh.getParam(name, matrix);
@@ -21,17 +21,17 @@ inline Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
   {
     const int rows = matrix.size();
     const int cols = matrix[0].size();
-    Eigen::MatrixXd X(rows,cols);
+    X.setZero(rows, cols);
     for (int i = 0; i < rows; ++i)
       for (int j = 0; j < cols; ++j)
         X(i,j) = matrix[i][j];
-    return X;
   }
   catch(...)
   {
-    ROS_ERROR("Error in getMatrixParam. Returning 1-by-1 zero matrix.");
-    return Eigen::MatrixXd::Zero(1,1);
+    X.setZero(1,1);
+    return false;
   }
+  return true;
 }
 
 inline void printEigen(std::string name, const Eigen::MatrixXd &X)

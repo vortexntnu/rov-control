@@ -41,17 +41,15 @@ inline void printEigen(std::string name, const Eigen::MatrixXd &X)
   ROS_INFO_STREAM(ss.str());
 }
 
-inline Eigen::MatrixXd pinv(const Eigen::MatrixXd &X)
+inline bool pinv(const Eigen::MatrixXd &X, Eigen::MatrixXd &X_pinv)
 {
-  Eigen::MatrixXd X_pinv = X.transpose() * ( X*X.transpose() ).inverse();
-
+  X_pinv = X.transpose() * ( X*(X.transpose()) ).inverse();
   if (isFucked(X_pinv))
   {
-    ROS_WARN("Could not compute pseudoinverse. Returning transpose.");
-    return X.transpose();
+    X_pinv = Eigen::MatrixXd::Zero(X.cols(), X.rows());
+    return false;
   }
-
-  return X_pinv;
+  return true;
 }
 
 #endif

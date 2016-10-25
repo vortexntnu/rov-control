@@ -10,13 +10,15 @@ PseudoinverseAllocator::PseudoinverseAllocator()
     ROS_FATAL("Failed to read parameter num_control_dof.");
   if (!nh.getParam("/num_thrusters", r))
     ROS_FATAL("Failed to read parameter num_thrusters.");
+  if (!getMatrixParam(nh, "thrust_configuration", T))
+    ROS_ERROR("Failed to read thrust config matrix from param server.");
 
   tau.setZero(n);
   u.setZero(r);
   K_inv.setIdentity(r,r);
-  T = getMatrixParam(nh, "thrust_configuration");
+
   if (!pinv(T, T_pinv))
-    ROS_WARN("Failed to compute pseudoinverse of thrust config matrix.");
+    ROS_ERROR("Failed to compute pseudoinverse of thrust config matrix.");
 }
 
 void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)

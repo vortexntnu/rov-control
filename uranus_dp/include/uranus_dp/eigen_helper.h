@@ -28,7 +28,6 @@ inline bool getMatrixParam(ros::NodeHandle nh, std::string name, Eigen::MatrixXd
   }
   catch(...)
   {
-    X.setZero(1,1);
     return false;
   }
   return true;

@@ -37,7 +37,7 @@ inline Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
 inline void printEigen(std::string name, const Eigen::MatrixXd &X)
 {
   std::stringstream ss;
-  ss << name << " = " << std::endl << X;
+  ss << std::endl << name << " = " << std::endl << X;
   ROS_INFO_STREAM(ss.str());
 }
 

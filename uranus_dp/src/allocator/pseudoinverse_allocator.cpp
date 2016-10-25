@@ -15,7 +15,8 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   u.setZero(r);
   K_inv.setIdentity(r,r);
   T = getMatrixParam(nh, "thrust_configuration");
-  T_pinv = pinv(T);
+  if (!pinv(T, T_pinv))
+    ROS_WARN("Failed to compute pseudoinverse of thrust config matrix.");
 }
 
 void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)

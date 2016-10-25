@@ -5,9 +5,9 @@
 #include <Eigen/Dense>
 
 template<typename Derived>
-inline bool isFucked(const Eigen::MatrixBase<Derived>& x)
+inline bool isFucked(const Eigen::MatrixBase<Derived>& X)
 {
-  return !((x.array() == x.array())).all() && !( (x - x).array() == (x - x).array()).all();
+  return !((X.array() == X.array())).all() && !( (X - X).array() == (X - X).array()).all();
 }
 
 inline Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
@@ -32,10 +32,10 @@ inline Eigen::MatrixXd getMatrixParam(ros::NodeHandle nh, std::string name)
   }
 }
 
-inline void printEigen(std::string name, const Eigen::MatrixXd &x)
+inline void printEigen(std::string name, const Eigen::MatrixXd &X)
 {
   std::stringstream ss;
-  ss << name << " = " << std::endl << x;
+  ss << name << " = " << std::endl << X;
   ROS_INFO_STREAM(ss.str());
 }
 

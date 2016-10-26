@@ -8,7 +8,8 @@ from vortex_msgs.msg import ThrusterForces, ThrusterPwm
 
 BITS_PER_PERIOD               = 4096.0 # 12 bit PWM
 FREQUENCY                     = 249    # Max 400 Hz
-PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY
+FREQUENCY_MEASURED            = 251.2  # Use this for better precision
+PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY_MEASURED
 
 T100_thrust      = rospy.get_param('/thrust')
 T100_pulse_width = rospy.get_param('/pulse_width')

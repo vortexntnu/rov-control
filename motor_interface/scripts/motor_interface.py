@@ -48,5 +48,5 @@ if __name__ == '__main__':
     pub = rospy.Publisher('pwm_state', ThrusterPwm, queue_size=10)
     rospy.Subscriber('thruster_forces', ThrusterForces, callback)
 
-    print 'Launching node motor_interface'
+    print 'Launching node motor_interface at', FREQUENCY, 'Hz'
     rospy.spin()

@@ -33,7 +33,7 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
 
   if (isFucked(u))
   {
-    ROS_WARN("Thruster forces u invalid, will not publish.");
+    ROS_WARN("Thrust vector u invalid, will not publish.");
     return;
   }
 

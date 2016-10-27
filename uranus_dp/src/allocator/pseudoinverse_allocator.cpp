@@ -37,11 +37,7 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tauMsg)
     return;
   }
 
-  std::vector<double> uVec(r);
-  for (int i = 0; i < r; ++i)
-    uVec[i] = u(i);
-
   vortex_msgs::ThrusterForces uMsg;
-  uMsg.thrust = uVec;
+  thrustEigenToMsg(u, uMsg);
   pub.publish(uMsg);
 }

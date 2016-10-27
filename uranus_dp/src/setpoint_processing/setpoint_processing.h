@@ -27,9 +27,6 @@ private:
 
   ControlMode control_mode;
 
-  double depth_setpoint;
-  ros::Time depth_setpoint_time;
-
   double max_force_x;
   double max_force_y;
   double max_force_z;

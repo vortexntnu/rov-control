@@ -30,11 +30,17 @@ private:
   double depth_setpoint;
   ros::Time depth_setpoint_time;
 
-  static const double MAX_FORCE_X  = 33.5; // [N]  Maximum possible force along x axis
-  static const double MAX_FORCE_Y  = 33.5; // [N]  Maximum possible force along y axis
-  static const double MAX_FORCE_Z  = 11.4; // [N]  Maximum possible force along z axis
-  static const double MAX_TORQUE_X = 2.4;  // [Nm] Maximum possible torque around x axis
-  static const double MAX_TORQUE_Z = 3.4;  // [Nm] Maximum possible torque around z axis
+  double max_force_x;
+  double max_force_y;
+  double max_force_z;
+  double max_torque_y;
+  double max_torque_z;
+
+  double scaling_force_x;
+  double scaling_force_y;
+  double scaling_force_z;
+  double scaling_torque_y;
+  double scaling_torque_z;
 
   void updateOpenLoop(const vortex_msgs::JoystickMotionCommand& msg);
   void updatePositionHold(const vortex_msgs::JoystickMotionCommand& msg);

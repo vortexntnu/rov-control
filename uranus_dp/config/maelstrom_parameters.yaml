@@ -27,3 +27,17 @@ thrust_configuration:
   [    1.0,     0.0,     0.0,    1.0,     0.0,     0.0], # Heave
   [-0.1600, -0.0467,  0.0467, 0.1600, -0.0467,  0.0467], # Pitch
   [    0.0, -0.2143,  0.2143,    0.0,  0.2143, -0.2143]] # Yaw
+
+max_force_x: 69.85
+max_force_y: 69.85
+max_force_z: 49.39
+max_torque_y: 5 # Only an estimate
+max_torque_z: 7 # Only an estimate
+
+scaling_force_x: 1
+scaling_force_y: 1
+scaling_force_z: 1
+scaling_torque_y: 1
+scaling_torque_z: 1
+
+controller_frequency: 10

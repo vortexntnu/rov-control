@@ -9,6 +9,30 @@ SetpointProcessing::SetpointProcessing()
   resetClient = nh.serviceClient<uranus_dp::ResetIntegrationFilter>("reset_integration_filter");
 
   control_mode = ControlModes::OPEN_LOOP;
+
+  // Read maximum forces/torques from parameter server
+  if (!nh.getParam("/max_force_x", max_force_x))
+    ROS_FATAL("Failed to read parameter max_force_x.");
+  if (!nh.getParam("/max_force_y", max_force_y))
+    ROS_FATAL("Failed to read parameter max_force_y.");
+  if (!nh.getParam("/max_force_z", max_force_z))
+    ROS_FATAL("Failed to read parameter max_force_z.");
+  if (!nh.getParam("/max_torque_y", max_torque_y))
+    ROS_FATAL("Failed to read parameter max_torque_y.");
+  if (!nh.getParam("/max_torque_z", max_torque_z))
+    ROS_FATAL("Failed to read parameter max_torque_z.");
+
+  // Read force/torque scaling factors from parameter server
+  if (!nh.getParam("/scaling_force_x", scaling_force_x))
+    ROS_FATAL("Failed to read parameter scaling_force_x.");
+  if (!nh.getParam("/scaling_force_y", scaling_force_y))
+    ROS_FATAL("Failed to read parameter scaling_force_y.");
+  if (!nh.getParam("/scaling_force_z", scaling_force_z))
+    ROS_FATAL("Failed to read parameter scaling_force_z.");
+  if (!nh.getParam("/scaling_torque_y", scaling_torque_y))
+    ROS_FATAL("Failed to read parameter scaling_torque_y.");
+  if (!nh.getParam("/scaling_torque_z", scaling_torque_z))
+    ROS_FATAL("Failed to read parameter scaling_torque_z.");
 }
 
 void SetpointProcessing::callback(const vortex_msgs::JoystickMotionCommand& msg)
@@ -54,12 +78,12 @@ void SetpointProcessing::updateOpenLoop(const vortex_msgs::JoystickMotionCommand
 {
   ROS_INFO("setpoint_processing: Sending OPEN_LOOP setpoints.");
   geometry_msgs::Wrench open_loop_msg;
-  open_loop_msg.force.x  = 0.5 * MAX_FORCE_X * msg.forward;
-  open_loop_msg.force.y  = 0.5 * MAX_FORCE_Y * msg.right;
-  open_loop_msg.force.z  = 1.0 * MAX_FORCE_Z * msg.down;
+  open_loop_msg.force.x  = 0.5 * max_force_x * msg.forward;
+  open_loop_msg.force.y  = 0.5 * max_force_y * msg.right;
+  open_loop_msg.force.z  = 1.0 * max_force_z * msg.down;
   open_loop_msg.torque.x = 0;
-  open_loop_msg.torque.y = 0.8 * MAX_TORQUE_X * msg.tilt_up;
-  open_loop_msg.torque.z = 0.8 * MAX_TORQUE_Z * msg.turn_right;
+  open_loop_msg.torque.y = 0.8 * max_torque_y * msg.tilt_up;
+  open_loop_msg.torque.z = 0.8 * max_torque_z * msg.turn_right;
   wrenchPub.publish(open_loop_msg);
 }
 

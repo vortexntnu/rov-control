@@ -8,6 +8,7 @@
 #include "sensor_msgs/Imu.h"
 #include "uranus_dp/ResetIntegrationFilter.h"
 #include "uranus_dp/eigen_typedefs.h"
+#include "uranus_dp/eigen_helper.h"
 
 class IntegrationFilter
 {
@@ -35,8 +36,6 @@ private:
   Eigen::Quaterniond q_nb;   // [1] Quaternion orientation from {n} to {b}
   Eigen::Vector3d    r_m_b;  // [m] Position of {m} relative to {b}
   Eigen::Matrix3d    R_m_b;  // [?] Rotation matrix from {m} to {b}
-
-  Eigen::Matrix3d skew(const Eigen::Vector3d& v);
 };
 
 #endif

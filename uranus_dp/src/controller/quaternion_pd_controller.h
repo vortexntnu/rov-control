@@ -36,7 +36,6 @@ private:
   void updateRestoringForceVector();
 
   int             sgn(double x);
-  Eigen::Matrix3d skew(const Eigen::Vector3d &v);
 
   Eigen::Vector3d    p;   // Position state
   Eigen::Quaterniond q;   // Orientation state

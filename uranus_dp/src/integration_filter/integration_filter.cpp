@@ -68,12 +68,3 @@ void IntegrationFilter::publish()
   tf::vectorEigenToMsg(w_bn_b, msg.twist.twist.angular);
   pub.publish(msg);
 }
-
-Eigen::Matrix3d IntegrationFilter::skew(const Eigen::Vector3d& v)
-{
-  Eigen::Matrix3d S;
-  S <<  0   , -v(2),  v(1),
-        v(2),  0   , -v(0),
-       -v(1),  v(0),  0   ;
-  return S;
-}

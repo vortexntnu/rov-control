@@ -148,12 +148,3 @@ int QuaternionPdController::sgn(double x)
     return -1;
   return 1;
 }
-
-Eigen::Matrix3d QuaternionPdController::skew(const Eigen::Vector3d &v)
-{
-  Eigen::Matrix3d S;
-  S <<  0   , -v(2),  v(1),
-        v(2),  0,    -v(0),
-       -v(1),  v(0),  0   ;
-  return S;
-}

@@ -1,8 +1,12 @@
 #include "controller.h"
 
-Controller::Controller(unsigned int f)
+Controller::Controller()
 {
-  frequency = f;
+  if (!nh.getParam("/controller/frequency", frequency))
+  {
+    ROS_WARN("Failed to read parameter controller frequency, defaulting to 10 Hz.");
+    frequency = 10;
+  }
   control_mode = ControlModes::OPEN_LOOP;
   position_hold_controller.disable();
   open_loop_controller.enable();

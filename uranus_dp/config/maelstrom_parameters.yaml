@@ -48,9 +48,9 @@ scaling_torque_y: 1
 scaling_torque_z: 1
 
 # Controller parameters
-controller_frequency: 10
 controller:
   gains:
     a: 0.1
     b: 3.0
     c: 20.0
+  frequency: 10

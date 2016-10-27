@@ -4,7 +4,6 @@
 #include "ros/ros.h"
 
 #include "open_loop_controller.h"
-#include "depth_hold_controller.h"
 #include "quaternion_pd_controller.h"
 #include "uranus_dp/SetControlMode.h"
 #include "uranus_dp/SetControllerGains.h"
@@ -24,7 +23,6 @@ private:
   ControlMode control_mode;
   OpenLoopController     open_loop_controller;
   QuaternionPdController position_hold_controller;
-  DepthHoldController    depth_hold_controller;
 };
 
 #endif

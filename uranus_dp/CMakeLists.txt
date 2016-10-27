@@ -60,7 +60,6 @@ add_executable(setpoint_processing src/setpoint_processing/setpoint_processing_n
 add_executable(controller src/controller/controller_node.cpp
                           src/controller/controller.cpp
                           src/controller/open_loop_controller.cpp
-                          src/controller/depth_hold_controller.cpp
                           src/controller/quaternion_pd_controller.cpp
 )
 

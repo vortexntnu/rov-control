@@ -5,7 +5,6 @@ Controller::Controller(unsigned int f)
   frequency = f;
   control_mode = ControlModes::OPEN_LOOP;
   position_hold_controller.disable();
-  depth_hold_controller.disable();
   open_loop_controller.enable();
 }
 
@@ -20,22 +19,13 @@ bool Controller::setControlMode(uranus_dp::SetControlMode::Request &req, uranus_
       case ControlModes::OPEN_LOOP:
       ROS_INFO("Changing control mode to OPEN LOOP.");
       position_hold_controller.disable();
-      depth_hold_controller.disable();
       open_loop_controller.enable();
       break;
 
       case ControlModes::POSITION_HOLD:
       ROS_INFO("Changing control mode to POSITION HOLD.");
       open_loop_controller.disable();
-      depth_hold_controller.disable();
       position_hold_controller.enable();
-      break;
-
-      case ControlModes::DEPTH_HOLD:
-      ROS_INFO("Changing control mode to DEPTH HOLD.");
-      open_loop_controller.disable();
-      position_hold_controller.disable();
-      depth_hold_controller.enable();
       break;
 
       default:
@@ -63,7 +53,6 @@ void Controller::spin()
   {
     ros::spinOnce();
     position_hold_controller.compute();
-    depth_hold_controller.compute();
     rate.sleep();
   }
 }

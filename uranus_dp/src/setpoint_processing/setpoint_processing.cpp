@@ -9,7 +9,6 @@ SetpointProcessing::SetpointProcessing()
   resetClient = nh.serviceClient<uranus_dp::ResetIntegrationFilter>("reset_integration_filter");
 
   control_mode = ControlModes::OPEN_LOOP;
-  depth_setpoint = 0.5; // [m]
 }
 
 void SetpointProcessing::callback(const vortex_msgs::JoystickMotionCommand& msg)
@@ -46,10 +45,6 @@ void SetpointProcessing::callback(const vortex_msgs::JoystickMotionCommand& msg)
     updatePositionHold(msg);
     break;
 
-    case ControlModes::DEPTH_HOLD:
-    updateDepthHold(msg);
-    break;
-
     default:
     ROS_WARN("setpoint_processing: Default control mode switch case reached.");
   }
@@ -81,31 +76,6 @@ void SetpointProcessing::updatePositionHold(const vortex_msgs::JoystickMotionCom
   position_hold_msg.orientation.z = 0;
   position_hold_msg.orientation.w = 1;
   posePub.publish(position_hold_msg);
-}
-
-void SetpointProcessing::updateDepthHold(const vortex_msgs::JoystickMotionCommand& msg)
-{
-  ROS_INFO("setpoint_processing: Sending DEPTH_HOLD setpoints.");
-
-  ros::Time curr_time = ros::Time::now();
-  double dt = (curr_time - depth_setpoint_time).toSec();
-  depth_setpoint = depth_setpoint + msg.down*dt*0.1; // Magic number to control how fast setpoint moves, 0.1 should give 10 cm per sec with button fully pressed
-  // Add min/max depth
-
-  geometry_msgs::Wrench depth_hold_msg;
-  depth_hold_msg.force.x  = 0.5 * MAX_FORCE_X * msg.forward;
-  depth_hold_msg.force.y  = 0.5 * MAX_FORCE_Y * msg.right;
-  depth_hold_msg.force.z  = 0;
-  depth_hold_msg.torque.x = 0;
-  depth_hold_msg.torque.y = 0.8 * MAX_TORQUE_X * msg.tilt_up;
-  depth_hold_msg.torque.z = 0.8 * MAX_TORQUE_Z * msg.turn_right;
-  wrenchPub.publish(depth_hold_msg);
-
-  sensor_msgs::FluidPressure pressure_msg;
-  pressure_msg.fluid_pressure = depth_setpoint * 1000 * 9.80665; // Get rid of magic numbers later, its 3 AM
-  pressurePub.publish(pressure_msg);
-
-  depth_setpoint_time = curr_time;
 }
 
 bool SetpointProcessing::healthyMessage(const vortex_msgs::JoystickMotionCommand& msg)

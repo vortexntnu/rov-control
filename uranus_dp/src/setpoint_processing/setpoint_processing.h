@@ -38,7 +38,6 @@ private:
 
   void updateOpenLoop(const vortex_msgs::JoystickMotionCommand& msg);
   void updatePositionHold(const vortex_msgs::JoystickMotionCommand& msg);
-  void updateDepthHold(const vortex_msgs::JoystickMotionCommand& msg);
   bool healthyMessage(const vortex_msgs::JoystickMotionCommand& msg);
 };
 

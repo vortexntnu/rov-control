@@ -1,14 +1,16 @@
 #ifndef INTEGRATION_FILTER_H
 #define INTEGRATION_FILTER_H
 
+#include "uranus_dp/eigen_helper.h"
+#include "uranus_dp/eigen_typedefs.h"
+#include "uranus_dp/ResetIntegrationFilter.h"
+
 #include "ros/ros.h"
-#include <Eigen/Dense>
-#include <eigen_conversions/eigen_msg.h>
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
-#include "uranus_dp/ResetIntegrationFilter.h"
-#include "uranus_dp/eigen_typedefs.h"
-#include "uranus_dp/eigen_helper.h"
+
+#include <eigen_conversions/eigen_msg.h>
+#include <Eigen/Dense>
 
 class IntegrationFilter
 {

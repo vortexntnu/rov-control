@@ -1,15 +1,15 @@
 #ifndef SETPOINT_PROCESSING_H
 #define SETPOINT_PROCESSING_H
 
-#include "ros/ros.h"
-#include "geometry_msgs/Wrench.h"
-#include "geometry_msgs/Pose.h"
-#include "sensor_msgs/FluidPressure.h"
-
-#include "vortex_msgs/JoystickMotionCommand.h"
-#include "uranus_dp/SetControlMode.h"
-#include "uranus_dp/ResetIntegrationFilter.h"
 #include "uranus_dp/control_mode_enum.h"
+#include "uranus_dp/ResetIntegrationFilter.h"
+#include "uranus_dp/SetControlMode.h"
+#include "vortex_msgs/JoystickMotionCommand.h"
+
+#include "ros/ros.h"
+#include "geometry_msgs/Pose.h"
+#include "geometry_msgs/Wrench.h"
+#include "sensor_msgs/FluidPressure.h"
 
 class SetpointProcessing
 {

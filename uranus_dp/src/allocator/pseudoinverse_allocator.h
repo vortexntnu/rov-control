@@ -1,8 +1,8 @@
 #ifndef PSEUDOINVERSE_ALLOCATOR_H
 #define PSEUDOINVERSE_ALLOCATOR_H
 
-#include "uranus_dp/eigen_typedefs.h"
 #include "uranus_dp/eigen_helper.h"
+#include "uranus_dp/eigen_typedefs.h"
 #include "vortex_msgs/ThrusterForces.h"
 
 #include "ros/ros.h"

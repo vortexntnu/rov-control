@@ -3,16 +3,17 @@
 #ifndef QUATERNION_PD_CONTROLLER_H
 #define QUATERNION_PD_CONTROLLER_H
 
-#include "ros/ros.h"
-#include <vector>
-#include <Eigen/Dense>
-#include <eigen_conversions/eigen_msg.h>
-#include "nav_msgs/Odometry.h"
-#include "geometry_msgs/Wrench.h"
-#include "geometry_msgs/Pose.h"
-
-#include "uranus_dp/eigen_typedefs.h"
 #include "uranus_dp/eigen_helper.h"
+#include "uranus_dp/eigen_typedefs.h"
+
+#include "ros/ros.h"
+#include "geometry_msgs/Pose.h"
+#include "geometry_msgs/Wrench.h"
+#include "nav_msgs/Odometry.h"
+
+#include <eigen_conversions/eigen_msg.h>
+#include <Eigen/Dense>
+#include <vector>
 
 class QuaternionPdController
 {

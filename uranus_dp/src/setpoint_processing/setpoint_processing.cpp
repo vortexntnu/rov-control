@@ -11,27 +11,27 @@ SetpointProcessing::SetpointProcessing()
   control_mode = ControlModes::OPEN_LOOP;
 
   // Read maximum forces/torques from parameter server
-  if (!nh.getParam("/max_force_x", max_force_x))
+  if (!nh.getParam("/actuation/max/force/x", max_force_x))
     ROS_FATAL("Failed to read parameter max_force_x.");
-  if (!nh.getParam("/max_force_y", max_force_y))
+  if (!nh.getParam("/actuation/max/force/y", max_force_y))
     ROS_FATAL("Failed to read parameter max_force_y.");
-  if (!nh.getParam("/max_force_z", max_force_z))
+  if (!nh.getParam("/actuation/max/force/z", max_force_z))
     ROS_FATAL("Failed to read parameter max_force_z.");
-  if (!nh.getParam("/max_torque_y", max_torque_y))
+  if (!nh.getParam("/actuation/max/torque/y", max_torque_y))
     ROS_FATAL("Failed to read parameter max_torque_y.");
-  if (!nh.getParam("/max_torque_z", max_torque_z))
+  if (!nh.getParam("/actuation/max/torque/z", max_torque_z))
     ROS_FATAL("Failed to read parameter max_torque_z.");
 
   // Read force/torque scaling factors from parameter server
-  if (!nh.getParam("/scaling_force_x", scaling_force_x))
+  if (!nh.getParam("/actuation/scaling/force/x", scaling_force_x))
     ROS_FATAL("Failed to read parameter scaling_force_x.");
-  if (!nh.getParam("/scaling_force_y", scaling_force_y))
+  if (!nh.getParam("/actuation/scaling/force/y", scaling_force_y))
     ROS_FATAL("Failed to read parameter scaling_force_y.");
-  if (!nh.getParam("/scaling_force_z", scaling_force_z))
+  if (!nh.getParam("/actuation/scaling/force/z", scaling_force_z))
     ROS_FATAL("Failed to read parameter scaling_force_z.");
-  if (!nh.getParam("/scaling_torque_y", scaling_torque_y))
+  if (!nh.getParam("/actuation/scaling/torque/y", scaling_torque_y))
     ROS_FATAL("Failed to read parameter scaling_torque_y.");
-  if (!nh.getParam("/scaling_torque_z", scaling_torque_z))
+  if (!nh.getParam("/actuation/scaling/torque/z", scaling_torque_z))
     ROS_FATAL("Failed to read parameter scaling_torque_z.");
 }
 

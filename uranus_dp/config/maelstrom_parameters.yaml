@@ -26,26 +26,33 @@ physical:
   center_of_mass: [0, 0, -0.15]
   center_of_buoyancy: [0, 0,  0.10]
 
-num_control_dof: 5
-num_thrusters: 6
-thrust_configuration:
- [[ 0.7071,  0.7071, -0.7071, -0.7071,     0.0,    0.0], # Surge
-  [ 0.7071, -0.7071, -0.7071,  0.7071,     0.0,    0.0], # Sway
-  [    0.0,     0.0,     0.0,     0.0,     1.0,    1.0], # Heave
-  [-0.0467, -0.0467,  0.0467,  0.0467, -0.1600, 0.1600], # Pitch
-  [ 0.2143, -0.2143,  0.2143, -0.2143,     0.0,    0.0]] # Yaw
+thrusters:
+  num: 6
+  dof: 5 # Controllable degrees of freedom
+  configuration_matrix:
+    [[ 0.7071,  0.7071, -0.7071, -0.7071,     0.0,    0.0], # Surge
+     [ 0.7071, -0.7071, -0.7071,  0.7071,     0.0,    0.0], # Sway
+     [    0.0,     0.0,     0.0,     0.0,     1.0,    1.0], # Heave
+     [-0.0467, -0.0467,  0.0467,  0.0467, -0.1600, 0.1600], # Pitch
+     [ 0.2143, -0.2143,  0.2143, -0.2143,     0.0,    0.0]] # Yaw
 
-max_force_x: 69.85
-max_force_y: 69.85
-max_force_z: 49.39
-max_torque_y: 5 # Only an estimate
-max_torque_z: 7 # Only an estimate
-
-scaling_force_x: 1
-scaling_force_y: 1
-scaling_force_z: 1
-scaling_torque_y: 1
-scaling_torque_z: 1
+actuation:
+  max:
+    force:
+      x: 69.85
+      y: 69.85
+      z: 49.39
+    torque:
+      y: 5 # Only an estimate
+      z: 7 # Only an estimate
+  scaling:
+    force:
+      x: 1
+      y: 1
+      z: 1
+    torque:
+      y: 1
+      z: 1
 
 # Controller parameters
 controller:

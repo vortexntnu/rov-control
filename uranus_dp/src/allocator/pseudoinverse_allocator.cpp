@@ -6,11 +6,11 @@ PseudoinverseAllocator::PseudoinverseAllocator()
   sub = nh.subscribe("rov_forces", 10, &PseudoinverseAllocator::callback, this);
   pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 10);
 
-  if (!nh.getParam("/num_control_dof", n))
-    ROS_FATAL("Failed to read parameter num_control_dof.");
-  if (!nh.getParam("/num_thrusters", r))
-    ROS_FATAL("Failed to read parameter num_thrusters.");
-  if (!getMatrixParam(nh, "thrust_configuration", T))
+  if (!nh.getParam("/thrusters/dof", n))
+    ROS_FATAL("Failed to read parameter thrusters/dof.");
+  if (!nh.getParam("/thrusters/num", r))
+    ROS_FATAL("Failed to read parameter thrusters/dof.");
+  if (!getMatrixParam(nh, "thrusters/configuration_matrix", T))
     ROS_ERROR("Failed to read thrust config matrix from param server.");
 
   tau.setZero(n);

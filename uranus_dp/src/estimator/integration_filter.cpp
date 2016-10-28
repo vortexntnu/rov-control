@@ -18,7 +18,7 @@ IntegrationFilter::IntegrationFilter()
   R_m_b.setIdentity();
 }
 
-bool IntegrationFilter::reset(uranus_dp::ResetIntegrationFilter::Request &req, uranus_dp::ResetIntegrationFilter::Response &resp)
+bool IntegrationFilter::reset(uranus_dp::ResetEstimator::Request &req, uranus_dp::ResetEstimator::Response &resp)
 {
   ROS_INFO("Resetting integration filter.");
   p_mn_b.setZero();

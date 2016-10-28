@@ -1,0 +1,15 @@
+# Locational gravity values are from wolframalpha.com
+# Locational atmospheric pressure values are based on 10 year average
+
+atmosphere:
+  pressure: 101000 # In Trondheim, Norway
+  # pressure: 101500 # In Long Beach, California
+
+water:
+  density: 1000 # Freshwater
+  # density: 1025 # Seawater
+
+gravity:
+  acceleration: 9.82841 # In Trondheim, Norway
+  # acceleration: 9.79609 # In Long Beach, California
+  # acceleration: 9.80665 # Standard gravity

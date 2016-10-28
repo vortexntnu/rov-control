@@ -5,5 +5,5 @@
   <node name="setpoint_processing" pkg="uranus_dp" type="setpoint_processing" output="screen"/>
   <node name="controller"          pkg="uranus_dp" type="controller"          output="screen"/>
   <node name="allocator"           pkg="uranus_dp" type="allocator"           output="screen"/>
-  <node name="integration_filter"  pkg="uranus_dp" type="integration_filter"  output="screen"/>
+  <node name="estimator"           pkg="uranus_dp" type="estimator"           output="screen"/>
 </launch>

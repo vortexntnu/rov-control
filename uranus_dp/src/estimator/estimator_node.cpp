@@ -3,8 +3,8 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "integration_filter");
-  ROS_INFO("Launching node integration_filter.");
+  ros::init(argc, argv, "estimator");
+  ROS_INFO("Launching node estimator.");
   ros::NodeHandle nh;
   SimpleEstimator e;
   // IntegrationFilter estimator;

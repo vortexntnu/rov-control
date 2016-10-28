@@ -67,20 +67,20 @@ add_executable(allocator src/allocator/allocator_node.cpp
                          src/allocator/pseudoinverse_allocator.cpp
 )
 
-add_executable(integration_filter src/estimator/integration_filter_node.cpp
-                                  src/estimator/integration_filter.cpp
-                                  src/estimator/simple_estimator.cpp
+add_executable(estimator src/estimator/estimator_node.cpp
+                         src/estimator/integration_filter.cpp
+                         src/estimator/simple_estimator.cpp
 )
 
 add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})
 add_dependencies(controller          ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(allocator           ${PROJECT_NAME}_generate_messages_cpp)
-add_dependencies(integration_filter  ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(estimator           ${PROJECT_NAME}_generate_messages_cpp)
 
 target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
 target_link_libraries(controller          ${catkin_LIBRARIES})
 target_link_libraries(allocator           ${catkin_LIBRARIES})
-target_link_libraries(integration_filter  ${catkin_LIBRARIES})
+target_link_libraries(estimator           ${catkin_LIBRARIES})
 
 #############
 ## Testing ##

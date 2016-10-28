@@ -67,9 +67,9 @@ add_executable(allocator src/allocator/allocator_node.cpp
                          src/allocator/pseudoinverse_allocator.cpp
 )
 
-add_executable(integration_filter src/integration_filter/integration_filter_node.cpp
-                                  src/integration_filter/integration_filter.cpp
-                                  src/integration_filter/simple_estimator.cpp
+add_executable(integration_filter src/estimator/integration_filter_node.cpp
+                                  src/estimator/integration_filter.cpp
+                                  src/estimator/simple_estimator.cpp
 )
 
 add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})

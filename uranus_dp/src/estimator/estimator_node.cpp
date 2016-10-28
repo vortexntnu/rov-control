@@ -8,7 +8,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   SimpleEstimator e;
   // IntegrationFilter estimator;
-  // ros::ServiceServer ss = nh.advertiseService("reset_integration_filter", &IntegrationFilter::reset, &estimator);
+  // ros::ServiceServer ss = nh.advertiseService("reset_estimator", &IntegrationFilter::reset, &estimator);
   ros::spin();
   return 0;
 }

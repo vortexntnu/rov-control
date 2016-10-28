@@ -3,7 +3,7 @@
 
 #include "uranus_dp/eigen_helper.h"
 #include "uranus_dp/eigen_typedefs.h"
-#include "uranus_dp/ResetIntegrationFilter.h"
+#include "uranus_dp/ResetEstimator.h"
 
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
@@ -16,7 +16,7 @@ class IntegrationFilter
 {
 public:
   IntegrationFilter();
-  bool reset(uranus_dp::ResetIntegrationFilter::Request &req, uranus_dp::ResetIntegrationFilter::Response &resp);
+  bool reset(uranus_dp::ResetEstimator::Request &req, uranus_dp::ResetEstimator::Response &resp);
   void callback(const sensor_msgs::Imu& msg);
   void update(double dt);
   void publish();

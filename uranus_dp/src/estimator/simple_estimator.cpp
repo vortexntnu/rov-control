@@ -50,7 +50,7 @@ void SimpleEstimator::publish()
     }
     else
     {
-      ROS_WARN("SimpleEstimator not yet initialized.");
+      ROS_WARN_ONCE("SimpleEstimator not yet initialized.");
     }
   }
 }

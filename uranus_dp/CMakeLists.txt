@@ -63,7 +63,7 @@ add_executable(controller src/controller/controller_node.cpp
                           src/controller/quaternion_pd_controller.cpp
 )
 
-add_executable(allocator src/allocator/allocator.cpp
+add_executable(allocator src/allocator/allocator_node.cpp
                          src/allocator/pseudoinverse_allocator.cpp
 )
 

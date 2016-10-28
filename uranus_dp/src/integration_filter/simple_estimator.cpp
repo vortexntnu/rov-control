@@ -1,16 +1,10 @@
 #include "simple_estimator.h"
 
-#include "nav_msgs/Odometry.h"
-#include <eigen_conversions/eigen_msg.h>
-
 SimpleEstimator::SimpleEstimator()
 {
   imu_sub      = nh.subscribe("imu/data", 10, &SimpleEstimator::imuCallback, this);
   pressure_sub = nh.subscribe("imu/pressure", 10, &SimpleEstimator::pressureCallback, this);
   state_pub    = nh.advertise<nav_msgs::Odometry>("state_estimate", 10);
-
-  position.setZero();
-  orientation.setIdentity();
 
   if (!nh.getParam("atmosphere/pressure", atmospheric_pressure))
     ROS_ERROR("Could not read parameter atmospheric pressure.");
@@ -20,27 +14,43 @@ SimpleEstimator::SimpleEstimator()
 
   if (!nh.getParam("/gravity/acceleration", gravitational_acceleration))
     ROS_ERROR("Could not read parameter gravititional acceleration.");
+
+  is_initialized       = false;
+  imu_initialized      = false;
+  pressure_initialized = false;
 }
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
 {
-  tf::quaternionMsgToEigen(msg.orientation, orientation);
-
+  state.pose.pose.orientation = msg.orientation;
+  imu_initialized = true;
   publish();
 }
 
 void SimpleEstimator::pressureCallback(const sensor_msgs::FluidPressure &msg)
 {
-  double depth = (msg.fluid_pressure - atmospheric_pressure)/(water_density * gravitational_acceleration);
-  position(2) = depth;
-
+  state.pose.pose.position.z = (msg.fluid_pressure - atmospheric_pressure)/(water_density * gravitational_acceleration);
+  pressure_initialized = true;
   publish();
 }
 
 void SimpleEstimator::publish()
 {
-  nav_msgs::Odometry msg;
-  tf::pointEigenToMsg(position, msg.pose.pose.position);
-  tf::quaternionEigenToMsg(orientation, msg.pose.pose.orientation);
-  state_pub.publish(msg);
+  if (is_initialized)
+  {
+    state_pub.publish(state);
+  }
+  else
+  {
+    if (imu_initialized && pressure_initialized)
+    {
+      is_initialized = true;
+      ROS_INFO("SimpleEstimator initialized.");
+      state_pub.publish(state);
+    }
+    else
+    {
+      ROS_WARN("SimpleEstimator not yet initialized.");
+    }
+  }
 }

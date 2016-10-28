@@ -2,10 +2,9 @@
 #define SIMPLE_ESTIMATOR_H
 
 #include "ros/ros.h"
+#include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/FluidPressure.h"
-
-#include <Eigen/Dense>
 
 class SimpleEstimator
 {
@@ -20,12 +19,15 @@ class SimpleEstimator
     ros::Subscriber pressure_sub;
     ros::Publisher  state_pub;
 
+    bool is_initialized;
+    bool imu_initialized;
+    bool pressure_initialized;
+
     double atmospheric_pressure;
     double water_density;
     double gravitational_acceleration;
 
-    Eigen::Vector3d    position;
-    Eigen::Quaterniond orientation;
+    nav_msgs::Odometry state;
 };
 
 #endif

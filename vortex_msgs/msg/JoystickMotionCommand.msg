@@ -28,5 +28,4 @@ float64 turn_right
 # Control mode
 # Set to 0 for open loop
 # Set to 1 for position hold
-# Set to 2 for depth hold
 int32 control_mode

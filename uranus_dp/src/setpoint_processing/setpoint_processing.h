@@ -30,12 +30,14 @@ private:
   double max_force_x;
   double max_force_y;
   double max_force_z;
+  double max_torque_x;
   double max_torque_y;
   double max_torque_z;
 
   double scaling_force_x;
   double scaling_force_y;
   double scaling_force_z;
+  double scaling_torque_x;
   double scaling_torque_y;
   double scaling_torque_z;
 

@@ -78,10 +78,10 @@ void SetpointProcessing::updateOpenLoop(const vortex_msgs::JoystickMotionCommand
 {
   ROS_INFO("setpoint_processing: Sending OPEN_LOOP setpoints.");
   geometry_msgs::Wrench open_loop_msg;
-  open_loop_msg.force.x  = scaling_force_x * max_force_x * msg.forward;
-  open_loop_msg.force.y  = scaling_force_y * max_force_y * msg.right;
-  open_loop_msg.force.z  = scaling_force_z * max_force_z * msg.down;
-  open_loop_msg.torque.x = 0;
+  open_loop_msg.force.x  = scaling_force_x  * max_force_x  * msg.forward;
+  open_loop_msg.force.y  = scaling_force_y  * max_force_y  * msg.right;
+  open_loop_msg.force.z  = scaling_force_z  * max_force_z  * msg.down;
+  open_loop_msg.torque.x = scaling_torque_x * max_torque_x * msg.roll_right;
   open_loop_msg.torque.y = scaling_torque_y * max_torque_y * msg.tilt_up;
   open_loop_msg.torque.z = scaling_torque_z * max_torque_z * msg.turn_right;
   wrenchPub.publish(open_loop_msg);

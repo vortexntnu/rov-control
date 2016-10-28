@@ -15,6 +15,11 @@ float64 right
 # Range [-1, 1]
 float64 down
 
+# Angular roll right/left command
+# Positive right
+# Range [-1, 1]
+float64 roll_right
+
 # Angular tilt up/down command
 # Positive up
 # Range [-1, 1]

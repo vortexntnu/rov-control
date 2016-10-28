@@ -43,6 +43,7 @@ actuation:
       y: 69.85
       z: 49.39
     torque:
+      x: 0 # Cannot control
       y: 5 # Only an estimate
       z: 7 # Only an estimate
   scaling:
@@ -51,6 +52,7 @@ actuation:
       y: 1
       z: 1
     torque:
+      x: 1 # Don't care
       y: 1
       z: 1
 

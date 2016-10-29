@@ -1,6 +1,6 @@
 <launch>
-  <rosparam command="load" file="$(find uranus_dp)/config/robot/maelstrom.yaml"/>
-  <rosparam command="load" file="$(find uranus_dp)/config/environment/trondheim_freshwater.yaml"/>
+  <rosparam command="load" file="$(find uranus_dp)/config/robots/maelstrom.yaml"/>
+  <rosparam command="load" file="$(find uranus_dp)/config/environments/trondheim_freshwater.yaml"/>
 
   <node name="setpoint_processing" pkg="uranus_dp" type="setpoint_processing" output="screen"/>
   <node name="controller"          pkg="uranus_dp" type="controller"          output="screen"/>

@@ -2,7 +2,7 @@
 #define SETPOINT_PROCESSING_H
 
 #include "uranus_dp/control_mode_enum.h"
-#include "uranus_dp/ResetIntegrationFilter.h"
+#include "uranus_dp/ResetEstimator.h"
 #include "uranus_dp/SetControlMode.h"
 #include "vortex_msgs/JoystickMotionCommand.h"
 

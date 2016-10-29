@@ -13,7 +13,7 @@ PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/FREQUENCY_MEASURED
 
 T100_thrust      = rospy.get_param('/thrust')
 T100_pulse_width = rospy.get_param('/pulse_width')
-num_thrusters    = rospy.get_param('/num_thrusters')
+num_thrusters    = rospy.get_param('/thrusters/num')
 
 # Initialise the PCA9685 using the default address (0x40)
 pca9685 = Adafruit_PCA9685.PCA9685()

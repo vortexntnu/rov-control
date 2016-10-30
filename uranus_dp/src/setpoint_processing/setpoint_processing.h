@@ -2,30 +2,36 @@
 #define SETPOINT_PROCESSING_H
 
 #include "uranus_dp/control_mode_enum.h"
-#include "uranus_dp/ResetEstimator.h"
-#include "uranus_dp/SetControlMode.h"
 #include "vortex_msgs/JoystickMotionCommand.h"
 
 #include "ros/ros.h"
-#include "geometry_msgs/Pose.h"
-#include "geometry_msgs/Wrench.h"
-#include "sensor_msgs/FluidPressure.h"
+#include "nav_msgs/Odometry.h"
+
+#include <Eigen/Dense>
 
 class SetpointProcessing
 {
 public:
   SetpointProcessing();
-  void callback(const vortex_msgs::JoystickMotionCommand& msg);
+  void commandCallback(const vortex_msgs::JoystickMotionCommand &msg);
+  void stateCallback(const nav_msgs::Odometry &msg);
 private:
   ros::NodeHandle    nh;
-  ros::Subscriber    joystickSub;
-  ros::Publisher     wrenchPub;
-  ros::Publisher     posePub;
-  ros::Publisher     pressurePub;
-  ros::ServiceClient modeClient;
-  ros::ServiceClient resetClient;
+  ros::Subscriber    command_sub;
+  ros::Subscriber    state_sub;
+  ros::Publisher     pose_pub;
+  ros::Publisher     wrench_pub;
+  ros::ServiceClient mode_client;
+  ros::ServiceClient reset_client;
+  ros::Time          prev_time;
 
   ControlMode control_mode;
+  bool is_initialized;
+
+  typedef Eigen::Matrix<double,6,1> Vector6d;
+  Vector6d pose;
+  Vector6d pose_setpoint;
+  Vector6d wrench_setpoint;
 
   double max_force_x;
   double max_force_y;
@@ -41,9 +47,15 @@ private:
   double scaling_torque_y;
   double scaling_torque_z;
 
-  void updateOpenLoop(const vortex_msgs::JoystickMotionCommand& msg);
-  void updatePositionHold(const vortex_msgs::JoystickMotionCommand& msg);
-  bool healthyMessage(const vortex_msgs::JoystickMotionCommand& msg);
+  double max_setpoint_rate_lin;
+  double max_setpoint_rate_ang;
+
+  void updatePoseSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
+  void publishPoseSetpoints();
+  void updateWrenchSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
+  void publishWrenchSetpoints();
+  void getParams();
+  bool healthyMessage(const vortex_msgs::JoystickMotionCommand &msg);
 };
 
 #endif

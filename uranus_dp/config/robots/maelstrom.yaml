@@ -26,6 +26,16 @@ physical:
   center_of_mass: [0, 0, -0.15]
   center_of_buoyancy: [0, 0,  0.10]
 
+control:
+  dof_num: 5
+  dofs:
+    surge: true
+    sway:  true
+    heave: true
+    roll:  false
+    pitch: true
+    yaw:   true
+
 thrusters:
   num: 6
   dof: 5 # Controllable degrees of freedom
@@ -63,3 +73,7 @@ controller:
     b: 3.0
     c: 20.0
   frequency: 10
+  setpoint:
+    rate:
+      linear: 0.20
+      angular: 0.35

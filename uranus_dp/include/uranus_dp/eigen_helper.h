@@ -78,4 +78,25 @@ inline void thrustEigenToMsg(const Eigen::VectorXd &u, vortex_msgs::ThrusterForc
   msg.thrust = u_vec;
 }
 
+// Saturate all elements of vector v to within [min, max].
+// Return true if all elements already are within the range.
+inline bool saturateVector(Eigen::VectorXd &v, double min, double max)
+{
+  bool vector_in_range = true;
+  for (int i = 0; i < v.size(); ++i)
+  {
+    if (v(i) > max)
+    {
+      v(i) = max;
+      vector_in_range = false;
+    }
+    else if (v(i) < min)
+    {
+      v(i) = min;
+      vector_in_range = false;
+    }
+  }
+  return vector_in_range;
+}
+
 #endif

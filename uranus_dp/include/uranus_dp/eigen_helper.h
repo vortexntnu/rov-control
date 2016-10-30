@@ -5,6 +5,7 @@
 #include "ros/ros.h"
 #include <Eigen/Dense>
 
+// Return false if X has any nan or inf elements.
 template<typename Derived>
 inline bool isFucked(const Eigen::MatrixBase<Derived>& X)
 {
@@ -13,6 +14,8 @@ inline bool isFucked(const Eigen::MatrixBase<Derived>& X)
   return has_nan || has_inf;
 }
 
+// Read a matrix from the ROS parameter server.
+// Return false if unsuccessful.
 inline bool getMatrixParam(ros::NodeHandle nh, std::string name, Eigen::MatrixXd &X)
 {
   XmlRpc::XmlRpcValue matrix;
@@ -41,17 +44,22 @@ inline void printEigen(std::string name, const Eigen::MatrixXd &X)
   ROS_INFO_STREAM(ss.str());
 }
 
-inline bool pinv(const Eigen::MatrixXd &X, Eigen::MatrixXd &X_pinv)
+// Calculate the pseudoinverse matrix of the matrix X.
+// Return false if the calculations fails.
+inline bool pseudoinverse(const Eigen::MatrixXd &X, Eigen::MatrixXd &X_pinv)
 {
-  X_pinv = X.transpose() * ( X*(X.transpose()) ).inverse();
-  if (isFucked(X_pinv))
+  Eigen::MatrixXd copy = X_pinv;
+  copy = X.transpose() * (X * X.transpose()).inverse();
+
+  if (isFucked(copy))
   {
-    X_pinv = Eigen::MatrixXd::Zero(X.cols(), X.rows());
     return false;
   }
+  X_pinv = copy;
   return true;
 }
 
+// Return the 3-by-3 skew-symmetric matrix of the vector v.
 inline Eigen::Matrix3d skew(const Eigen::Vector3d &v)
 {
   Eigen::Matrix3d S;

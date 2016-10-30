@@ -26,7 +26,7 @@ private:
   ros::Time          prev_time;
 
   ControlMode control_mode;
-  bool is_initialized;
+  bool prev_time_valid;
 
   typedef Eigen::Matrix<double,6,1> Vector6d;
   Vector6d pose;

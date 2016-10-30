@@ -19,7 +19,7 @@ SetpointProcessing::SetpointProcessing()
   reset_client = nh.serviceClient<uranus_dp::ResetEstimator>("reset_estimator");
 
   control_mode = ControlModes::OPEN_LOOP;
-  is_initialized = false;
+  prev_time_valid = false;
 
   pose.setZero();
   pose_setpoint.setZero();
@@ -30,45 +30,43 @@ SetpointProcessing::SetpointProcessing()
 
 void SetpointProcessing::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
 {
-  if (is_initialized)
+  if (!healthyMessage(msg))
   {
-    if (!healthyMessage(msg))
-    {
-      ROS_WARN("setpoint_processing: Joystick motion command message out of range, ignoring...");
-      return;
-    }
+    ROS_WARN("setpoint_processing: Joystick motion command message out of range, ignoring...");
+    return;
+  }
 
-    if (msg.control_mode != control_mode)
-    {
-      control_mode = static_cast<ControlMode>(msg.control_mode);
-      switch (control_mode)
-      {
-        case ControlModes::OPEN_LOOP:
-        break;
-
-        case ControlModes::POSITION_HOLD:
-        pose_setpoint = pose;
-        break;
-      }
-
-      uranus_dp::SetControlMode srv;
-      srv.request.mode = control_mode;
-      if (!mode_client.call(srv))
-        ROS_ERROR_STREAM("Failed to call service set_control_mode. New mode " << control_mode << " not activated.");
-    }
-
+  if (msg.control_mode != control_mode)
+  {
+    control_mode = static_cast<ControlMode>(msg.control_mode);
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
-      updateWrenchSetpoints(msg);
-      publishWrenchSetpoints();
       break;
 
       case ControlModes::POSITION_HOLD:
-      updatePoseSetpoints(msg);
-      publishPoseSetpoints();
+      pose_setpoint = pose;
+      prev_time_valid = false;
       break;
     }
+
+    uranus_dp::SetControlMode srv;
+    srv.request.mode = control_mode;
+    if (!mode_client.call(srv))
+      ROS_ERROR_STREAM("Failed to call service set_control_mode. New mode " << control_mode << " not activated.");
+  }
+
+  switch (control_mode)
+  {
+    case ControlModes::OPEN_LOOP:
+    updateWrenchSetpoints(msg);
+    publishWrenchSetpoints();
+    break;
+
+    case ControlModes::POSITION_HOLD:
+    updatePoseSetpoints(msg);
+    publishPoseSetpoints();
+    break;
   }
 }
 
@@ -88,17 +86,14 @@ void SetpointProcessing::updatePoseSetpoints(const vortex_msgs::JoystickMotionCo
 {
   // Calculate time difference
   ros::Time curr_time = msg.header.stamp;
-
-  if (!is_initialized)
-  {
-    prev_time = curr_time;
-    is_initialized = true;
-    ROS_INFO("Initialized setpoint processing.");
-    return;
-  }
-
   double dt = (curr_time - prev_time).toSec();
   prev_time = curr_time;
+
+  if (!prev_time_valid)
+  {
+    prev_time_valid = true;
+    return;
+  }
 
   // Increment setpoints (position and euler angle orientation)
   pose_setpoint(0) += max_setpoint_rate_lin * dt * msg.forward;
@@ -114,7 +109,6 @@ void SetpointProcessing::publishPoseSetpoints()
   // Convert euler angle setpoints to quaternions
   tf::Quaternion q_setpoint;
   q_setpoint.setRPY(pose_setpoint(3), pose_setpoint(4), pose_setpoint(5));
-
   // Create and publish pose setpoint message
   geometry_msgs::Pose pose_msg;
   tf::pointEigenToMsg(pose_setpoint.head(3), pose_msg.position);

@@ -21,11 +21,12 @@
 
 # Robot physical parameters
 physical:
-  mass: 15
-  buoyancy: 156.9064 # = 16 * 9.80665
+  mass_kg: 15
+  displacement_m3: 0.015
   center_of_mass: [0, 0, -0.15]
   center_of_buoyancy: [0, 0,  0.10]
 
+# General control parameters
 control:
   dof_num: 5
   dofs:
@@ -35,6 +36,12 @@ control:
     roll:  false
     pitch: true
     yaw:   true
+  command:
+    wrench:
+      max: [69.85, 69.85, 49.39, 0, 5, 7] # 5 & 7 are rough estimates
+      scaling: [0.7, 0.5, 1, 0, 1, 1]
+    pose:
+      rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
 
 thrusters:
   num: 6
@@ -45,26 +52,6 @@ thrusters:
      [    0.0,     0.0,     0.0,     0.0,     1.0,    1.0], # Heave
      [-0.0467, -0.0467,  0.0467,  0.0467, -0.1600, 0.1600], # Pitch
      [ 0.2143, -0.2143,  0.2143, -0.2143,     0.0,    0.0]] # Yaw
-
-propulsion:
-  max:
-    force:
-      x: 69.85
-      y: 69.85
-      z: 49.39
-    torque:
-      x: 0 # Cannot control
-      y: 5 # Only an estimate
-      z: 7 # Only an estimate
-  scaling:
-    force:
-      x: 1
-      y: 1
-      z: 1
-    torque:
-      x: 1 # Don't care
-      y: 1
-      z: 1
 
 # Controller parameters
 controller:

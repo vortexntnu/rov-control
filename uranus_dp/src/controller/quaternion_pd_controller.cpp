@@ -17,31 +17,7 @@ QuaternionPdController::QuaternionPdController()
   g.setZero();
   R = q.toRotationMatrix();
 
-  // Read controller gains from parameter server
-  double a_init, b_init, c_init;
-  if (!nh.getParam("/controller/gains/a", a_init))
-    ROS_ERROR("Failed to read derivative controller gain (a).");
-  if (!nh.getParam("/controller/gains/b", b_init))
-    ROS_ERROR("Failed to read position controller gain (b).");
-  if (!nh.getParam("/controller/gains/c", c_init))
-    ROS_ERROR("Failed to read orientation controller gain (c).");
-  setGains(a_init, b_init, c_init);
-
-  // Read physical parameters from server
-  double mass, buoyancy;
-  if (!nh.getParam("/physical/mass", mass))
-    ROS_ERROR("Failed to read robot mass parameter.");
-  if (!nh.getParam("/physical/buoyancy", B))
-    ROS_ERROR("Failed to read robot buoyancy parameter.");
-  W = mass * ACCELERATION_OF_GRAVITY;
-
-  std::vector<double> r_g_vec, r_b_vec;
-  if (!nh.getParam("/physical/center_of_mass", r_g_vec))
-    ROS_ERROR("Failed to read robot center of mass parameter.");
-  if (!nh.getParam("/physical/center_of_buoyancy", r_b_vec))
-    ROS_ERROR("Failed to read robot center of buoyancy parameter.");
-  r_g << r_g_vec[0], r_g_vec[1], r_g_vec[2];
-  r_b << r_b_vec[0], r_b_vec[1], r_b_vec[2];
+  getParams();
 }
 
 void QuaternionPdController::stateCallback(const nav_msgs::Odometry &msg)
@@ -147,4 +123,39 @@ int QuaternionPdController::sgn(double x)
   if (x < 0)
     return -1;
   return 1;
+}
+
+void QuaternionPdController::getParams()
+{
+  // Read controller gains from parameter server
+  double a_init, b_init, c_init;
+  if (!nh.getParam("/controller/gains/a", a_init))
+    ROS_ERROR("Failed to read derivative controller gain (a).");
+  if (!nh.getParam("/controller/gains/b", b_init))
+    ROS_ERROR("Failed to read position controller gain (b).");
+  if (!nh.getParam("/controller/gains/c", c_init))
+    ROS_ERROR("Failed to read orientation controller gain (c).");
+  setGains(a_init, b_init, c_init);
+
+  // Read and calculate ROV weight and buoyancy
+  double mass, displacement, acceleration_of_gravity, density_of_water;
+  if (!nh.getParam("/physical/mass_kg", mass))
+    ROS_ERROR("Failed to read parameter mass.");
+  if (!nh.getParam("/physical/displacement_m3", displacement))
+    ROS_ERROR("Failed to read parameter displacement.");
+  if (!nh.getParam("/gravity/acceleration", acceleration_of_gravity))
+    ROS_ERROR("Failed to read parameter acceleration of gravity");
+  if (!nh.getParam("/water/density", density_of_water))
+    ROS_ERROR("Failed to read parameter density of water");
+  W = mass * acceleration_of_gravity;
+  B = density_of_water * displacement * acceleration_of_gravity;
+
+  // Read center of gravity and buoyancy vectors
+  std::vector<double> r_g_vec, r_b_vec;
+  if (!nh.getParam("/physical/center_of_mass", r_g_vec))
+    ROS_ERROR("Failed to read robot center of mass parameter.");
+  if (!nh.getParam("/physical/center_of_buoyancy", r_b_vec))
+    ROS_ERROR("Failed to read robot center of buoyancy parameter.");
+  r_g << r_g_vec[0], r_g_vec[1], r_g_vec[2];
+  r_b << r_b_vec[0], r_b_vec[1], r_b_vec[2];
 }

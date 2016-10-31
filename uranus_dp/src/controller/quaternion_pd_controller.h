@@ -35,8 +35,8 @@ private:
   void updateProportionalGainMatrix();
   void updateErrorVector();
   void updateRestoringForceVector();
-
-  int             sgn(double x);
+  int  sgn(double x);
+  void getParams();
 
   Eigen::Vector3d    p;   // Position state
   Eigen::Quaterniond q;   // Orientation state
@@ -57,7 +57,6 @@ private:
   Eigen::Vector6d g; // Restoring force vector
   Eigen::Matrix3d R; // Rotation matrix from {n} to {b}
 
-  static const double ACCELERATION_OF_GRAVITY = 9.80665;
   Eigen::Vector3d r_g; // Center of gravity, expressed in body frame
   Eigen::Vector3d r_b; // Center of buoyancy, expressed in body frame
   double W;            // [N] Weight of ROV

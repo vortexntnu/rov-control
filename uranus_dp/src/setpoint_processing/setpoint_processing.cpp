@@ -100,12 +100,12 @@ void SetpointProcessing::updatePoseSetpoints(const vortex_msgs::JoystickMotionCo
     ROS_WARN("Zero time difference between propulsion command messages.");
 
   // Increment setpoints (position and euler angle orientation)
-  pose_setpoint(0) += max_setpoint_rate_lin * dt * msg.forward;
-  pose_setpoint(1) += max_setpoint_rate_lin * dt * msg.right;
-  pose_setpoint(2) += max_setpoint_rate_lin * dt * msg.down;
-  pose_setpoint(3) += max_setpoint_rate_ang * dt * msg.roll_right;
-  pose_setpoint(4) += max_setpoint_rate_ang * dt * msg.tilt_up;
-  pose_setpoint(5) += max_setpoint_rate_ang * dt * msg.turn_right;
+  pose_setpoint(0) += pose_command_rate[0] * dt * msg.forward;
+  pose_setpoint(1) += pose_command_rate[1] * dt * msg.right;
+  pose_setpoint(2) += pose_command_rate[2] * dt * msg.down;
+  pose_setpoint(3) += pose_command_rate[3] * dt * msg.roll_right;
+  pose_setpoint(4) += pose_command_rate[4] * dt * msg.tilt_up;
+  pose_setpoint(5) += pose_command_rate[5] * dt * msg.turn_right;
 }
 
 void SetpointProcessing::publishPoseSetpoints()
@@ -122,12 +122,12 @@ void SetpointProcessing::publishPoseSetpoints()
 
 void SetpointProcessing::updateWrenchSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 {
-  wrench_setpoint(0) = scaling_force_x  * max_force_x  * msg.forward;
-  wrench_setpoint(1) = scaling_force_y  * max_force_y  * msg.right;
-  wrench_setpoint(2) = scaling_force_z  * max_force_z  * msg.down;
-  wrench_setpoint(3) = scaling_torque_x * max_torque_x * msg.roll_right;
-  wrench_setpoint(4) = scaling_torque_y * max_torque_y * msg.tilt_up;
-  wrench_setpoint(5) = scaling_torque_z * max_torque_z * msg.turn_right;
+  wrench_setpoint(0) = wrench_command_scaling[0] * wrench_command_max[0] * msg.forward;
+  wrench_setpoint(1) = wrench_command_scaling[1] * wrench_command_max[1] * msg.right;
+  wrench_setpoint(2) = wrench_command_scaling[2] * wrench_command_max[2] * msg.down;
+  wrench_setpoint(3) = wrench_command_scaling[3] * wrench_command_max[3] * msg.roll_right;
+  wrench_setpoint(4) = wrench_command_scaling[4] * wrench_command_max[4] * msg.tilt_up;
+  wrench_setpoint(5) = wrench_command_scaling[5] * wrench_command_max[5] * msg.turn_right;
 }
 
 void SetpointProcessing::publishWrenchSetpoints()
@@ -139,34 +139,13 @@ void SetpointProcessing::publishWrenchSetpoints()
 
 void SetpointProcessing::getParams()
 {
-  // Read maximum forces/torques from parameter server
-  if (!nh.getParam("/propulsion/max/force/x", max_force_x))
-    ROS_FATAL("Failed to read parameter max_force_x.");
-  if (!nh.getParam("/propulsion/max/force/y", max_force_y))
-    ROS_FATAL("Failed to read parameter max_force_y.");
-  if (!nh.getParam("/propulsion/max/force/z", max_force_z))
-    ROS_FATAL("Failed to read parameter max_force_z.");
-  if (!nh.getParam("/propulsion/max/torque/y", max_torque_y))
-    ROS_FATAL("Failed to read parameter max_torque_y.");
-  if (!nh.getParam("/propulsion/max/torque/z", max_torque_z))
-    ROS_FATAL("Failed to read parameter max_torque_z.");
-
-  // Read force/torque scaling factors from parameter server
-  if (!nh.getParam("/propulsion/scaling/force/x", scaling_force_x))
-    ROS_FATAL("Failed to read parameter scaling_force_x.");
-  if (!nh.getParam("/propulsion/scaling/force/y", scaling_force_y))
-    ROS_FATAL("Failed to read parameter scaling_force_y.");
-  if (!nh.getParam("/propulsion/scaling/force/z", scaling_force_z))
-    ROS_FATAL("Failed to read parameter scaling_force_z.");
-  if (!nh.getParam("/propulsion/scaling/torque/y", scaling_torque_y))
-    ROS_FATAL("Failed to read parameter scaling_torque_y.");
-  if (!nh.getParam("/propulsion/scaling/torque/z", scaling_torque_z))
-    ROS_FATAL("Failed to read parameter scaling_torque_z.");
-
-  if (!nh.getParam("/controller/setpoint/rate/linear", max_setpoint_rate_lin))
-    ROS_FATAL("Failed to read parameter max linear setpoint rate.");
-  if (!nh.getParam("/controller/setpoint/rate/angular", max_setpoint_rate_ang))
-    ROS_FATAL("Failed to read parameter max angular setpoint rate.");
+  // Read control command parameters
+  if (!nh.getParam("/control/command/wrench/max", wrench_command_max))
+    ROS_FATAL("Failed to read parameter max wrench command.");
+  if (!nh.getParam("/control/command/wrench/scaling", wrench_command_scaling))
+    ROS_FATAL("Failed to read parameter scaling wrench command.");
+  if (!nh.getParam("/control/command/pose/rate", pose_command_rate))
+    ROS_FATAL("Failed to read parameter pose command rate.");
 }
 
 bool SetpointProcessing::healthyMessage(const vortex_msgs::JoystickMotionCommand& msg)

@@ -33,6 +33,11 @@ private:
   Vector6d pose_setpoint;
   Vector6d wrench_setpoint;
 
+  typedef std::vector<double> vector;
+  vector wrench_command_max;
+  vector wrench_command_scaling;
+  vector pose_command_rate;
+
   double max_force_x;
   double max_force_y;
   double max_force_z;

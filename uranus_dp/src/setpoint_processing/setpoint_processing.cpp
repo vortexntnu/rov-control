@@ -84,16 +84,20 @@ void SetpointProcessing::stateCallback(const nav_msgs::Odometry &msg)
 
 void SetpointProcessing::updatePoseSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 {
+  if (!prev_time_valid)
+  {
+    prev_time = msg.header.stamp;
+    prev_time_valid = true;
+    return;
+  }
+
   // Calculate time difference
   ros::Time curr_time = msg.header.stamp;
   double dt = (curr_time - prev_time).toSec();
   prev_time = curr_time;
 
-  if (!prev_time_valid)
-  {
-    prev_time_valid = true;
-    return;
-  }
+  if (dt == 0)
+    ROS_WARN("Zero time difference between propulsion command messages.");
 
   // Increment setpoints (position and euler angle orientation)
   pose_setpoint(0) += max_setpoint_rate_lin * dt * msg.forward;

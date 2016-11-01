@@ -38,23 +38,6 @@ private:
   vector wrench_command_scaling;
   vector pose_command_rate;
 
-  double max_force_x;
-  double max_force_y;
-  double max_force_z;
-  double max_torque_x;
-  double max_torque_y;
-  double max_torque_z;
-
-  double scaling_force_x;
-  double scaling_force_y;
-  double scaling_force_z;
-  double scaling_torque_x;
-  double scaling_torque_y;
-  double scaling_torque_z;
-
-  double max_setpoint_rate_lin;
-  double max_setpoint_rate_ang;
-
   void updatePoseSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
   void publishPoseSetpoints();
   void updateWrenchSetpoints(const vortex_msgs::JoystickMotionCommand &msg);

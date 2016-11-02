@@ -37,20 +37,20 @@ class JoystickInterfaceNode(object):
             axes[self.axes_map[j]] = msg.axes[j]
 
         arm_msg_fields = {
-            'base_up' : axes['dpad_vertical'],
+            'base_up' : axes['dpad_vertical'] == 1,
             'base_down' : axes['dpad_vertical'] == -1,
-            'rot_left' : axes['dpad_horizontal'],
+            'rot_left' : axes['dpad_horizontal'] == 1,
             'rot_right' : axes['dpad_horizontal'] == -1,
             'grip_open' : buttons['B'],
             'grip_close' : buttons['A']
         }
 
         motion_msg_fields = {
-            'forward' : -axes['vertical_axis_left_stick'],
-            'right' : axes['horizontal_axis_left_stick'],
-            'down' : axes['RT'] - axes['LT'],
+            'forward' : axes['vertical_axis_left_stick'],
+            'right' : -axes['horizontal_axis_left_stick'],
+            'down' : (axes ['RT'] - axes ['LT'])/2,
             'tilt_up' : axes['vertical_axis_right_stick'],
-            'turn_right' : axes['horizontal_axis_right_stick']
+            'turn_right' : -axes['horizontal_axis_right_stick']
         }
 
         for field, value in arm_msg_fields.iteritems():

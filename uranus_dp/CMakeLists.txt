@@ -29,7 +29,7 @@ find_package(GTest REQUIRED)
 ################################################
 
 generate_dynamic_reconfigure_options(
-  cfg/uranusDp.cfg
+  cfg/Controller.cfg
 )
 
 ###################################

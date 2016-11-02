@@ -7,7 +7,7 @@
 #include "nav_msgs/Odometry.h"
 #include <dynamic_reconfigure/server.h>
 
-#include <uranus_dp/uranusDpConfig.h>
+#include <uranus_dp/ControllerConfig.h>
 #include "uranus_dp/eigen_typedefs.h"
 #include "uranus_dp/control_mode_enum.h"
 #include "vortex_msgs/JoystickMotionCommand.h"
@@ -20,14 +20,14 @@ public:
   Controller(ros::NodeHandle nh);
   void commandCallback(const vortex_msgs::JoystickMotionCommand &msg);
   void stateCallback(const nav_msgs::Odometry &msg);
-  void configCallback(uranus_dp::uranusDpConfig& config, uint32_t level);
+  void configCallback(uranus_dp::ControllerConfig& config, uint32_t level);
   void spin();
 private:
   ros::NodeHandle nh;
   ros::Subscriber command_sub;
   ros::Subscriber state_sub;
   ros::Publisher  wrench_pub;
-  dynamic_reconfigure::Server<uranus_dp::uranusDpConfig> dr_srv;
+  dynamic_reconfigure::Server<uranus_dp::ControllerConfig> dr_srv;
 
   ControlMode control_mode;
   int  frequency;

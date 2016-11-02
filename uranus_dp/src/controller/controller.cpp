@@ -51,7 +51,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
 
   // Set up a dynamic reconfigure server
-  dynamic_reconfigure::Server<uranus_dp::uranusDpConfig>::CallbackType cb;
+  dynamic_reconfigure::Server<uranus_dp::ControllerConfig>::CallbackType cb;
   cb = boost::bind(&Controller::configCallback, this, _1, _2);
   dr_srv.setCallback(cb);
 
@@ -93,7 +93,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation_state);
 }
 
-void Controller::configCallback(uranus_dp::uranusDpConfig& config, uint32_t level)
+void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t level)
 {
   ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
   position_hold_controller->setGains(config.a, config.b, config.c);

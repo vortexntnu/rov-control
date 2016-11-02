@@ -154,16 +154,16 @@ void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 
   // Calc euler setpoints
   Eigen::Vector3d orientation_setpoint_euler;
-  orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+  orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(0,1,2);
   // Increment euler setpoints
   orientation_setpoint_euler(0) += pose_command_rate[3] * dt * msg.roll_right;
   orientation_setpoint_euler(1) += pose_command_rate[4] * dt * msg.tilt_up;
   orientation_setpoint_euler(2) += pose_command_rate[5] * dt * msg.turn_right;
   // Calc incremented quat setpoints
   Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitZ())
+  R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitX())
     * Eigen::AngleAxisd(orientation_setpoint_euler(1), Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(orientation_setpoint_euler(2), Eigen::Vector3d::UnitX());
+    * Eigen::AngleAxisd(orientation_setpoint_euler(2), Eigen::Vector3d::UnitZ());
   Eigen::Quaterniond q(R);
   orientation_setpoint = q;
 }

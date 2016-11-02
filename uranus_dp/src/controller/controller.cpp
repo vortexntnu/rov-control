@@ -19,14 +19,6 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   orientation_setpoint.setIdentity();
   wrench_setpoint.setZero();
 
-  // Set up a dynamic reconfigure server.
-  // Do this before parameter server, else some of the parameter server values can be overwritten.
-  dynamic_reconfigure::Server<uranus_dp::uranusDpConfig>::CallbackType cb;
-  cb = boost::bind(&Controller::configCallback, this, _1, _2);
-  ROS_INFO("Hello");
-  dr_srv_.setCallback(cb);
-  ROS_INFO("Has setup dynamic reconfigure.");
-
   getParams();
 
   // Read controller gains from parameter server
@@ -58,7 +50,12 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
 
   position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
 
-  ROS_INFO("Controller: Initialized.");
+  // Set up a dynamic reconfigure server
+  dynamic_reconfigure::Server<uranus_dp::uranusDpConfig>::CallbackType cb;
+  cb = boost::bind(&Controller::configCallback, this, _1, _2);
+  dr_srv.setCallback(cb);
+
+  ROS_INFO("Controller: Initialized with dynamic reconfigure.");
 }
 
 void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
@@ -98,12 +95,8 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 
 void Controller::configCallback(uranus_dp::uranusDpConfig& config, uint32_t level)
 {
-  // Set class variables to new values. They should match what is input at the dynamic reconfigure GUI.
-  // message_ = config.message.c_str();
-  // a_ = config.a;
-  // b_ = config.b;
-  // position_hold_controller->setGains(config.a, config.b, config.c);
-  ROS_INFO_STREAM("The a parameter is " << config.a);
+  ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
+  position_hold_controller->setGains(config.a, config.b, config.c);
 }
 
 void Controller::spin()

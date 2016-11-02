@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(uranus_dp)
 
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
   cmake_modules
   roscpp
   message_generation
@@ -10,12 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
   vortex_msgs
   nav_msgs
   sensor_msgs
+  dynamic_reconfigure
 )
 
 find_package(Eigen3 REQUIRED)
 find_package(GTest REQUIRED)
-
-find_package(Boost REQUIRED COMPONENTS system)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -23,7 +21,6 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 # add_service_files(
 #   FILES
-#   SetControllerGains.srv
 #   ResetEstimator.srv
 # )
 
@@ -31,17 +28,6 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
 
-## To declare and build dynamic reconfigure parameters within this
-## package, follow these steps:
-## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
-## * In this file (CMakeLists.txt):
-##   * add "dynamic_reconfigure" to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * uncomment the "generate_dynamic_reconfigure_options" section below
-##     and list every .cfg file to be processed
-
-## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
   cfg/uranusDp.cfg
 )
@@ -89,8 +75,6 @@ add_executable(estimator src/estimator/estimator_node.cpp
 )
 
 add_dependencies(controller ${PROJECT_NAME}_gencfg)
-# add_dependencies(allocator)
-# add_dependencies(estimator)
 
 target_link_libraries(controller ${catkin_LIBRARIES})
 target_link_libraries(allocator  ${catkin_LIBRARIES})

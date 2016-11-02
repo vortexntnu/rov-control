@@ -15,7 +15,6 @@ class JoystickInterfaceNode(object):
         self.pub_arm = rospy.Publisher('joystick_arm_command',
                                        vortex_msgs.msg.JoystickArmCommand,
                                        queue_size=10)
-
     def callback(self, msg):
         button_mapping = {
             0: ('A', 'grip_close'),
@@ -40,6 +39,17 @@ class JoystickInterfaceNode(object):
             6: ('cross_horizontal', None),
             7: ('cross_vertical', None)
         }
+
+        for i in range(len(msg.buttons)):
+            rospy.loginfo("%s: %i", button_mapping[i], msg.buttons[i])
+            if (button_mapping[i][1] is not None):
+                if (hasattr(self.arm_cmd, button_mapping[i][1])):
+                    setattr(self.arm_cmd, button_mapping[i][1], msg.buttons[i])
+                if (hasattr(self.motion_cmd, button_mapping[i][1])):
+                    setattr(self.motion_cmd, button_mapping[i][1], msg.buttons[i])
+        self.pub_arm.publish(self.arm_cmd)
+        self.pub_motion.publish(self.motion_cmd)
+
 
 if __name__ == '__main__':
     try:

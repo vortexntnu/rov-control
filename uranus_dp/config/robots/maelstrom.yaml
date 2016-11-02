@@ -59,7 +59,7 @@ controller:
     a: 0.1
     b: 3.0
     c: 20.0
-  frequency: 10
+  frequency: 1
   setpoint:
     rate:
       linear: 0.20

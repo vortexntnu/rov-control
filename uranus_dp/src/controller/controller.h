@@ -1,9 +1,9 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "open_loop_controller.h"
 #include "quaternion_pd_controller.h"
 
+#include "uranus_dp/eigen_typedefs.h"
 #include "uranus_dp/control_mode_enum.h"
 #include "uranus_dp/SetControllerGains.h"
 
@@ -28,34 +28,33 @@ public:
   void stateCallback(const nav_msgs::Odometry &msg);
   void spin();
 private:
-  ros::NodeHandle    nh;
-  ros::Subscriber    command_sub;
-  ros::Subscriber    state_sub;
-  ros::Publisher     pose_pub;
-  ros::Publisher     wrench_pub;
-  ros::Time          prev_time;
+  ros::NodeHandle nh;
+  ros::Subscriber command_sub;
+  ros::Subscriber state_sub;
+  ros::Publisher  wrench_pub;
 
   ControlMode control_mode;
-  bool prev_time_valid;
   int  frequency;
 
-  typedef Eigen::Matrix<double,6,1> Vector6d;
-  Vector6d pose;
-  Vector6d pose_setpoint;
-  Vector6d wrench_setpoint;
+  ros::Time prev_time;
+  bool prev_time_valid;
+
+  // TODO: Consider a typedef Vector6d or something
+  Eigen::Vector3d    position_state;
+  Eigen::Quaterniond orientation_state;
+  Eigen::Vector6d    velocity_state;
+  Eigen::Vector3d    position_setpoint;
+  Eigen::Quaterniond orientation_setpoint;
+  Eigen::Vector6d    wrench_setpoint;
 
   typedef std::vector<double> vector;
   vector wrench_command_max;
   vector wrench_command_scaling;
   vector pose_command_rate;
 
-  OpenLoopController     open_loop_controller;
-  QuaternionPdController position_hold_controller;
+  QuaternionPdController *position_hold_controller;
 
-  void updatePoseSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
-  void publishPoseSetpoints();
-  void updateWrenchSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
-  void publishWrenchSetpoints();
+  void updateSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
   void getParams();
   bool healthyMessage(const vortex_msgs::JoystickMotionCommand &msg);
 };

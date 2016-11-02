@@ -6,7 +6,6 @@ int main(int argc, char **argv)
   ROS_INFO("Launching node controller.");
   ros::NodeHandle nh;
   Controller controller;
-  ros::ServiceServer ss2 = nh.advertiseService("set_controller_gains", &Controller::setControllerGains, &controller);
   controller.spin();
   return 0;
 }

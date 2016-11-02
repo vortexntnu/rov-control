@@ -54,7 +54,6 @@ include_directories(
 
 add_executable(controller src/controller/controller_node.cpp
                           src/controller/controller.cpp
-                          src/controller/open_loop_controller.cpp
                           src/controller/quaternion_pd_controller.cpp
 )
 

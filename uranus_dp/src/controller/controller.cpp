@@ -4,27 +4,60 @@ Controller::Controller()
 {
   command_sub  = nh.subscribe("joystick_motion_command", 10, &Controller::commandCallback, this);
   state_sub    = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
-  wrench_pub   = nh.advertise<geometry_msgs::Wrench>("wrench_setpoints", 10);
-  pose_pub     = nh.advertise<geometry_msgs::Pose>("pose_setpoints", 10);
+  wrench_pub   = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
   control_mode = ControlModes::OPEN_LOOP;
   prev_time_valid = false;
 
-  pose.setZero();
-  pose_setpoint.setZero();
+  position_state.setZero();
+  orientation_state.setIdentity();
+  velocity_state.setZero();
+  position_setpoint.setZero();
+  orientation_setpoint.setIdentity();
   wrench_setpoint.setZero();
 
   getParams();
 
-  position_hold_controller.disable();
-  open_loop_controller.enable();
+  // TODO: Read these parameters in a nicer way
+  // Read controller gains from parameter server
+  double a, b, c;
+  if (!nh.getParam("/controller/gains/a", a))
+    ROS_ERROR("Failed to read derivative controller gain (a).");
+  if (!nh.getParam("/controller/gains/b", b))
+    ROS_ERROR("Failed to read position controller gain (b).");
+  if (!nh.getParam("/controller/gains/c", c))
+    ROS_ERROR("Failed to read orientation controller gain (c).");
+
+  // Read center of gravity and buoyancy vectors
+  std::vector<double> r_G_vec, r_B_vec;
+  if (!nh.getParam("/physical/center_of_mass", r_G_vec))
+    ROS_ERROR("Failed to read robot center of mass parameter.");
+  if (!nh.getParam("/physical/center_of_buoyancy", r_B_vec))
+    ROS_ERROR("Failed to read robot center of buoyancy parameter.");
+  Eigen::Vector3d r_G(r_G_vec.data());
+  Eigen::Vector3d r_B(r_B_vec.data());
+
+  // Read and calculate ROV weight and buoyancy
+  double mass, displacement, acceleration_of_gravity, density_of_water;
+  if (!nh.getParam("/physical/mass_kg", mass))
+    ROS_ERROR("Failed to read parameter mass.");
+  if (!nh.getParam("/physical/displacement_m3", displacement))
+    ROS_ERROR("Failed to read parameter displacement.");
+  if (!nh.getParam("/gravity/acceleration", acceleration_of_gravity))
+    ROS_ERROR("Failed to read parameter acceleration of gravity");
+  if (!nh.getParam("/water/density", density_of_water))
+    ROS_ERROR("Failed to read parameter density of water");
+  double W = mass * acceleration_of_gravity;
+  double B = density_of_water * displacement * acceleration_of_gravity;
+
+  position_hold_controller = new QuaternionPdController(a, b, c, r_G, r_B, W, B);
 }
 
 void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
 {
   if (!healthyMessage(msg))
   {
-    ROS_WARN("controller: Joystick motion command message out of range, ignoring...");
+    ROS_WARN("controller: Propulsion command message out of range, ignoring...");
     return;
   }
 
@@ -35,50 +68,24 @@ void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
     {
       case ControlModes::OPEN_LOOP:
       ROS_INFO("Changing control mode to OPEN LOOP.");
-      position_hold_controller.disable();
-      open_loop_controller.enable();
       break;
 
       case ControlModes::POSITION_HOLD:
       ROS_INFO("Changing control mode to POSITION HOLD.");
-      pose_setpoint = pose;
+      position_setpoint    = position_state;
+      orientation_setpoint = orientation_state;
       prev_time_valid = false;
-      open_loop_controller.disable();
-      position_hold_controller.enable();
       break;
     }
   }
 
-  switch (control_mode)
-  {
-    case ControlModes::OPEN_LOOP:
-    updateWrenchSetpoints(msg);
-    publishWrenchSetpoints();
-    break;
-
-    case ControlModes::POSITION_HOLD:
-    updatePoseSetpoints(msg);
-    publishPoseSetpoints();
-    break;
-  }
+  updateSetpoints(msg);
 }
 
 void Controller::stateCallback(const nav_msgs::Odometry &msg)
 {
-  pose(0) = msg.pose.pose.position.x;
-  pose(1) = msg.pose.pose.position.y;
-  pose(2) = msg.pose.pose.position.z;
-
-  tf::Quaternion q;
-  tf::quaternionMsgToTF(msg.pose.pose.orientation, q); q.normalize();
-  tf::Matrix3x3 m(q);
-  m.getRPY(pose(3), pose(4), pose(5));
-}
-
-bool Controller::setControllerGains(uranus_dp::SetControllerGains::Request &req, uranus_dp::SetControllerGains::Response &resp)
-{
-  ROS_INFO_STREAM("Setting new gains: a = " << req.a << ", b = " << req.b << ", c = " << req.c << ".");
-  position_hold_controller.setGains(req.a, req.b, req.c);
+  tf::pointMsgToEigen(msg.pose.pose.position, position_state);
+  tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation_state);
 }
 
 void Controller::spin()
@@ -86,14 +93,45 @@ void Controller::spin()
   ros::Rate rate(frequency);
   while (ros::ok())
   {
+    Eigen::Vector6d tau;
+    switch (control_mode)
+    {
+      case ControlModes::POSITION_HOLD:
+      tau = position_hold_controller->compute(position_state,
+                                              orientation_state,
+                                              velocity_state,
+                                              position_setpoint,
+                                              orientation_setpoint);
+      break;
+
+      case ControlModes::OPEN_LOOP:
+      tau = wrench_setpoint;
+      break;
+
+      // TODO: Reimplement combined mode
+    }
+
+    geometry_msgs::Wrench msg;
+    tf::wrenchEigenToMsg(tau, msg);
+    wrench_pub.publish(msg);
+
+    // TODO: should spinonce and sleep be at beginnig or end? does it matter?
     ros::spinOnce();
-    position_hold_controller.compute();
     rate.sleep();
   }
 }
 
-void Controller::updatePoseSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
+void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 {
+  // Update wrench setpoints
+  wrench_setpoint(0) = wrench_command_scaling[0] * wrench_command_max[0] * msg.forward;
+  wrench_setpoint(1) = wrench_command_scaling[1] * wrench_command_max[1] * msg.right;
+  wrench_setpoint(2) = wrench_command_scaling[2] * wrench_command_max[2] * msg.down;
+  wrench_setpoint(3) = wrench_command_scaling[3] * wrench_command_max[3] * msg.roll_right;
+  wrench_setpoint(4) = wrench_command_scaling[4] * wrench_command_max[4] * msg.tilt_up;
+  wrench_setpoint(5) = wrench_command_scaling[5] * wrench_command_max[5] * msg.turn_right;
+
+  // Update pose setpoints
   if (!prev_time_valid)
   {
     prev_time = msg.header.stamp;
@@ -109,42 +147,25 @@ void Controller::updatePoseSetpoints(const vortex_msgs::JoystickMotionCommand& m
   if (dt == 0)
     ROS_WARN("Zero time difference between propulsion command messages.");
 
-  // Increment setpoints (position and euler angle orientation)
-  pose_setpoint(0) += pose_command_rate[0] * dt * msg.forward;
-  pose_setpoint(1) += pose_command_rate[1] * dt * msg.right;
-  pose_setpoint(2) += pose_command_rate[2] * dt * msg.down;
-  pose_setpoint(3) += pose_command_rate[3] * dt * msg.roll_right;
-  pose_setpoint(4) += pose_command_rate[4] * dt * msg.tilt_up;
-  pose_setpoint(5) += pose_command_rate[5] * dt * msg.turn_right;
-}
+  // Increment position setpoints
+  position_setpoint(0) += pose_command_rate[0] * dt * msg.forward;
+  position_setpoint(1) += pose_command_rate[1] * dt * msg.right;
+  position_setpoint(2) += pose_command_rate[2] * dt * msg.down;
 
-void Controller::publishPoseSetpoints()
-{
-  // Convert euler angle setpoints to quaternions
-  tf::Quaternion q_setpoint;
-  q_setpoint.setRPY(pose_setpoint(3), pose_setpoint(4), pose_setpoint(5));
-  // Create and publish pose setpoint message
-  geometry_msgs::Pose pose_msg;
-  tf::pointEigenToMsg(pose_setpoint.head(3), pose_msg.position);
-  tf::quaternionTFToMsg(q_setpoint, pose_msg.orientation);
-  pose_pub.publish(pose_msg);
-}
-
-void Controller::updateWrenchSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
-{
-  wrench_setpoint(0) = wrench_command_scaling[0] * wrench_command_max[0] * msg.forward;
-  wrench_setpoint(1) = wrench_command_scaling[1] * wrench_command_max[1] * msg.right;
-  wrench_setpoint(2) = wrench_command_scaling[2] * wrench_command_max[2] * msg.down;
-  wrench_setpoint(3) = wrench_command_scaling[3] * wrench_command_max[3] * msg.roll_right;
-  wrench_setpoint(4) = wrench_command_scaling[4] * wrench_command_max[4] * msg.tilt_up;
-  wrench_setpoint(5) = wrench_command_scaling[5] * wrench_command_max[5] * msg.turn_right;
-}
-
-void Controller::publishWrenchSetpoints()
-{
-  geometry_msgs::Wrench wrench_msg;
-  tf::wrenchEigenToMsg(wrench_setpoint, wrench_msg);
-  wrench_pub.publish(wrench_msg);
+  // Calc euler setpoints
+  Eigen::Vector3d orientation_setpoint_euler;
+  orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+  // Increment euler setpoints
+  orientation_setpoint_euler(0) += pose_command_rate[3] * dt * msg.roll_right;
+  orientation_setpoint_euler(1) += pose_command_rate[4] * dt * msg.tilt_up;
+  orientation_setpoint_euler(2) += pose_command_rate[5] * dt * msg.turn_right;
+  // Calc incremented quat setpoints
+  Eigen::Matrix3d R;
+  R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitZ())
+    * Eigen::AngleAxisd(orientation_setpoint_euler(1), Eigen::Vector3d::UnitY())
+    * Eigen::AngleAxisd(orientation_setpoint_euler(2), Eigen::Vector3d::UnitX());
+  Eigen::Quaterniond q(R);
+  orientation_setpoint = q;
 }
 
 void Controller::getParams()
@@ -157,7 +178,6 @@ void Controller::getParams()
   if (!nh.getParam("/control/command/pose/rate", pose_command_rate))
     ROS_FATAL("Failed to read parameter pose command rate.");
 
-  //
   if (!nh.getParam("/controller/frequency", frequency))
   {
     ROS_WARN("Failed to read parameter controller frequency, defaulting to 10 Hz.");

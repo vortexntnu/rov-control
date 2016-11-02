@@ -1,3 +1,2 @@
 # joystick_interface
-
-Depends on xboxdrv and python-evdev
+Package for interfacing an Xbox 360 controller with the rest of the system.

@@ -54,6 +54,9 @@ void PseudoinverseAllocator::callback(const geometry_msgs::Wrench& tau_msg)
       tau(i) = tau_msg.torque.z;
       ++i;
     }
+
+    if (i != n)
+      ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << n);
   }
 
   u = K_inv * T_pinv * tau;

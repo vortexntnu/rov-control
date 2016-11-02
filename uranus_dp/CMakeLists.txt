@@ -20,7 +20,6 @@ find_package(GTest REQUIRED)
 
 add_service_files(
   FILES
-  SetControlMode.srv
   SetControllerGains.srv
   ResetEstimator.srv
 )
@@ -53,13 +52,8 @@ include_directories(
   ${GTEST_INCLUDE_DIRS}
 )
 
-add_executable(setpoint_processing src/setpoint_processing/setpoint_processing_node.cpp
-                                   src/setpoint_processing/setpoint_processing.cpp
-)
-
 add_executable(controller src/controller/controller_node.cpp
                           src/controller/controller.cpp
-                          src/controller/open_loop_controller.cpp
                           src/controller/quaternion_pd_controller.cpp
 )
 
@@ -72,12 +66,11 @@ add_executable(estimator src/estimator/estimator_node.cpp
                          src/estimator/simple_estimator.cpp
 )
 
-add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})
+# add_dependencies(setpoint_processing ${catkin_EXPORTED_TARGETS})
 add_dependencies(controller          ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(allocator           ${PROJECT_NAME}_generate_messages_cpp)
 add_dependencies(estimator           ${PROJECT_NAME}_generate_messages_cpp)
 
-target_link_libraries(setpoint_processing ${catkin_LIBRARIES})
 target_link_libraries(controller          ${catkin_LIBRARIES})
 target_link_libraries(allocator           ${catkin_LIBRARIES})
 target_link_libraries(estimator           ${catkin_LIBRARIES})

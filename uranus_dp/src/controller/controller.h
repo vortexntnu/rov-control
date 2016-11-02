@@ -13,18 +13,30 @@
 
 #include <Eigen/Dense>
 
+// Dynamic reconfigure includes.
+#include <dynamic_reconfigure/server.h>
+// Auto-generated from cfg/ directory.
+#include <uranus_dp/uranusDpConfig.h>
+
 class Controller
 {
 public:
   Controller(ros::NodeHandle nh);
   void commandCallback(const vortex_msgs::JoystickMotionCommand &msg);
   void stateCallback(const nav_msgs::Odometry &msg);
+  //! Callback function for dynamic reconfigure server.
+  // void configCallback(node_example::nodeExampleConfig& config, uint32_t level);
+  void configCallback(uranus_dp::uranusDpConfig& config, uint32_t level);
   void spin();
 private:
   ros::NodeHandle nh;
   ros::Subscriber command_sub;
   ros::Subscriber state_sub;
   ros::Publisher  wrench_pub;
+
+  //! Dynamic reconfigure server.
+  // dynamic_reconfigure::Server<node_example::nodeExampleConfig> dr_srv_;
+  dynamic_reconfigure::Server<uranus_dp::uranusDpConfig> dr_srv_;
 
   ControlMode control_mode;
   int  frequency;

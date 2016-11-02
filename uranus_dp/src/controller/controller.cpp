@@ -1,10 +1,13 @@
 #include "controller.h"
 
-Controller::Controller()
+#include <tf/transform_datatypes.h>
+#include <eigen_conversions/eigen_msg.h>
+
+Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
-  command_sub  = nh.subscribe("joystick_motion_command", 10, &Controller::commandCallback, this);
-  state_sub    = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
-  wrench_pub   = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+  command_sub = nh.subscribe("joystick_motion_command", 10, &Controller::commandCallback, this);
+  state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
+  wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
   control_mode = ControlModes::OPEN_LOOP;
   prev_time_valid = false;
@@ -18,15 +21,10 @@ Controller::Controller()
 
   getParams();
 
-  // TODO: Read these parameters in a nicer way
   // Read controller gains from parameter server
-  double a, b, c;
-  if (!nh.getParam("/controller/gains/a", a))
-    ROS_ERROR("Failed to read derivative controller gain (a).");
-  if (!nh.getParam("/controller/gains/b", b))
-    ROS_ERROR("Failed to read position controller gain (b).");
-  if (!nh.getParam("/controller/gains/c", c))
-    ROS_ERROR("Failed to read orientation controller gain (c).");
+  std::map<std::string,double> gains;
+  if (!nh.getParam("/controller/gains", gains))
+    ROS_ERROR("Failed to read parameter controller gains.");
 
   // Read center of gravity and buoyancy vectors
   std::vector<double> r_G_vec, r_B_vec;
@@ -50,14 +48,16 @@ Controller::Controller()
   double W = mass * acceleration_of_gravity;
   double B = density_of_water * displacement * acceleration_of_gravity;
 
-  position_hold_controller = new QuaternionPdController(a, b, c, r_G, r_B, W, B);
+  position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
+
+  ROS_INFO("Controller: Initialized.");
 }
 
 void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
 {
   if (!healthyMessage(msg))
   {
-    ROS_WARN("controller: Propulsion command message out of range, ignoring...");
+    ROS_WARN("Controller: Propulsion command message out of range, ignoring...");
     return;
   }
 
@@ -67,11 +67,11 @@ void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
-      ROS_INFO("Changing control mode to OPEN LOOP.");
+      ROS_INFO("Controller: Changing mode to OPEN LOOP.");
       break;
 
       case ControlModes::POSITION_HOLD:
-      ROS_INFO("Changing control mode to POSITION HOLD.");
+      ROS_INFO("Controller: Changing mode to POSITION HOLD.");
       position_setpoint    = position_state;
       orientation_setpoint = orientation_state;
       prev_time_valid = false;
@@ -107,15 +107,12 @@ void Controller::spin()
       case ControlModes::OPEN_LOOP:
       tau = wrench_setpoint;
       break;
-
-      // TODO: Reimplement combined mode
     }
 
     geometry_msgs::Wrench msg;
     tf::wrenchEigenToMsg(tau, msg);
     wrench_pub.publish(msg);
 
-    // TODO: should spinonce and sleep be at beginnig or end? does it matter?
     ros::spinOnce();
     rate.sleep();
   }
@@ -145,7 +142,10 @@ void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
   prev_time = curr_time;
 
   if (dt == 0)
-    ROS_WARN("Zero time difference between propulsion command messages.");
+  {
+    // ROS_WARN("Zero time difference between propulsion command messages.");
+    return;
+  }
 
   // Increment position setpoints
   position_setpoint(0) += pose_command_rate[0] * dt * msg.forward;
@@ -154,16 +154,16 @@ void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 
   // Calc euler setpoints
   Eigen::Vector3d orientation_setpoint_euler;
-  orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+  orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(0,1,2);
   // Increment euler setpoints
   orientation_setpoint_euler(0) += pose_command_rate[3] * dt * msg.roll_right;
   orientation_setpoint_euler(1) += pose_command_rate[4] * dt * msg.tilt_up;
   orientation_setpoint_euler(2) += pose_command_rate[5] * dt * msg.turn_right;
   // Calc incremented quat setpoints
   Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitZ())
+  R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitX())
     * Eigen::AngleAxisd(orientation_setpoint_euler(1), Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(orientation_setpoint_euler(2), Eigen::Vector3d::UnitX());
+    * Eigen::AngleAxisd(orientation_setpoint_euler(2), Eigen::Vector3d::UnitZ());
   Eigen::Quaterniond q(R);
   orientation_setpoint = q;
 }

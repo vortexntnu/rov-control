@@ -12,19 +12,19 @@
 class QuaternionPdController
 {
 public:
-  QuaternionPdController(double a_init,
-                         double b_init,
-                         double c_init,
-                         Eigen::Vector3d r_G_init,
-                         Eigen::Vector3d r_B_init,
-                         double W_init,
-                         double B_init);
+  QuaternionPdController(double a,
+                         double b,
+                         double c,
+                         double W,
+                         double B,
+                         const Eigen::Vector3d r_G,
+                         const Eigen::Vector3d r_B);
   void setGains(double a, double b, double c);
   Eigen::Vector6d compute(Eigen::Vector3d x, Eigen::Quaterniond q, Eigen::Vector6d nu, Eigen::Vector3d x_d, Eigen::Quaterniond q_d);
 private:
-  Eigen::Matrix6d proportionalGainMatrix(Eigen::Quaterniond q);
+  Eigen::Matrix6d proportionalGainMatrix(Eigen::Matrix3d R);
   Eigen::Vector6d errorVector(Eigen::Vector3d p, Eigen::Vector3d p_d, Eigen::Quaterniond q, Eigen::Quaterniond q_d);
-  Eigen::Vector6d restoringForceVector(Eigen::Quaterniond q);
+  Eigen::Vector6d restoringForceVector(Eigen::Matrix3d R);
   int             sgn(double x);
 
   double c;            // Orientation gain

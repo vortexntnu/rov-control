@@ -9,7 +9,6 @@
 #include "geometry_msgs/Wrench.h"
 
 #include <Eigen/Dense>
-#include <map>
 
 class PseudoinverseAllocator
 {

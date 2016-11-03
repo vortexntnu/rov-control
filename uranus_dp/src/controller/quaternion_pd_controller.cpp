@@ -19,11 +19,11 @@ void QuaternionPdController::setGains(double a_new, double b_new, double c_new)
   K_x = b_new * Eigen::MatrixXd::Identity(3,3);
 }
 
-Eigen::Vector6d QuaternionPdController::compute(Eigen::Vector3d    x,
-                                                Eigen::Quaterniond q,
-                                                Eigen::Vector6d    nu,
-                                                Eigen::Vector3d    x_d,
-                                                Eigen::Quaterniond q_d)
+Eigen::Vector6d QuaternionPdController::compute(const Eigen::Vector3d    &x,
+                                                const Eigen::Quaterniond &q,
+                                                const Eigen::Vector6d    &nu,
+                                                const Eigen::Vector3d    &x_d,
+                                                const Eigen::Quaterniond &q_d)
 {
   Eigen::Matrix3d R   = q.toRotationMatrix();
   Eigen::Matrix6d K_p = proportionalGainMatrix(R);
@@ -32,23 +32,23 @@ Eigen::Vector6d QuaternionPdController::compute(Eigen::Vector3d    x,
   return (Eigen::Vector6d() << -K_d*nu - K_p*z + g).finished();
 }
 
-Eigen::Matrix6d QuaternionPdController::proportionalGainMatrix(Eigen::Matrix3d R)
+Eigen::Matrix6d QuaternionPdController::proportionalGainMatrix(const Eigen::Matrix3d &R)
 {
   return (Eigen::Matrix6d() << R.transpose() * K_x,        Eigen::MatrixXd::Zero(3,3),
                                Eigen::MatrixXd::Zero(3,3), c*Eigen::MatrixXd::Identity(3,3)).finished();
 }
 
-Eigen::Vector6d QuaternionPdController::errorVector(Eigen::Vector3d    x,
-                                                    Eigen::Vector3d    x_d,
-                                                    Eigen::Quaterniond q,
-                                                    Eigen::Quaterniond q_d)
+Eigen::Vector6d QuaternionPdController::errorVector(const Eigen::Vector3d    &x,
+                                                    const Eigen::Vector3d    &x_d,
+                                                    const Eigen::Quaterniond &q,
+                                                    const Eigen::Quaterniond &q_d)
 {
   Eigen::Quaterniond q_tilde = q_d.conjugate()*q;
   q_tilde.normalize();
   return (Eigen::Vector6d() << x - x_d, sgn(q_tilde.w())*q_tilde.vec()).finished();
 }
 
-Eigen::Vector6d QuaternionPdController::restoringForceVector(Eigen::Matrix3d R)
+Eigen::Vector6d QuaternionPdController::restoringForceVector(const Eigen::Matrix3d &R)
 {
   Eigen::Vector3d f_G = R.transpose() * Eigen::Vector3d(0, 0, W);
   Eigen::Vector3d f_B = R.transpose() * Eigen::Vector3d(0, 0, -B);

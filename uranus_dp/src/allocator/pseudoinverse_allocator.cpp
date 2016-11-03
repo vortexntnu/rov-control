@@ -1,4 +1,3 @@
-// See Fossen 2011, chapter 12.3.2
 #include "pseudoinverse_allocator.h"
 
 #include <vector>

@@ -1,3 +1,7 @@
+// Implement the unweighted pseudoinverse-based allocator described in e.g.
+// Fossen 2011 Handbook of Marine Craft Hydrodynamics and Motion Control
+// (chapter 12.3.2).
+
 #ifndef PSEUDOINVERSE_ALLOCATOR_H
 #define PSEUDOINVERSE_ALLOCATOR_H
 

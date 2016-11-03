@@ -1,4 +1,4 @@
-#include "controller.h"
+#include "controller_ros.h"
 
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>

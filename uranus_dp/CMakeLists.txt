@@ -19,10 +19,12 @@ find_package(GTest REQUIRED)
 ## Declare ROS messages, services and actions ##
 ################################################
 
-# add_service_files(
-#   FILES
-#   ResetEstimator.srv
-# )
+add_service_files(
+  FILES
+  ResetEstimator.srv
+)
+
+generate_messages()
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -74,7 +76,9 @@ add_executable(estimator src/estimator/estimator_node.cpp
                          src/estimator/simple_estimator.cpp
 )
 
-add_dependencies(controller ${PROJECT_NAME}_gencfg)
+add_dependencies(controller ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
+add_dependencies(allocator  ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(estimator  ${PROJECT_NAME}_generate_messages_cpp)
 
 target_link_libraries(controller ${catkin_LIBRARIES})
 target_link_libraries(allocator  ${catkin_LIBRARIES})

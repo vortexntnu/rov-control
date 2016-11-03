@@ -1,3 +1,8 @@
+// This state estimator simply reads IMU orientation and a pressure sensor,
+// and publishes orientation and z-axis position based on the readings.
+// The velocity twist is always zero, and x- and y-axis position is always
+// zero.
+
 #ifndef SIMPLE_ESTIMATOR_H
 #define SIMPLE_ESTIMATOR_H
 

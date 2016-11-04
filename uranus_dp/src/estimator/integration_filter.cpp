@@ -18,7 +18,7 @@ IntegrationFilter::IntegrationFilter()
   R_m_b.setIdentity();
 }
 
-bool IntegrationFilter::reset(uranus_dp::ResetIntegrationFilter::Request &req, uranus_dp::ResetIntegrationFilter::Response &resp)
+bool IntegrationFilter::reset(uranus_dp::ResetEstimator::Request &req, uranus_dp::ResetEstimator::Response &resp)
 {
   ROS_INFO("Resetting integration filter.");
   p_mn_b.setZero();
@@ -67,13 +67,4 @@ void IntegrationFilter::publish()
   tf::vectorEigenToMsg(v_bn_b, msg.twist.twist.linear);
   tf::vectorEigenToMsg(w_bn_b, msg.twist.twist.angular);
   pub.publish(msg);
-}
-
-Eigen::Matrix3d IntegrationFilter::skew(const Eigen::Vector3d& v)
-{
-  Eigen::Matrix3d S;
-  S <<  0   , -v(2),  v(1),
-        v(2),  0   , -v(0),
-       -v(1),  v(0),  0   ;
-  return S;
 }

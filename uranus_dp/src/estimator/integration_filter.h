@@ -1,19 +1,22 @@
 #ifndef INTEGRATION_FILTER_H
 #define INTEGRATION_FILTER_H
 
+#include "uranus_dp/eigen_helper.h"
+#include "uranus_dp/eigen_typedefs.h"
+#include "uranus_dp/ResetEstimator.h"
+
 #include "ros/ros.h"
-#include <Eigen/Dense>
-#include <eigen_conversions/eigen_msg.h>
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
-#include "uranus_dp/ResetIntegrationFilter.h"
-#include "uranus_dp/eigen_typedefs.h"
+
+#include <eigen_conversions/eigen_msg.h>
+#include <Eigen/Dense>
 
 class IntegrationFilter
 {
 public:
   IntegrationFilter();
-  bool reset(uranus_dp::ResetIntegrationFilter::Request &req, uranus_dp::ResetIntegrationFilter::Response &resp);
+  bool reset(uranus_dp::ResetEstimator::Request &req, uranus_dp::ResetEstimator::Response &resp);
   void callback(const sensor_msgs::Imu& msg);
   void update(double dt);
   void publish();
@@ -35,8 +38,6 @@ private:
   Eigen::Quaterniond q_nb;   // [1] Quaternion orientation from {n} to {b}
   Eigen::Vector3d    r_m_b;  // [m] Position of {m} relative to {b}
   Eigen::Matrix3d    R_m_b;  // [?] Rotation matrix from {m} to {b}
-
-  Eigen::Matrix3d skew(const Eigen::Vector3d& v);
 };
 
 #endif

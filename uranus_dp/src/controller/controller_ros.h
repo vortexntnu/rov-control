@@ -10,7 +10,7 @@
 #include <uranus_dp/ControllerConfig.h>
 #include "uranus_dp/eigen_typedefs.h"
 #include "uranus_dp/control_mode_enum.h"
-#include "vortex_msgs/JoystickMotionCommand.h"
+#include "vortex_msgs/PropulsionCommand.h"
 
 #include "quaternion_pd_controller.h"
 
@@ -18,7 +18,7 @@ class Controller
 {
 public:
   Controller(ros::NodeHandle nh);
-  void commandCallback(const vortex_msgs::JoystickMotionCommand &msg);
+  void commandCallback(const vortex_msgs::PropulsionCommand &msg);
   void stateCallback(const nav_msgs::Odometry &msg);
   void configCallback(uranus_dp::ControllerConfig& config, uint32_t level);
   void spin();
@@ -48,9 +48,9 @@ private:
 
   QuaternionPdController *position_hold_controller;
 
-  void updateSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
+  void updateSetpoints(const vortex_msgs::PropulsionCommand &msg);
   void getParams();
-  bool healthyMessage(const vortex_msgs::JoystickMotionCommand &msg);
+  bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
 };
 
 #endif

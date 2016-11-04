@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
-#include "vortex_msgs/JoystickMotionCommand.h"
+#include "vortex_msgs/PropulsionCommand.h"
 #include "vortex_msgs/ThrusterForces.h"
 #include "uranus_dp/control_mode_enum.h"
 #include <Eigen/Dense>
@@ -10,7 +10,7 @@ class OpenLoopIntegrationTest : public ::testing::Test
 public:
     OpenLoopIntegrationTest()
     {
-        pub = nh.advertise<vortex_msgs::JoystickMotionCommand>("joystick_motion_command", 10);
+        pub = nh.advertise<vortex_msgs::PropulsionCommand>("propulsion_command", 10);
         sub = nh.subscribe("thruster_forces", 10, &OpenLoopIntegrationTest::Callback, this);
         message_received = false;
     }
@@ -23,7 +23,7 @@ public:
 
     void Publish(int forward, int right, int down, int tilt_up, int turn_right)
     {
-        vortex_msgs::JoystickMotionCommand msg;
+        vortex_msgs::PropulsionCommand msg;
         msg.forward    = forward;
         msg.right      = right;
         msg.down       = down;

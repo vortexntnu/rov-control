@@ -6,7 +6,7 @@
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
-  command_sub = nh.subscribe("joystick_motion_command", 10, &Controller::commandCallback, this);
+  command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
   state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
   wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
@@ -59,7 +59,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   ROS_INFO("Controller: Initialized with dynamic reconfigure.");
 }
 
-void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
+void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 {
   if (!healthyMessage(msg))
   {
@@ -139,7 +139,7 @@ void Controller::spin()
   }
 }
 
-void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
+void Controller::updateSetpoints(const vortex_msgs::PropulsionCommand& msg)
 {
   // Update wrench setpoints
   for (int i = 0; i < 6; ++i) // TODO: Fix magic number
@@ -200,7 +200,7 @@ void Controller::getParams()
   }
 }
 
-bool Controller::healthyMessage(const vortex_msgs::JoystickMotionCommand& msg)
+bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
 {
   // Check that motion commands are in range
   for (int i = 0; i < msg.motion.size(); ++i)

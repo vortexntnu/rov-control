@@ -7,10 +7,10 @@ class JoystickInterfaceNode(object):
     def __init__(self):
         rospy.init_node('joystick_node')
         self.arm_msg = vortex_msgs.msg.JoystickArmCommand()
-        self.motion_msg = vortex_msgs.msg.JoystickMotionCommand()
+        self.motion_msg = vortex_msgs.msg.PropulsionCommand()
         self.sub = rospy.Subscriber('joy', Joy, self.callback, queue_size=10)
-        self.pub_motion = rospy.Publisher('joystick_motion_command',
-                                          vortex_msgs.msg.JoystickMotionCommand,
+        self.pub_motion = rospy.Publisher('propulsion_command',
+                                          vortex_msgs.msg.PropulsionCommand,
                                           queue_size=10)
         self.pub_arm = rospy.Publisher('joystick_arm_command',
                                        vortex_msgs.msg.JoystickArmCommand,

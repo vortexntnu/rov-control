@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 #include "sensor_msgs/Imu.h"
-#include "vortex_msgs/JoystickMotionCommand.h"
+#include "vortex_msgs/PropulsionCommand.h"
 #include "vortex_msgs/ThrusterForces.h"
 #include "uranus_dp/control_mode_enum.h"
 #include "uranus_dp/eigen_typedefs.h"
@@ -12,7 +12,7 @@ class ClosedLoopIntegrationTest : public ::testing::Test
 public:
     ClosedLoopIntegrationTest()
     {
-        joyPub = nh.advertise<vortex_msgs::JoystickMotionCommand>("joystick_motion_command", 10);
+        joyPub = nh.advertise<vortex_msgs::PropulsionCommand>("propulsion_command", 10);
         imuPub = nh.advertise<sensor_msgs::Imu>("sensor_raw", 10);
         sub = nh.subscribe("thruster_forces", 10, &ClosedLoopIntegrationTest::Callback, this);
         message_received = false;
@@ -26,7 +26,7 @@ public:
 
     void JoystickPublish(double forward, double right, double down, double tilt_up, double turn_right, ControlMode control_mode)
     {
-        vortex_msgs::JoystickMotionCommand msg;
+        vortex_msgs::PropulsionCommand msg;
         msg.forward    = forward;
         msg.right      = right;
         msg.down       = down;

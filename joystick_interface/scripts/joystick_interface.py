@@ -36,14 +36,11 @@ class JoystickInterfaceNode(object):
         for j in range(len(msg.axes)):
             axes[self.axes_map[j]] = msg.axes[j]
 
-        arm_msg_fields = {
-            'base_up' : axes['dpad_vertical'] == 1,
-            'base_down' : axes['dpad_vertical'] == -1,
-            'rot_left' : axes['dpad_horizontal'] == 1,
-            'rot_right' : axes['dpad_horizontal'] == -1,
-            'grip_open' : buttons['B'],
-            'grip_close' : buttons['A']
-        }
+        arm_msg_fields = [
+            axes['dpad_vertical'],
+            -axes['dpad_horizontal'],
+            (buttons['A'] - buttons['B'])
+        ]
 
         motion_msg_motion = [
             axes['vertical_axis_left_stick'],
@@ -58,13 +55,15 @@ class JoystickInterfaceNode(object):
             (buttons ['back'] == 1),
             (buttons ['start'] == 1)
         ]
+        self.arm_msg.manipulator = [None]*3
+        for i in range(3):
+            self.arm_msg.manipulator[i] = arm_msg_fields[i]
 
-        for field, value in arm_msg_fields.iteritems():
-            setattr(self.arm_msg, field, value)
-
+        self.motion_msg.motion = [None]*6
         for i in range(6):
             self.motion_msg.motion[i] = motion_msg_motion[i]
 
+        self.motion_msg.control_mode = [None]*2
         for i in range(2):
             self.motion_msg.control_mode[i] = motion_msg_control_mode[i]
 

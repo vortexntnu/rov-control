@@ -42,8 +42,6 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
   if (!pseudoinverse(thrust_configuration, thrust_configuration_pseudoinverse))
     ROS_FATAL("Failed to compute pseudoinverse of thrust config matrix.");
 
-  printEigen("T_pinv", thrust_configuration_pseudoinverse);
-
   Eigen::MatrixXd force_coefficient_inverse = Eigen::MatrixXd::Identity(num_thrusters, num_thrusters);
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse, force_coefficient_inverse);

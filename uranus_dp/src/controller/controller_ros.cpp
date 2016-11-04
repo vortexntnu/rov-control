@@ -182,11 +182,11 @@ void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 void Controller::getParams()
 {
   // Read control command parameters
-  if (!nh.getParam("/control/command/wrench/max", wrench_command_max))
+  if (!nh.getParam("/propulsion/command/wrench/max", wrench_command_max))
     ROS_FATAL("Failed to read parameter max wrench command.");
-  if (!nh.getParam("/control/command/wrench/scaling", wrench_command_scaling))
+  if (!nh.getParam("/propulsion/command/wrench/scaling", wrench_command_scaling))
     ROS_FATAL("Failed to read parameter scaling wrench command.");
-  if (!nh.getParam("/control/command/pose/rate", pose_command_rate))
+  if (!nh.getParam("/propulsion/command/pose/rate", pose_command_rate))
     ROS_FATAL("Failed to read parameter pose command rate.");
 
   if (!nh.getParam("/controller/frequency", frequency))

@@ -22,7 +22,7 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 
   // Read thrust limits
   std::vector<double> thrust;
-  if (!nh.getParam("/thrust", thrust))
+  if (!nh.getParam("/thrusters/characteristics/thrust", thrust))
   {
     min_thrust = -std::numeric_limits<double>::infinity();
     max_thrust =  std::numeric_limits<double>::infinity();

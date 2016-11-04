@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef CONTROLLER_ROS_H
+#define CONTROLLER_ROS_H
 
 #include <Eigen/Dense>
 

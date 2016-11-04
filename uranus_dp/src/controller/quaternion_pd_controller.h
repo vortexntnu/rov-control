@@ -25,7 +25,7 @@ public:
                           const Eigen::Vector6d    &nu,
                           const Eigen::Vector3d    &x_d,
                           const Eigen::Quaterniond &q_d);
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW // http://eigen.tuxfamily.org/dox-devel/group__TopicStructHavingEigenMembers.html
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 private:
   Eigen::Matrix6d proportionalGainMatrix(const Eigen::Matrix3d &R);
   Eigen::Vector6d errorVector(const Eigen::Vector3d    &p,

@@ -43,16 +43,6 @@ propulsion:
        [    0.0,     0.0,     0.0,     0.0,     1.0,    1.0], # Heave
        [-0.0467, -0.0467,  0.0467,  0.0467, -0.1600, 0.1600], # Pitch
        [ 0.2143, -0.2143,  0.2143, -0.2143,     0.0,    0.0]] # Yaw
-
-control:
-  dof_num: 5
-  dofs:
-    surge: true
-    sway:  true
-    heave: true
-    roll:  false
-    pitch: true
-    yaw:   true
   command:
     wrench:
       max: [69.85, 69.85, 49.39, 0, 5, 7] # 5 & 7 are rough estimates
@@ -60,23 +50,9 @@ control:
     pose:
       rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
 
-thrusters:
-  num: 6
-  dof: 5 # Controllable degrees of freedom
-  configuration_matrix:
-    [[ 0.7071,  0.7071, -0.7071, -0.7071,     0.0,    0.0], # Surge
-     [ 0.7071, -0.7071, -0.7071,  0.7071,     0.0,    0.0], # Sway
-     [    0.0,     0.0,     0.0,     0.0,     1.0,    1.0], # Heave
-     [-0.0467, -0.0467,  0.0467,  0.0467, -0.1600, 0.1600], # Pitch
-     [ 0.2143, -0.2143,  0.2143, -0.2143,     0.0,    0.0]] # Yaw
-
 controller:
   gains:
     a: 0.1
     b: 3.0
     c: 20.0
   frequency: 10
-  setpoint:
-    rate:
-      linear: 0.20
-      angular: 0.35

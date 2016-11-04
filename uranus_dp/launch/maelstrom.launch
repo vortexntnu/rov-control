@@ -7,5 +7,5 @@
   <node name="allocator"           pkg="uranus_dp" type="allocator"           output="screen"/>
   <node name="estimator"           pkg="uranus_dp" type="estimator"           output="screen"/>
 
-  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
+  <!-- <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/> -->
 </launch>

@@ -49,7 +49,7 @@ class JoystickInterfaceNode(object):
             'forward' : axes['vertical_axis_left_stick'],
             'right' : -axes['horizontal_axis_left_stick'],
             'down' : (axes ['RT'] - axes ['LT'])/2,
-            'tilt_up' : axes['vertical_axis_right_stick'],
+            'tilt_up' : -axes['vertical_axis_right_stick'],
             'turn_right' : -axes['horizontal_axis_right_stick']
         }
 

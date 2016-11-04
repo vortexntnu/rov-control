@@ -5,8 +5,8 @@ QuaternionPdController::QuaternionPdController(double a,
                                                double c,
                                                double W,
                                                double B,
-                                               const Eigen::Vector3d r_G,
-                                               const Eigen::Vector3d r_B)
+                                               const Eigen::Vector3d &r_G,
+                                               const Eigen::Vector3d &r_B)
 : r_G(r_G), r_B(r_B), W(W), B(B)
 {
   setGains(a, b, c);

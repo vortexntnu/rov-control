@@ -17,8 +17,8 @@ public:
                          double c,
                          double W,
                          double B,
-                         const Eigen::Vector3d r_G,
-                         const Eigen::Vector3d r_B);
+                         const Eigen::Vector3d &r_G,
+                         const Eigen::Vector3d &r_B);
   void setGains(double a, double b, double c);
   Eigen::Vector6d compute(const Eigen::Vector3d    &x,
                           const Eigen::Quaterniond &q,

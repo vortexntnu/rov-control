@@ -1,0 +1,4 @@
+<launch>
+    <node name="joy" pkg="joy" type="joy_node" output="screen"/>
+    <node name="joystick_interface" pkg="joystick_interface" type="joystick_interface.py" output="screen"/>
+</launch>

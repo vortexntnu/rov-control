@@ -132,12 +132,8 @@ void Controller::spin()
 void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
 {
   // Update wrench setpoints
-  wrench_setpoint(0) = wrench_command_scaling[0] * wrench_command_max[0] * msg.forward;
-  wrench_setpoint(1) = wrench_command_scaling[1] * wrench_command_max[1] * msg.right;
-  wrench_setpoint(2) = wrench_command_scaling[2] * wrench_command_max[2] * msg.down;
-  wrench_setpoint(3) = wrench_command_scaling[3] * wrench_command_max[3] * msg.roll_right;
-  wrench_setpoint(4) = wrench_command_scaling[4] * wrench_command_max[4] * msg.tilt_up;
-  wrench_setpoint(5) = wrench_command_scaling[5] * wrench_command_max[5] * msg.turn_right;
+  for (int i = 0; i < 6; ++i) // TODO: Fix magic number
+    wrench_setpoint(i) = wrench_command_scaling[i] * wrench_command_max[i] * msg.motion[i];
 
   // Update pose setpoints
   if (!prev_time_valid)
@@ -159,17 +155,15 @@ void Controller::updateSetpoints(const vortex_msgs::JoystickMotionCommand& msg)
   }
 
   // Increment position setpoints
-  position_setpoint(0) += pose_command_rate[0] * dt * msg.forward;
-  position_setpoint(1) += pose_command_rate[1] * dt * msg.right;
-  position_setpoint(2) += pose_command_rate[2] * dt * msg.down;
+  for (int i = 0; i < 3; ++i) // TODO: Fix magic number
+    position_setpoint(i) += pose_command_rate[i] * dt * msg.motion[i];
 
   // Calc euler setpoints
   Eigen::Vector3d orientation_setpoint_euler;
   orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(0,1,2);
   // Increment euler setpoints
-  orientation_setpoint_euler(0) += pose_command_rate[3] * dt * msg.roll_right;
-  orientation_setpoint_euler(1) += pose_command_rate[4] * dt * msg.tilt_up;
-  orientation_setpoint_euler(2) += pose_command_rate[5] * dt * msg.turn_right;
+  for (int i = 0; i < 3; ++i) // TODO: Fix magic number
+    orientation_setpoint_euler(i) += pose_command_rate[3+i] * dt * msg.motion[3+i];
   // Calc incremented quat setpoints
   Eigen::Matrix3d R;
   R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitX())

@@ -45,25 +45,30 @@ class JoystickInterfaceNode(object):
             'grip_close' : buttons['A']
         }
 
-        motion_msg_fields = {
-            'forward' : axes['vertical_axis_left_stick'],
-            'right' : -axes['horizontal_axis_left_stick'],
-            'down' : (axes ['RT'] - axes ['LT'])/2,
-            'tilt_up' : -axes['vertical_axis_right_stick'],
-            'turn_right' : -axes['horizontal_axis_right_stick']
-        }
+        motion_msg_motion = [
+            axes['vertical_axis_left_stick'],
+            -axes['horizontal_axis_left_stick'],
+            (buttons['RB'] - buttons['LB']),
+            (axes['RT'] - axes['LT'])/2,
+            -axes['vertical_axis_right_stick'],
+            -axes['horizontal_axis_right_stick']
+        ]
+
+        motion_msg_control_mode = [
+            (buttons ['back'] == 1),
+            (buttons ['start'] == 1)
+        ]
 
         for field, value in arm_msg_fields.iteritems():
             setattr(self.arm_msg, field, value)
 
-        for field, value in motion_msg_fields.iteritems():
-            setattr(self.motion_msg, field, value)
+        for i in range(6):
+            self.motion_msg.motion[i] = motion_msg_motion[i]
 
-        #Control mode is separate to avoid overwriting old mode
-        if buttons['back']:
-            self.motion_msg.control_mode = 1
-        if buttons['start']:
-            self.motion_msg.control_mode = 0
+        for i in range(2):
+            self.motion_msg.control_mode[i] = motion_msg_control_mode[i]
+
+        self.motion_msg.header.stamp = rospy.get_rostime()
 
         self.pub_arm.publish(self.arm_msg)
         self.pub_motion.publish(self.motion_msg)

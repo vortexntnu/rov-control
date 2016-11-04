@@ -68,6 +68,7 @@ add_executable(controller src/controller/controller_node.cpp
 )
 
 add_executable(allocator src/allocator/allocator_node.cpp
+                         src/allocator/allocator_ros.cpp
                          src/allocator/pseudoinverse_allocator.cpp
 )
 

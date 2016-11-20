@@ -12,6 +12,8 @@
 #include "uranus_dp/control_mode_enum.h"
 #include "vortex_msgs/JoystickMotionCommand.h"
 
+#include "state.h"
+#include "setpoints.h"
 #include "quaternion_pd_controller.h"
 
 class Controller
@@ -32,24 +34,12 @@ private:
   ControlMode control_mode;
   int  frequency;
 
-  ros::Time prev_time;
-  bool prev_time_valid;
-
-  Eigen::Vector3d    position_state;
-  Eigen::Quaterniond orientation_state;
-  Eigen::Vector6d    velocity_state;
-  Eigen::Vector3d    position_setpoint;
-  Eigen::Quaterniond orientation_setpoint;
-  Eigen::Vector6d    wrench_setpoint;
-
-  std::vector<double> wrench_command_max;
-  std::vector<double> wrench_command_scaling;
-  std::vector<double> pose_command_rate;
-
+  State                  *state;
+  Setpoints              *setpoints;
   QuaternionPdController *position_hold_controller;
 
-  void updateSetpoints(const vortex_msgs::JoystickMotionCommand &msg);
-  void getParams();
+  void initSetpoints();
+  void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::JoystickMotionCommand &msg);
 };
 

@@ -1,11 +1,12 @@
 #include "controller_ros.h"
 
+#include "uranus_dp/eigen_helper.h"
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
-  command_sub = nh.subscribe("joystick_motion_command", 10, &Controller::commandCallback, this);
+  command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
   state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
   wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
@@ -30,7 +31,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   ROS_INFO("Controller: Initialized with dynamic reconfigure.");
 }
 
-void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
+void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 {
   if (!healthyMessage(msg))
   {
@@ -38,9 +39,18 @@ void Controller::commandCallback(const vortex_msgs::JoystickMotionCommand& msg)
     return;
   }
 
-  if (msg.control_mode != control_mode)
+  ControlMode new_control_mode;
   {
-    control_mode = static_cast<ControlMode>(msg.control_mode);
+    int i;
+    for (i = 0; i < msg.control_mode.size(); ++i)
+      if (msg.control_mode[i])
+        break;
+    new_control_mode = static_cast<ControlMode>(i);
+  }
+
+  if (new_control_mode != control_mode)
+  {
+    control_mode = new_control_mode;
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
@@ -178,39 +188,28 @@ void Controller::initPositionHoldController()
   position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
 }
 
-bool Controller::healthyMessage(const vortex_msgs::JoystickMotionCommand& msg)
+bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
 {
-  if (abs(msg.forward) > 1)
+  // Check that motion commands are in range
+  for (int i = 0; i < msg.motion.size(); ++i)
   {
-    ROS_WARN("controller: Forward motion command out of range");
-    return false;
-  }
-  if (abs(msg.right) > 1)
-  {
-    ROS_WARN("controller: Right motion command out of range");
-    return false;
-  }
-  if (abs(msg.down) > 1)
-  {
-    ROS_WARN("controller: Down motion command out of range.");
-    return false;
-  }
-  if (abs(msg.tilt_up) > 1)
-  {
-    ROS_WARN("controller: Tilt up motion command out of range");
-    return false;
-  }
-  if (abs(msg.turn_right) > 1)
-  {
-    ROS_WARN("controller: Turn right motion command out of range");
-    return false;
+    if (msg.motion[i] > 1 || msg.motion[i] < -1)
+    {
+      ROS_WARN("Controller: Motion command out of range.");
+      return false;
+    }
   }
 
-  bool validControlMode = (msg.control_mode == ControlModes::OPEN_LOOP || msg.control_mode == ControlModes::POSITION_HOLD);
-  if (!validControlMode)
+  // Check that exactly one control mode is requested
+  int num_requested_modes = 0;
+  for (int i = 0; i < msg.control_mode.size(); ++i)
+    if (msg.control_mode[i])
+      num_requested_modes++;
+  if (num_requested_modes != 1)
   {
     ROS_WARN("controller: Invalid control mode.");
     return false;
   }
+
   return true;
 }

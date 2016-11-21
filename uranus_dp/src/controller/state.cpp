@@ -6,7 +6,7 @@ State::State()
   orientation_.setIdentity();
   velocity_.setZero();
 
-  is_initialized = false;
+  is_initialized_ = false;
 }
 
 void State::set(const Eigen::Vector3d    &position,
@@ -17,15 +17,15 @@ void State::set(const Eigen::Vector3d    &position,
   orientation_ = orientation;
   velocity_    = velocity;
 
-  if (!is_initialized)
-    is_initialized = true;
+  if (!is_initialized_)
+    is_initialized_ = true;
 }
 
 bool State::get(Eigen::Vector3d    &position,
                 Eigen::Quaterniond &orientation,
                 Eigen::Vector6d    &velocity)
 {
-  if (!is_initialized)
+  if (!is_initialized_)
     return false;
 
   position    = position_;

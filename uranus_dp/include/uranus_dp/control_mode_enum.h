@@ -1,3 +1,6 @@
+#ifndef CONTROL_MODE_ENUM_H
+#define CONTROL_MODE_ENUM_H
+
 namespace ControlModes
 {
 enum ControlMode
@@ -7,3 +10,5 @@ enum ControlMode
 };
 }
 typedef ControlModes::ControlMode ControlMode;
+
+#endif

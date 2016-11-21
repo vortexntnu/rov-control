@@ -1,3 +1,6 @@
+#ifndef SETPOINTS_H
+#define SETPOINTS_H
+
 #include <Eigen/Dense>
 #include "uranus_dp/eigen_typedefs.h"
 #include "uranus_dp/control_mode_enum.h"
@@ -27,3 +30,5 @@ private:
   double time_;
   bool   time_valid_;
 };
+
+#endif

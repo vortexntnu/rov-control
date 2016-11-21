@@ -12,7 +12,6 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
 
   control_mode = ControlModes::OPEN_LOOP;
 
-
   if (!nh.getParam("/controller/frequency", frequency))
   {
     ROS_WARN("Failed to read parameter controller frequency, defaulting to 10 Hz.");
@@ -62,15 +61,17 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
       Eigen::Vector3d    position;
       Eigen::Quaterniond orientation;
       Eigen::Vector6d    velocity;
-      state.get(position, orientation, velocity);
-      setpoints.setPose(position, orientation);
+      state->get(position, orientation, velocity);
+      setpoints->setPose(position, orientation);
       break;
     }
   }
 
-  ros::Time time = msg.header.stamp; // TODO: Possible to init as double immediately?
-  Eigen::Vector6d command = Eigen::Vector6d::Map(msg.motion);
-  setpoints.update(time.toSec(), command);
+  double time = msg.header.stamp.toSec();
+  Eigen::Vector6d command;
+  for (int i = 0; i < 6; ++i)
+    command(i) = msg.motion[i];
+  setpoints->update(time, command);
 }
 
 void Controller::stateCallback(const nav_msgs::Odometry &msg)
@@ -118,7 +119,7 @@ void Controller::spin()
       break;
 
       case ControlModes::OPEN_LOOP:
-      setpoints.getWrench(tau);
+      setpoints->getWrench(tau);
       break;
 
       default:

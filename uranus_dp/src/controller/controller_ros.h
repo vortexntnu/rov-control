@@ -40,7 +40,7 @@ private:
 
   void initSetpoints();
   void initPositionHoldController();
-  bool healthyMessage(const vortex_msgs::JoystickMotionCommand &msg);
+  bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
 };
 
 #endif

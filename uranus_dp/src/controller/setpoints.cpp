@@ -11,7 +11,7 @@ Setpoints::Setpoints(const Eigen::Vector6d &wrench_scaling,
   position_.setZero();
   orientation_.setIdentity();
 
-  prev_time_valid = false;
+  time_valid_ = false;
 }
 
 bool Setpoints::update(const double time, const Eigen::Vector6d &command)
@@ -29,12 +29,12 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
     return false;
 
   // Update wrench setpoint
-  for (int i = 0; i < 6, ++i)
+  for (int i = 0; i < 6; ++i)
     wrench_(i) = wrench_scaling_(i) * wrench_max_(i) * command(i);
 
   // Increment position setpoint
   for (int i = 0; i < 3; ++i)
-    position_setpoint(i) += pose_rate_(i) * dt * command(i);
+    position_(i) += pose_rate_(i) * dt * command(i);
 
   // Convert quaternion setpoint to euler angles (ZYX convention)
   Eigen::Vector3d euler;

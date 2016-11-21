@@ -1,3 +1,6 @@
+#ifndef STATE_H
+#define STATE_H
+
 #include <Eigen/Dense>
 #include "uranus_dp/eigen_typedefs.h"
 
@@ -17,5 +20,7 @@ private:
   Eigen::Quaterniond orientation_;
   Eigen::Vector6d    velocity_;
 
-  bool is_initialized;
+  bool is_initialized_;
 };
+
+#endif

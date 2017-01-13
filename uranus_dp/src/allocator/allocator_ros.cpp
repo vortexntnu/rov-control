@@ -68,6 +68,7 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
 
     vortex_msgs::ThrusterForces u_msg;
     thrustEigenToMsg(u, u_msg);
+    u_msg.header.stamp = ros::Time::now();
     pub.publish(u_msg);
 }
 

@@ -11,45 +11,16 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
 
   control_mode = ControlModes::OPEN_LOOP;
-  prev_time_valid = false;
 
-  position_state.setZero();
-  orientation_state.setIdentity();
-  velocity_state.setZero();
-  position_setpoint.setZero();
-  orientation_setpoint.setIdentity();
-  wrench_setpoint.setZero();
+  if (!nh.getParam("/controller/frequency", frequency))
+  {
+    ROS_WARN("Failed to read parameter controller frequency, defaulting to 10 Hz.");
+    frequency = 10;
+  }
 
-  getParams();
-
-  // Read controller gains from parameter server
-  std::map<std::string,double> gains;
-  if (!nh.getParam("/controller/gains", gains))
-    ROS_ERROR("Failed to read parameter controller gains.");
-
-  // Read center of gravity and buoyancy vectors
-  std::vector<double> r_G_vec, r_B_vec;
-  if (!nh.getParam("/physical/center_of_mass", r_G_vec))
-    ROS_ERROR("Failed to read robot center of mass parameter.");
-  if (!nh.getParam("/physical/center_of_buoyancy", r_B_vec))
-    ROS_ERROR("Failed to read robot center of buoyancy parameter.");
-  Eigen::Vector3d r_G(r_G_vec.data());
-  Eigen::Vector3d r_B(r_B_vec.data());
-
-  // Read and calculate ROV weight and buoyancy
-  double mass, displacement, acceleration_of_gravity, density_of_water;
-  if (!nh.getParam("/physical/mass_kg", mass))
-    ROS_ERROR("Failed to read parameter mass.");
-  if (!nh.getParam("/physical/displacement_m3", displacement))
-    ROS_ERROR("Failed to read parameter displacement.");
-  if (!nh.getParam("/gravity/acceleration", acceleration_of_gravity))
-    ROS_ERROR("Failed to read parameter acceleration of gravity");
-  if (!nh.getParam("/water/density", density_of_water))
-    ROS_ERROR("Failed to read parameter density of water");
-  double W = mass * acceleration_of_gravity;
-  double B = density_of_water * displacement * acceleration_of_gravity;
-
-  position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
+  state = new State();
+  initSetpoints();
+  initPositionHoldController();
 
   // Set up a dynamic reconfigure server
   dynamic_reconfigure::Server<uranus_dp::ControllerConfig>::CallbackType cb;
@@ -87,20 +58,34 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 
       case ControlModes::POSITION_HOLD:
       ROS_INFO("Controller: Changing mode to POSITION HOLD.");
-      position_setpoint    = position_state;
-      orientation_setpoint = orientation_state;
-      prev_time_valid = false;
+      Eigen::Vector3d    position;
+      Eigen::Quaterniond orientation;
+      Eigen::Vector6d    velocity;
+      state->get(position, orientation, velocity);
+      setpoints->setPose(position, orientation);
       break;
     }
   }
 
-  updateSetpoints(msg);
+  double time = msg.header.stamp.toSec();
+  Eigen::Vector6d command;
+  for (int i = 0; i < 6; ++i)
+    command(i) = msg.motion[i];
+  setpoints->update(time, command);
 }
 
 void Controller::stateCallback(const nav_msgs::Odometry &msg)
 {
-  tf::pointMsgToEigen(msg.pose.pose.position, position_state);
-  tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation_state);
+  Eigen::Vector3d    position;
+  Eigen::Quaterniond orientation;
+  Eigen::Vector6d    velocity;
+
+  tf::pointMsgToEigen(msg.pose.pose.position, position);
+  tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
+  // tf::twistMsgToEigen(msg.twist.twist, velocity);
+  velocity.setZero();
+
+  state->set(position, orientation, velocity);
 }
 
 void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t level)
@@ -111,13 +96,21 @@ void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t le
 
 void Controller::spin()
 {
+  Eigen::Vector6d    tau                  = Eigen::VectorXd::Zero(6);
+  Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
+  Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
+  Eigen::Vector6d    velocity_state       = Eigen::VectorXd::Zero(6);
+  Eigen::Vector3d    position_setpoint    = Eigen::Vector3d::Zero();
+  Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
+
   ros::Rate rate(frequency);
   while (ros::ok())
   {
-    Eigen::Vector6d tau;
     switch (control_mode)
     {
       case ControlModes::POSITION_HOLD:
+      state->get(position_state, orientation_state, velocity_state);
+      setpoints->getPose(position_setpoint, orientation_setpoint);
       tau = position_hold_controller->compute(position_state,
                                               orientation_state,
                                               velocity_state,
@@ -126,7 +119,11 @@ void Controller::spin()
       break;
 
       case ControlModes::OPEN_LOOP:
-      tau = wrench_setpoint;
+      setpoints->getWrench(tau);
+      break;
+
+      default:
+      ROS_ERROR("Default control mode reached in Controller::spin().");
       break;
     }
 
@@ -139,65 +136,57 @@ void Controller::spin()
   }
 }
 
-void Controller::updateSetpoints(const vortex_msgs::PropulsionCommand& msg)
+void Controller::initSetpoints()
 {
-  // Update wrench setpoints
-  for (int i = 0; i < 6; ++i) // TODO: Fix magic number
-    wrench_setpoint(i) = wrench_command_scaling[i] * wrench_command_max[i] * msg.motion[i];
+  std::vector<double> v;
 
-  // Update pose setpoints
-  if (!prev_time_valid)
-  {
-    prev_time = msg.header.stamp;
-    prev_time_valid = true;
-    return;
-  }
+  if (!nh.getParam("/propulsion/command/wrench/max", v))
+    ROS_FATAL("Failed to read parameter max wrench command.");
+  Eigen::Vector6d wrench_command_max = Eigen::Vector6d::Map(v.data(), v.size());
 
-  // Calculate time difference
-  ros::Time curr_time = msg.header.stamp;
-  double dt = (curr_time - prev_time).toSec();
-  prev_time = curr_time;
+  if (!nh.getParam("/propulsion/command/wrench/scaling", v))
+    ROS_FATAL("Failed to read parameter scaling wrench command.");
+  Eigen::Vector6d wrench_command_scaling = Eigen::Vector6d::Map(v.data(), v.size());
 
-  if (dt == 0)
-  {
-    // ROS_WARN("Zero time difference between propulsion command messages.");
-    return;
-  }
+  if (!nh.getParam("/propulsion/command/pose/rate", v))
+    ROS_FATAL("Failed to read parameter pose command rate.");
+  Eigen::Vector6d pose_command_rate = Eigen::Vector6d::Map(v.data(), v.size());
 
-  // Increment position setpoints
-  for (int i = 0; i < 3; ++i) // TODO: Fix magic number
-    position_setpoint(i) += pose_command_rate[i] * dt * msg.motion[i];
-
-  // Calc euler setpoints
-  Eigen::Vector3d orientation_setpoint_euler;
-  orientation_setpoint_euler = orientation_setpoint.toRotationMatrix().eulerAngles(0,1,2);
-  // Increment euler setpoints
-  for (int i = 0; i < 3; ++i) // TODO: Fix magic number
-    orientation_setpoint_euler(i) += pose_command_rate[3+i] * dt * msg.motion[3+i];
-  // Calc incremented quat setpoints
-  Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(orientation_setpoint_euler(0), Eigen::Vector3d::UnitX())
-    * Eigen::AngleAxisd(orientation_setpoint_euler(1), Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(orientation_setpoint_euler(2), Eigen::Vector3d::UnitZ());
-  Eigen::Quaterniond q(R);
-  orientation_setpoint = q;
+  setpoints = new Setpoints(wrench_command_scaling,
+                            wrench_command_max,
+                            pose_command_rate);
 }
 
-void Controller::getParams()
+void Controller::initPositionHoldController()
 {
-  // Read control command parameters
-  if (!nh.getParam("/propulsion/command/wrench/max", wrench_command_max))
-    ROS_FATAL("Failed to read parameter max wrench command.");
-  if (!nh.getParam("/propulsion/command/wrench/scaling", wrench_command_scaling))
-    ROS_FATAL("Failed to read parameter scaling wrench command.");
-  if (!nh.getParam("/propulsion/command/pose/rate", pose_command_rate))
-    ROS_FATAL("Failed to read parameter pose command rate.");
+  // Read controller gains from parameter server
+  std::map<std::string,double> gains;
+  if (!nh.getParam("/controller/gains", gains))
+    ROS_ERROR("Failed to read parameter controller gains.");
 
-  if (!nh.getParam("/controller/frequency", frequency))
-  {
-    ROS_WARN("Failed to read parameter controller frequency, defaulting to 10 Hz.");
-    frequency = 10;
-  }
+  // Read center of gravity and buoyancy vectors
+  std::vector<double> r_G_vec, r_B_vec;
+  if (!nh.getParam("/physical/center_of_mass", r_G_vec))
+    ROS_ERROR("Failed to read robot center of mass parameter.");
+  if (!nh.getParam("/physical/center_of_buoyancy", r_B_vec))
+    ROS_ERROR("Failed to read robot center of buoyancy parameter.");
+  Eigen::Vector3d r_G(r_G_vec.data());
+  Eigen::Vector3d r_B(r_B_vec.data());
+
+  // Read and calculate ROV weight and buoyancy
+  double mass, displacement, acceleration_of_gravity, density_of_water;
+  if (!nh.getParam("/physical/mass_kg", mass))
+    ROS_ERROR("Failed to read parameter mass.");
+  if (!nh.getParam("/physical/displacement_m3", displacement))
+    ROS_ERROR("Failed to read parameter displacement.");
+  if (!nh.getParam("/gravity/acceleration", acceleration_of_gravity))
+    ROS_ERROR("Failed to read parameter acceleration of gravity");
+  if (!nh.getParam("/water/density", density_of_water))
+    ROS_ERROR("Failed to read parameter density of water");
+  double W = mass * acceleration_of_gravity;
+  double B = density_of_water * displacement * acceleration_of_gravity;
+
+  position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
 }
 
 bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)

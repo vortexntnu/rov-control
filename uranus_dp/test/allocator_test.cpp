@@ -36,6 +36,22 @@ public:
     pub.publish(msg);
   }
 
+  // TODO: This should be vectorized somehow in number of arguments
+  void ExpectThrustNear(double f1, double f2, double f3, double f4, double f5, double f6)
+  {
+    double arr[] = {f1, f2, f3, f4, f5, f6};
+    std::vector<double> thrust_expected (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+
+    for (int i = 0; i < thrust.size(); ++i)
+      EXPECT_NEAR(thrust[i], thrust_expected[i], MAX_ERROR);
+  }
+
+  void ExpectThrustNear(double* arr)
+  {
+    for (int i = 0; i < thrust.size(); ++i)
+      EXPECT_NEAR(thrust[i], arr[i], MAX_ERROR);
+  }
+
   void WaitForMessage()
   {
     while (!message_received)
@@ -44,7 +60,7 @@ public:
 
   int                 num_thrusters;
   std::vector<double> thrust;
-  static const double MAX_ERROR = 1e-6;
+  static const double MAX_ERROR = 1e-4;
 
  private:
   ros::NodeHandle nh;
@@ -75,10 +91,8 @@ TEST_F(AllocatorTest, ZeroInput)
   Publish(0, 0, 0, 0, 0, 0);
   WaitForMessage();
 
-  for(std::vector<double>::iterator it = thrust.begin(); it != thrust.end(); ++it)
-  {
-    EXPECT_NEAR(*it, 0, MAX_ERROR);
-  }
+  double thrust_expected[] = {0,0,0,0,0,0};
+  ExpectThrustNear(thrust_expected);
 }
 
 TEST_F(AllocatorTest, Forward)
@@ -86,12 +100,8 @@ TEST_F(AllocatorTest, Forward)
   Publish(1, 0, 0, 0, 0, 0);
   WaitForMessage();
 
-  EXPECT_TRUE(thrust[0] > 0);
-  EXPECT_TRUE(thrust[1] > 0);
-  EXPECT_TRUE(thrust[2] < 0);
-  EXPECT_TRUE(thrust[3] < 0);
-  EXPECT_TRUE(thrust[4] < 0);
-  EXPECT_TRUE(thrust[5] > 0);
+  double thrust_expected[] = {0.35356, 0.35356, -0.35356, -0.35356, -0.20639, 0.20639};
+  ExpectThrustNear(thrust_expected);
 }
 
 TEST_F(AllocatorTest, Sideways)
@@ -99,12 +109,8 @@ TEST_F(AllocatorTest, Sideways)
   Publish(0, 1, 0, 0, 0, 0);
   WaitForMessage();
 
-  EXPECT_TRUE(thrust[0] > 0);
-  EXPECT_TRUE(thrust[1] < 0);
-  EXPECT_TRUE(thrust[2] < 0);
-  EXPECT_TRUE(thrust[3] > 0);
-  EXPECT_NEAR(thrust[4], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[5], 0, MAX_ERROR);
+  double thrust_expected[] = {0.35356, -0.35356, -0.35356, 0.35356, 0.0, 0.0};
+  ExpectThrustNear(thrust_expected);
 }
 
 TEST_F(AllocatorTest, Downward)
@@ -112,12 +118,8 @@ TEST_F(AllocatorTest, Downward)
   Publish(0, 0, 1, 0, 0, 0);
   WaitForMessage();
 
-  EXPECT_NEAR(thrust[0], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[1], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[2], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[3], 0, MAX_ERROR);
-  EXPECT_TRUE(thrust[4] > 0);
-  EXPECT_TRUE(thrust[5] > 0);
+  double thrust_expected[] = {0.0, 0.0, 0.0, 0.0, 0.5, 0.5};
+  ExpectThrustNear(thrust_expected);
 }
 
 TEST_F(AllocatorTest, TiltUp)
@@ -125,12 +127,8 @@ TEST_F(AllocatorTest, TiltUp)
   Publish(0, 0, 0, 0, 1, 0);
   WaitForMessage();
 
-  EXPECT_NEAR(thrust[0], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[1], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[2], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[3], 0, MAX_ERROR);
-  EXPECT_TRUE(thrust[4] < 0);
-  EXPECT_TRUE(thrust[5] > 0);
+  double thrust_expected[] = {0.0, 0.0, 0.0, 0.0, -3.1250, 3.1250};
+  ExpectThrustNear(thrust_expected);
 }
 
 TEST_F(AllocatorTest, TurnRight)
@@ -138,12 +136,8 @@ TEST_F(AllocatorTest, TurnRight)
   Publish(0, 0, 0, 0, 0, 1);
   WaitForMessage();
 
-  EXPECT_TRUE(thrust[0] > 0);
-  EXPECT_TRUE(thrust[1] < 0);
-  EXPECT_TRUE(thrust[2] > 0);
-  EXPECT_TRUE(thrust[3] < 0);
-  EXPECT_NEAR(thrust[4], 0, MAX_ERROR);
-  EXPECT_NEAR(thrust[5], 0, MAX_ERROR);
+  double thrust_expected[] = {1.1666, -1.1666, 1.1666, -1.1666, 0.0, 0.0};
+  ExpectThrustNear(thrust_expected);
 }
 
 int main(int argc, char **argv)

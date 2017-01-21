@@ -4,10 +4,10 @@
     file="$(find uranus_dp)/config/robots/maelstrom.yaml"
   />
 
-  <rosparam
+<!--   <rosparam
     command="load"
     file="$(find uranus_dp)/config/environments/trondheim_freshwater.yaml"
-  />
+  /> -->
 
   <rosparam
     command="load"

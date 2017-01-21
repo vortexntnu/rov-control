@@ -70,83 +70,81 @@ TEST_F(AllocatorTest, CheckResponsiveness)
   WaitForMessage();
 }
 
-// TEST_F(AllocatorTest, ZeroInput)
-// {
-//   Publish(0, 0, 0, 0, 0, 0);
-//   WaitForMessage();
+TEST_F(AllocatorTest, ZeroInput)
+{
+  Publish(0, 0, 0, 0, 0, 0);
+  WaitForMessage();
 
-//   EXPECT_NEAR(F1, 0, MAX_ERROR);
-//   EXPECT_NEAR(F2, 0, MAX_ERROR);
-//   EXPECT_NEAR(F3, 0, MAX_ERROR);
-//   EXPECT_NEAR(F4, 0, MAX_ERROR);
-//   EXPECT_NEAR(F5, 0, MAX_ERROR);
-//   EXPECT_NEAR(F6, 0, MAX_ERROR);
-// }
+  for(std::vector<double>::iterator it = thrust.begin(); it != thrust.end(); ++it)
+  {
+    EXPECT_NEAR(*it, 0, MAX_ERROR);
+  }
+}
 
-// TEST_F(AllocatorTest, Forward)
-// {
-//   Publish(1, 0, 0, 0, 0, 0);
-//   WaitForMessage();
+TEST_F(AllocatorTest, Forward)
+{
+  Publish(1, 0, 0, 0, 0, 0);
+  WaitForMessage();
 
-//   EXPECT_TRUE(F1 < 0);
-//   EXPECT_TRUE(F2 > 0);
-//   EXPECT_TRUE(F3 < 0);
-//   EXPECT_TRUE(F4 > 0);
-//   EXPECT_TRUE(F5 > 0);
-//   EXPECT_TRUE(F6 < 0);
-// }
+  EXPECT_TRUE(thrust[0] > 0);
+  EXPECT_TRUE(thrust[1] > 0);
+  EXPECT_TRUE(thrust[2] < 0);
+  EXPECT_TRUE(thrust[3] < 0);
+  EXPECT_TRUE(thrust[4] < 0);
+  EXPECT_TRUE(thrust[5] > 0);
+}
 
-// TEST_F(AllocatorTest, Sideways)
-// {
-//   Publish(0, 1, 0, 0, 0, 0);
-//   WaitForMessage();
+TEST_F(AllocatorTest, Sideways)
+{
+  Publish(0, 1, 0, 0, 0, 0);
+  WaitForMessage();
 
-//   EXPECT_NEAR(F1, 0, MAX_ERROR);
-//   EXPECT_TRUE(F2 < 0);
-//   EXPECT_TRUE(F3 < 0);
-//   EXPECT_NEAR(F4, 0, MAX_ERROR);
-//   EXPECT_TRUE(F5 > 0);
-//   EXPECT_TRUE(F6 > 0);
-// }
+  EXPECT_TRUE(thrust[0] > 0);
+  EXPECT_TRUE(thrust[1] < 0);
+  EXPECT_TRUE(thrust[2] < 0);
+  EXPECT_TRUE(thrust[3] > 0);
+  EXPECT_NEAR(thrust[4], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[5], 0, MAX_ERROR);
+}
 
-// TEST_F(AllocatorTest, Downward)
-// {
-//   Publish(0, 0, 1, 0, 0, 0);
-//   WaitForMessage();
+TEST_F(AllocatorTest, Downward)
+{
+  Publish(0, 0, 1, 0, 0, 0);
+  WaitForMessage();
 
-//   EXPECT_TRUE(F1 > 0);
-//   EXPECT_NEAR(F2, 0, MAX_ERROR);
-//   EXPECT_NEAR(F3, 0, MAX_ERROR);
-//   EXPECT_TRUE(F4 > 0);
-//   EXPECT_NEAR(F5, 0, MAX_ERROR);
-//   EXPECT_NEAR(F6, 0, MAX_ERROR);
-// }
+  EXPECT_NEAR(thrust[0], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[1], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[2], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[3], 0, MAX_ERROR);
+  EXPECT_TRUE(thrust[4] > 0);
+  EXPECT_TRUE(thrust[5] > 0);
+}
 
-// TEST_F(AllocatorTest, TiltUp)
-// {
-//   Publish(0, 0, 0, 0, 1, 0);
-//   WaitForMessage();
+TEST_F(AllocatorTest, TiltUp)
+{
+  Publish(0, 0, 0, 0, 1, 0);
+  WaitForMessage();
 
-//   EXPECT_TRUE(F1 < 0);
-//   EXPECT_NEAR(F2, 0, MAX_ERROR);
-//   EXPECT_NEAR(F3, 0, MAX_ERROR);
-//   EXPECT_TRUE(F4 > 0);
-//   EXPECT_NEAR(F5, 0, MAX_ERROR);
-//   EXPECT_NEAR(F6, 0, MAX_ERROR);
-// }
+  EXPECT_NEAR(thrust[0], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[1], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[2], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[3], 0, MAX_ERROR);
+  EXPECT_TRUE(thrust[4] < 0);
+  EXPECT_TRUE(thrust[5] > 0);
+}
 
-// TEST_F(AllocatorTest, TurnRight)
-// {
-//   Publish(0, 0, 0, 0, 0, 1);
-//   WaitForMessage();
+TEST_F(AllocatorTest, TurnRight)
+{
+  Publish(0, 0, 0, 0, 0, 1);
+  WaitForMessage();
 
-//   EXPECT_NEAR(F1, 0, MAX_ERROR);
-//   EXPECT_TRUE(F2 < 0);
-//   EXPECT_TRUE(F3 > 0);
-//   EXPECT_NEAR(F4, 0, MAX_ERROR);
-//   EXPECT_TRUE(F5 > 0);
-//   EXPECT_TRUE(F6 < 0);
-// }
+  EXPECT_TRUE(thrust[0] > 0);
+  EXPECT_TRUE(thrust[1] < 0);
+  EXPECT_TRUE(thrust[2] > 0);
+  EXPECT_TRUE(thrust[3] < 0);
+  EXPECT_NEAR(thrust[4], 0, MAX_ERROR);
+  EXPECT_NEAR(thrust[5], 0, MAX_ERROR);
+}
 
 int main(int argc, char **argv)
 {

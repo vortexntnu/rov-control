@@ -208,7 +208,8 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
       num_requested_modes++;
   if (num_requested_modes != 1)
   {
-    ROS_WARN("controller: Invalid control mode.");
+    ROS_WARN_STREAM("Controller: Invalid control mode. Attempt to set "
+                    << num_requested_modes << " control modes at once.");
     return false;
   }
 

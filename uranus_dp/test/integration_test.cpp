@@ -22,19 +22,22 @@ public:
       ros::spinOnce();
   }
 
-  void PublishOpenloop(double forward,    double right,   double down,
-                       double roll_right, double tilt_up, double turn_right)
+  void PublishOpenloop(double forward, double right, double down, double roll_right, double tilt_up, double turn_right)
   {
-    boost::array<double,6> propulsion = { {forward,    right,   down,
-                                           roll_right, tilt_up, turn_right} };
+    boost::array<double,6> propulsion = { {forward, right, down, roll_right, tilt_up, turn_right} };
     const unsigned char arr[] = {1, 0};
     std::vector<unsigned char> mode (arr, arr + sizeof(arr) / sizeof(arr[0]) );
-    // std::vector<unsigned char> mode(1, 0);
 
     vortex_msgs::PropulsionCommand msg;
     msg.motion = propulsion;
     msg.control_mode = mode;
     pub.publish(msg);
+  }
+
+  void ExpectThrustNear(double* arr)
+  {
+    for (int i = 0; i < thrust.size(); ++i)
+      EXPECT_NEAR(thrust[i], arr[i], MAX_ERROR);
   }
 
   void WaitForMessage()
@@ -48,14 +51,15 @@ public:
   //   return message_received;
   // }
 
-  // void OneSecondSpin()
-  // {
-  //   ros::Time start = ros::Time::now();
-  //   while (ros::Time::now() < start + ros::Duration(1))
-  //     ros::spinOnce();
-  // }
+  void OneSecondSpin()
+  {
+    ros::Time start = ros::Time::now();
+    while (ros::Time::now() < start + ros::Duration(1))
+      ros::spinOnce();
+  }
 
   std::vector<double> thrust;
+  static const double MAX_ERROR = 1e-4;
 
  private:
   ros::NodeHandle nh;
@@ -82,26 +86,15 @@ TEST_F(IntegrationTest, CheckResponsiveness)
 }
 
 // Command forward motion, assure correct forces for each thruster.
-// TEST_F(IntegrationTest, Forward)
-// {
-//   Publish(1,0,0,0,0);
-//   WaitForMessage();
+TEST_F(IntegrationTest, Forward)
+{
+  PublishOpenloop(1,0,0,0,0,0);
+  // OneSecondSpin();
+  WaitForMessage();
 
-//   EXPECT_TRUE(F_A < 0);
-//   EXPECT_TRUE(F_B > 0);
-//   EXPECT_TRUE(F_C < 0);
-//   EXPECT_TRUE(F_D > 0);
-//   EXPECT_TRUE(F_E > 0);
-//   EXPECT_TRUE(F_F < 0);
-// }
-
-// Publish message with out of range value, assure no reply.
-// TEST_F(IntegrationTest, OutOfRange)
-// {
-//   Publish(0,0,-2,0,0);
-//   OneSecondSpin();
-//   EXPECT_TRUE(!HasReceivedMessage());
-// }
+  double thrust_expected[] = {0.35356, 0.35356, -0.35356, -0.35356, -0.20639, 0.20639};
+  ExpectThrustNear(thrust_expected);
+}
 
 int main(int argc, char **argv)
 {

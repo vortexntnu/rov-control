@@ -36,16 +36,6 @@ public:
     pub.publish(msg);
   }
 
-  // TODO: This should be vectorized somehow in number of arguments
-  void ExpectThrustNear(double f1, double f2, double f3, double f4, double f5, double f6)
-  {
-    double arr[] = {f1, f2, f3, f4, f5, f6};
-    std::vector<double> thrust_expected (arr, arr + sizeof(arr) / sizeof(arr[0]) );
-
-    for (int i = 0; i < thrust.size(); ++i)
-      EXPECT_NEAR(thrust[i], thrust_expected[i], MAX_ERROR);
-  }
-
   void ExpectThrustNear(double* arr)
   {
     for (int i = 0; i < thrust.size(); ++i)

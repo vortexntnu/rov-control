@@ -16,6 +16,10 @@ Setpoints::Setpoints(const Eigen::Vector6d &wrench_scaling,
 
 bool Setpoints::update(const double time, const Eigen::Vector6d &command)
 {
+  // Update wrench setpoint (independent of timestamp)
+  for (int i = 0; i < 6; ++i)
+    wrench_(i) = wrench_scaling_(i) * wrench_max_(i) * command(i);
+
   // Check difference and validity of timestamp
   if (!time_valid_)
   {
@@ -27,10 +31,6 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   time_ = time;
   if (dt == 0)
     return false;
-
-  // Update wrench setpoint
-  for (int i = 0; i < 6; ++i)
-    wrench_(i) = wrench_scaling_(i) * wrench_max_(i) * command(i);
 
   // Increment position setpoint
   for (int i = 0; i < 3; ++i)

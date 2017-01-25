@@ -1,10 +1,9 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
 #include "boost/array.hpp"
+
 #include "vortex_msgs/PropulsionCommand.h"
 #include "vortex_msgs/ThrusterForces.h"
-// #include "uranus_dp/control_mode_enum.h"
-// #include <Eigen/Dense>
 
 class IntegrationTest : public ::testing::Test
 {
@@ -26,6 +25,18 @@ public:
   {
     boost::array<double,6> propulsion = { {forward, right, down, roll_right, tilt_up, turn_right} };
     const unsigned char arr[] = {1, 0};
+    std::vector<unsigned char> mode (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+
+    vortex_msgs::PropulsionCommand msg;
+    msg.motion = propulsion;
+    msg.control_mode = mode;
+    pub.publish(msg);
+  }
+
+  void PublishInvalidMode()
+  {
+    boost::array<double,6> propulsion = { {1, 2, 3, 4, 5, 6} };
+    const unsigned char arr[] = {0, 0};
     std::vector<unsigned char> mode (arr, arr + sizeof(arr) / sizeof(arr[0]) );
 
     vortex_msgs::PropulsionCommand msg;
@@ -80,14 +91,26 @@ TEST_F(IntegrationTest, CheckResponsiveness)
   WaitForMessage();
 }
 
-// Command forward motion, assure correct forces for each thruster.
-TEST_F(IntegrationTest, Forward)
+// Command forward motion in open loop, assure correct forces for each thruster.
+TEST_F(IntegrationTest, ForwardOpenloop)
 {
   PublishOpenloop(1,0,0,0,0,0);
+  // Spin long enough for the control node to respond to input (depends on control frequency)
   SpinSeconds(0.2);
   WaitForMessage();
 
-  // Wrong thrust below, forgot to map 1 up to newton (1 * max_forward * scaling_forward)
+  double thrust_expected[] = {17.2872, 17.2872, -17.2872, -17.2872, -10.0914, 10.0914};
+  ExpectThrustNear(thrust_expected);
+}
+
+// Give invalid control mode, assure no output change
+TEST_F(IntegrationTest, OutOfRange)
+{
+  PublishOpenloop(1,0,0,0,0,0);
+  PublishInvalidMode();
+  SpinSeconds(0.2);
+  WaitForMessage();
+
   double thrust_expected[] = {17.2872, 17.2872, -17.2872, -17.2872, -10.0914, 10.0914};
   ExpectThrustNear(thrust_expected);
 }

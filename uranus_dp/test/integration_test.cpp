@@ -34,10 +34,10 @@ public:
     pub.publish(msg);
   }
 
-  void ExpectThrustNear(double* arr)
+  void ExpectThrustNear(double* expected)
   {
     for (int i = 0; i < thrust.size(); ++i)
-      EXPECT_NEAR(thrust[i], arr[i], MAX_ERROR);
+      EXPECT_NEAR(thrust[i], expected[i], MAX_ERROR);
   }
 
   void WaitForMessage()
@@ -46,15 +46,10 @@ public:
       ros::spinOnce();
   }
 
-  // bool HasReceivedMessage()
-  // {
-  //   return message_received;
-  // }
-
-  void OneSecondSpin()
+  void SpinSeconds(double s)
   {
-    ros::Time start = ros::Time::now();
-    while (ros::Time::now() < start + ros::Duration(1))
+    ros::Time end = ros::Time::now() + ros::Duration(s);
+    while (ros::Time::now() < end)
       ros::spinOnce();
   }
 
@@ -89,10 +84,11 @@ TEST_F(IntegrationTest, CheckResponsiveness)
 TEST_F(IntegrationTest, Forward)
 {
   PublishOpenloop(1,0,0,0,0,0);
-  // OneSecondSpin();
+  SpinSeconds(0.2);
   WaitForMessage();
 
-  double thrust_expected[] = {0.35356, 0.35356, -0.35356, -0.35356, -0.20639, 0.20639};
+  // Wrong thrust below, forgot to map 1 up to newton (1 * max_forward * scaling_forward)
+  double thrust_expected[] = {17.2872, 17.2872, -17.2872, -17.2872, -10.0914, 10.0914};
   ExpectThrustNear(thrust_expected);
 }
 

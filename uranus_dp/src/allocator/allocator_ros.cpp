@@ -127,18 +127,12 @@ bool Allocator::healthyWrench(const Eigen::VectorXd &v)
 {
   // Check for NaN/Inf
   if (isFucked(v))
-  {
     return false;
-  }
 
   // Check reasonableness
   for (int i = 0; i < 6; ++i)
-  {
     if (abs(v[i]) > 100)
-    {
       return false;
-    }
-  }
 
   return true;
 }

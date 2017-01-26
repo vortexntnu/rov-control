@@ -6,7 +6,8 @@ namespace ControlModes
 enum ControlMode
 {
   OPEN_LOOP = 0,
-  SIXDOF    = 1
+  SIXDOF    = 1,
+  RPY_DEPTH = 2
 };
 }
 typedef ControlModes::ControlMode ControlMode;

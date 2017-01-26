@@ -22,7 +22,7 @@ class MotorInterface(object):
         self.T100_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
         self.num_thrusters    = rospy.get_param('/propulsion/thrusters/num')
         self.max_rate         = rospy.get_param('/thrusters/rate_of_change/max')
-
+        self.motor_connection_enabled = rospy.get_param('/motor_interface/motor_connection_enabled')
         self.prev_time = rospy.get_rostime()
         self.is_initialized = False
 
@@ -32,13 +32,15 @@ class MotorInterface(object):
         self.thrust_reference = numpy.zeros(self.num_thrusters)
 
         # Initialize the PCA9685 using the default address (0x40)
-        # self.pca9685 = Adafruit_PCA9685.PCA9685()
-        # pca9685.set_pwm_freq(FREQUENCY)
+        if (self.motor_connection_enabled):
+            self.pca9685 = Adafruit_PCA9685.PCA9685()
+            pca9685.set_pwm_freq(FREQUENCY)
 
         # Initialize outputs to zero newton
         neutral_pulse_width = self.pulse_width_in_bits(0)
-        # for i in range(num_thrusters):
-            # pca9685.set_pwm(i, 0, neutral_pulse_width)
+        if (self.motor_connection_enabled):
+            for i in range(num_thrusters):
+                pca9685.set_pwm(i, 0, neutral_pulse_width)
 
         print 'Launching node motor_interface at', self.FREQUENCY, 'Hz'
 
@@ -88,7 +90,8 @@ class MotorInterface(object):
         pwm_state = [None]*self.num_thrusters
         for i in range(self.num_thrusters):
             pwm_state[i] = self.pulse_width_in_bits(self.thrust_reference[i])
-            # pca9685.set_pwm(i, 0, pwm_state[i])
+            if (self.motor_connection_enabled):
+                pca9685.set_pwm(i, 0, pwm_state[i])
 
         # Publish outputs for debug
         pwm_msg = ThrusterPwm()

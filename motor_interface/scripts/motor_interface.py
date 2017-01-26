@@ -16,6 +16,7 @@ class MotorInterface(object):
         self.FREQUENCY                     = 249    # Max 400 Hz
         self.FREQUENCY_MEASURED            = 251.2  # Use this for better precision
         self.PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/self.FREQUENCY_MEASURED
+        self.THRUST_RANGE_LIMIT            = 100
 
         self.T100_thrust      = rospy.get_param('/thrusters/characteristics/thrust')
         self.T100_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
@@ -43,7 +44,7 @@ class MotorInterface(object):
 
     def callback(self, msg):
         if not self.healthy_message(msg):
-            rospy.logwarn('Motor interface: Bad message, ignoring.')
+            rospy.logwarn('Motor interface: Message out of range, ignoring.')
             return
 
         if not self.is_initialized:
@@ -101,7 +102,7 @@ class MotorInterface(object):
                 return False
             if math.isinf(t):
                 return False
-            if (abs(t) > 100):
+            if (abs(t) > self.THRUST_RANGE_LIMIT):
                 return False
         return True
 

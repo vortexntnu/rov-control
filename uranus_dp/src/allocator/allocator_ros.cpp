@@ -131,7 +131,7 @@ bool Allocator::healthyWrench(const Eigen::VectorXd &v)
 
   // Check reasonableness
   for (int i = 0; i < 6; ++i)
-    if (abs(v[i]) > 100)
+    if (abs(v[i]) > FORCE_RANGE_LIMIT)
       return false;
 
   return true;

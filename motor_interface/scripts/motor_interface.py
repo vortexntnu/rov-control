@@ -2,6 +2,7 @@
 
 import rospy
 import numpy
+import math
 import Adafruit_PCA9685
 from vortex_msgs.msg import ThrusterForces, ThrusterPwm
 
@@ -41,10 +42,14 @@ class MotorInterface(object):
         print 'Launching node motor_interface at', self.FREQUENCY, 'Hz'
 
     def callback(self, msg):
+        if not self.healthy_message(msg):
+            rospy.logwarn('Motor interface: Bad message, ignoring.')
+            return
+
         if not self.is_initialized:
             self.prev_time = msg.header.stamp
             self.is_initialized = True
-            print 'Initialized motor_interface'
+            rospy.loginfo('Initialized motor_interface')
             return
 
         curr_time = msg.header.stamp
@@ -89,6 +94,18 @@ class MotorInterface(object):
         pwm_msg.header.stamp = rospy.get_rostime()
         pwm_msg.pwm = pwm_state
         self.pub.publish(pwm_msg)
+
+    def healthy_message(self, msg):
+        for t in msg.thrust:
+            if math.isnan(t):
+                return False
+            if math.isinf(t):
+                return False
+            if (abs(t) > 100):
+                return False
+        return True
+
+
 
 if __name__ == '__main__':
     try:

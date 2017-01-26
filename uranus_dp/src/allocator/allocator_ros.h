@@ -25,6 +25,7 @@ private:
     PseudoinverseAllocator *pseudoinverse_allocator;
 
     Eigen::VectorXd rovForcesMsgToEigen(const geometry_msgs::Wrench &msg);
+    bool healthyWrench(const Eigen::VectorXd &v);
 };
 
 #endif

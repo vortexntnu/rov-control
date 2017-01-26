@@ -54,12 +54,18 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
 {
     Eigen::VectorXd tau = rovForcesMsgToEigen(msg);
 
+    if (!healthyWrench(tau))
+    {
+      ROS_ERROR("Allocator: Wrench vector tau invalid, ignoring.");
+      return;
+    }
+
     Eigen::VectorXd u(num_thrusters);
     u = pseudoinverse_allocator->compute(tau);
 
     if (isFucked(u))
     {
-      ROS_ERROR("Thrust vector u invalid, will not publish.");
+      ROS_ERROR("Thrust vector u invalid, ignoring.");
       return;
     }
 
@@ -115,4 +121,24 @@ Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
     }
 
     return tau;
+}
+
+bool Allocator::healthyWrench(const Eigen::VectorXd &v)
+{
+  // Check for NaN/Inf
+  if (isFucked(v))
+  {
+    return false;
+  }
+
+  // Check reasonableness
+  for (int i = 0; i < 6; ++i)
+  {
+    if (abs(v[i]) > 100)
+    {
+      return false;
+    }
+  }
+
+  return true;
 }

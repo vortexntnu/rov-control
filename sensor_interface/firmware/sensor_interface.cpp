@@ -92,43 +92,40 @@ void setup() {
     // nh.advertise(pub_mag);
 }
 
-void setupIMU() {
+void setupIMU(){ /*
+                  Sets opmode to NDOF by default
 
-    /*
-        Sets opmode to NDOF by default
+                  From Adafruit_BNO055.h:
 
-        From Adafruit_BNO055.h:
-
-        OPERATION_MODE_CONFIG                                   = 0X00,
-        OPERATION_MODE_ACCONLY                                  = 0X01,
-        OPERATION_MODE_MAGONLY                                  = 0X02,
-        OPERATION_MODE_GYRONLY                                  = 0X03,
-        OPERATION_MODE_ACCMAG                                   = 0X04,
-        OPERATION_MODE_ACCGYRO                                  = 0X05,
-        OPERATION_MODE_MAGGYRO                                  = 0X06,
-        OPERATION_MODE_AMG                                      = 0X07,
-        OPERATION_MODE_IMUPLUS                                  = 0X08,
-        OPERATION_MODE_COMPASS                                  = 0X09,
-        OPERATION_MODE_M4G                                      = 0X0A,
-        OPERATION_MODE_NDOF_FMC_OFF                             = 0X0B,
-        OPERATION_MODE_NDOF                                     = 0X0C
+                  OPERATION_MODE_CONFIG                                   = 0X00,
+                  OPERATION_MODE_ACCONLY                                  = 0X01,
+                  OPERATION_MODE_MAGONLY                                  = 0X02,
+                  OPERATION_MODE_GYRONLY                                  = 0X03,
+                  OPERATION_MODE_ACCMAG                                   = 0X04,
+                  OPERATION_MODE_ACCGYRO                                  = 0X05,
+                  OPERATION_MODE_MAGGYRO                                  = 0X06,
+                  OPERATION_MODE_AMG                                      = 0X07,
+                  OPERATION_MODE_IMUPLUS                                  = 0X08,
+                  OPERATION_MODE_COMPASS                                  = 0X09,
+                  OPERATION_MODE_M4G                                      = 0X0A,
+                  OPERATION_MODE_NDOF_FMC_OFF                             = 0X0B,
+                  OPERATION_MODE_NDOF                                     = 0X0C
 
 
-                    ACCEL   MAG     GYRO    RELATIVE        ABSOLUTE
-                                            ORIENTATION     ORIENTATION
-        ---------------------------------------------------------------
-        IMU     |    X    |   -    |   X  |       X        |     -
-        COMPASS |    X    |   X    |   -  |       -        |     X
-        M4G     |    X    |   X    |   -  |       X        |     -
-        NDOF    |    X    |   X    |   X  |       -        |     X
-    */
+                  ACCEL   MAG     GYRO    RELATIVE        ABSOLUTE
+                  ORIENTATION     ORIENTATION
+                  ---------------------------------------------------------------
+                  IMU     |    X    |   -    |   X  |       X        |     -
+                  COMPASS |    X    |   X    |   -  |       -        |     X
+                  M4G     |    X    |   X    |   -  |       X        |     -
+                  NDOF    |    X    |   X    |   X  |       -        |     X
+                */
 
     id = bno055.begin(bno055.OPERATION_MODE_CONFIG);
     bno055.setAxisConfig(bno055.REMAP_CONFIG_P6);
     bno055.setAxisSign(bno055.REMAP_SIGN_P6);
     bno055.setMode(bno055.OPERATION_MODE_IMUPLUS);
 }
-
 
 void getPressure() {
 
@@ -281,5 +278,3 @@ void loop(){
 
     }
 }
-
-

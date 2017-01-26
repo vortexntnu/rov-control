@@ -52,75 +52,75 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 // inline bool saturateVector(Eigen::VectorXd &v, double min, double max)
 void Allocator::callback(const geometry_msgs::Wrench &msg)
 {
-    Eigen::VectorXd tau = rovForcesMsgToEigen(msg);
+  Eigen::VectorXd tau = rovForcesMsgToEigen(msg);
 
-    if (!healthyWrench(tau))
-    {
-      ROS_ERROR("Allocator: Wrench vector tau invalid, ignoring.");
-      return;
-    }
+  if (!healthyWrench(tau))
+  {
+    ROS_ERROR("Allocator: Wrench vector tau invalid, ignoring.");
+    return;
+  }
 
-    Eigen::VectorXd u(num_thrusters);
-    u = pseudoinverse_allocator->compute(tau);
+  Eigen::VectorXd u(num_thrusters);
+  u = pseudoinverse_allocator->compute(tau);
 
-    if (isFucked(u))
-    {
-      ROS_ERROR("Thrust vector u invalid, ignoring.");
-      return;
-    }
+  if (isFucked(u))
+  {
+    ROS_ERROR("Thrust vector u invalid, ignoring.");
+    return;
+  }
 
-    if (!saturateVector(u, min_thrust, max_thrust))
-      ROS_WARN("Thrust vector u required saturation.");
+  if (!saturateVector(u, min_thrust, max_thrust))
+    ROS_WARN("Thrust vector u required saturation.");
 
-    vortex_msgs::ThrusterForces u_msg;
-    thrustEigenToMsg(u, u_msg);
-    u_msg.header.stamp = ros::Time::now();
-    pub.publish(u_msg);
+  vortex_msgs::ThrusterForces u_msg;
+  thrustEigenToMsg(u, u_msg);
+  u_msg.header.stamp = ros::Time::now();
+  pub.publish(u_msg);
 }
 
 Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
 {
-    // TODO: rewrite without a million ifs
-    Eigen::VectorXd tau(num_dof);
-    int i = 0;
-    if (dofs["surge"])
-    {
-      tau(i) = msg.force.x;
-      ++i;
-    }
-    if (dofs["sway"])
-    {
-      tau(i) = msg.force.y;
-      ++i;
-    }
-    if (dofs["heave"])
-    {
-      tau(i) = msg.force.z;
-      ++i;
-    }
-    if (dofs["roll"])
-    {
-      tau(i) = msg.torque.x;
-      ++i;
-    }
-    if (dofs["pitch"])
-    {
-      tau(i) = msg.torque.y;
-      ++i;
-    }
-    if (dofs["yaw"])
-    {
-      tau(i) = msg.torque.z;
-      ++i;
-    }
+  // TODO: rewrite without a million ifs
+  Eigen::VectorXd tau(num_dof);
+  int i = 0;
+  if (dofs["surge"])
+  {
+    tau(i) = msg.force.x;
+    ++i;
+  }
+  if (dofs["sway"])
+  {
+    tau(i) = msg.force.y;
+    ++i;
+  }
+  if (dofs["heave"])
+  {
+    tau(i) = msg.force.z;
+    ++i;
+  }
+  if (dofs["roll"])
+  {
+    tau(i) = msg.torque.x;
+    ++i;
+  }
+  if (dofs["pitch"])
+  {
+    tau(i) = msg.torque.y;
+    ++i;
+  }
+  if (dofs["yaw"])
+  {
+    tau(i) = msg.torque.z;
+    ++i;
+  }
 
-    if (i != num_dof)
-    {
-      ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof << ". Returning zero thrust vector.");
-      return Eigen::VectorXd::Zero(num_dof);
-    }
+  if (i != num_dof)
+  {
+    ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof << ". Returning zero thrust vector.");
+    return Eigen::VectorXd::Zero(num_dof);
+  }
 
-    return tau;
+  return tau;
 }
 
 bool Allocator::healthyWrench(const Eigen::VectorXd &v)

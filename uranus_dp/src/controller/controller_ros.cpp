@@ -56,7 +56,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
       ROS_INFO("Controller: Changing mode to OPEN LOOP.");
       break;
 
-      case ControlModes::POSITION_HOLD:
+      case ControlModes::SIXDOF:
       ROS_INFO("Controller: Changing mode to POSITION HOLD.");
       Eigen::Vector3d    position;
       Eigen::Quaterniond orientation;
@@ -108,7 +108,7 @@ void Controller::spin()
   {
     switch (control_mode)
     {
-      case ControlModes::POSITION_HOLD:
+      case ControlModes::SIXDOF:
       state->get(position_state, orientation_state, velocity_state);
       setpoints->getPose(position_setpoint, orientation_setpoint);
       tau = position_hold_controller->compute(position_state,

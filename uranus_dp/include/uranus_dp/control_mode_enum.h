@@ -5,9 +5,10 @@ namespace ControlModes
 {
 enum ControlMode
 {
-  OPEN_LOOP = 0,
-  SIXDOF    = 1,
-  RPY_DEPTH = 2
+  OPEN_LOOP  = 0,
+  SIXDOF     = 1,
+  RPY_DEPTH  = 2,
+  DEPTH_HOLD = 3
 };
 }
 typedef ControlModes::ControlMode ControlMode;

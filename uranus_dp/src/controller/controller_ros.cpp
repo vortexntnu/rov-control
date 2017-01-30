@@ -44,94 +44,82 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     for (i = 0; i < msg.control_mode.size(); ++i)
       if (msg.control_mode[i])
         break;
-      new_control_mode = static_cast<ControlMode>(i);
-    }
-
-    if (new_control_mode != control_mode)
-    {
-      control_mode = new_control_mode;
-
-      Eigen::Vector3d    position;
-      Eigen::Quaterniond orientation;
-      Eigen::Vector6d    velocity;
-
-      switch (control_mode)
-      {
-        case ControlModes::OPEN_LOOP:
-        ROS_INFO("Controller: Changing mode to OPEN_LOOP.");
-        break;
-
-        case ControlModes::SIXDOF:
-        ROS_INFO("Controller: Changing mode to SIXDOF.");
-        state->get(position, orientation, velocity);
-        setpoints->setPose(position, orientation);
-        break;
-
-        case ControlModes::RPY_DEPTH:
-        ROS_INFO("Controller: Changing mode to RPY_DEPTH.");
-        state->get(position, orientation, velocity);
-        setpoints->setPose(position, orientation);
-      }
-    }
-
-    double time = msg.header.stamp.toSec();
-    Eigen::Vector6d command;
-    for (int i = 0; i < 6; ++i)
-      command(i) = msg.motion[i];
-    setpoints->update(time, command);
+    new_control_mode = static_cast<ControlMode>(i);
   }
 
-  void Controller::stateCallback(const nav_msgs::Odometry &msg)
+  if (new_control_mode != control_mode)
   {
+    control_mode = new_control_mode;
+
     Eigen::Vector3d    position;
     Eigen::Quaterniond orientation;
     Eigen::Vector6d    velocity;
 
-    tf::pointMsgToEigen(msg.pose.pose.position, position);
-    tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
+    // Reset setpoints to be equal to state
+    state->get(position, orientation, velocity);
+    setpoints->setPose(position, orientation);
+
+    ROS_INFO_STREAM("Controller: Changing mode to control mode " << control_mode << ".");
+  }
+
+  double time = msg.header.stamp.toSec();
+  Eigen::Vector6d command;
+  for (int i = 0; i < 6; ++i)
+    command(i) = msg.motion[i];
+  setpoints->update(time, command);
+}
+
+void Controller::stateCallback(const nav_msgs::Odometry &msg)
+{
+  Eigen::Vector3d    position;
+  Eigen::Quaterniond orientation;
+  Eigen::Vector6d    velocity;
+
+  tf::pointMsgToEigen(msg.pose.pose.position, position);
+  tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
   // tf::twistMsgToEigen(msg.twist.twist, velocity);
-    velocity.setZero();
+  velocity.setZero();
 
-    state->set(position, orientation, velocity);
-  }
+  state->set(position, orientation, velocity);
+}
 
-  void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t level)
+void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t level)
+{
+  ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
+  position_hold_controller->setGains(config.a, config.b, config.c);
+}
+
+void Controller::spin()
+{
+  Eigen::Vector6d    tau                  = Eigen::VectorXd::Zero(6);
+  Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
+  Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
+  Eigen::Vector6d    velocity_state       = Eigen::VectorXd::Zero(6);
+  Eigen::Vector3d    position_setpoint    = Eigen::Vector3d::Zero();
+  Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
+
+  ros::Rate rate(frequency);
+  while (ros::ok())
   {
-    ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
-    position_hold_controller->setGains(config.a, config.b, config.c);
-  }
-
-  void Controller::spin()
-  {
-    Eigen::Vector6d    tau                  = Eigen::VectorXd::Zero(6);
-    Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
-    Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
-    Eigen::Vector6d    velocity_state       = Eigen::VectorXd::Zero(6);
-    Eigen::Vector3d    position_setpoint    = Eigen::Vector3d::Zero();
-    Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
-
-    ros::Rate rate(frequency);
-    while (ros::ok())
+    switch (control_mode)
     {
-      switch (control_mode)
+      case ControlModes::OPEN_LOOP:
       {
-        case ControlModes::OPEN_LOOP:
-        {
-          setpoints->getWrench(tau);
-          break;
-        }
+        setpoints->getWrench(tau);
+        break;
+      }
 
-        case ControlModes::SIXDOF:
-        {
-          state->get(position_state, orientation_state, velocity_state);
-          setpoints->getPose(position_setpoint, orientation_setpoint);
-          tau = position_hold_controller->compute(position_state,
-            orientation_state,
-            velocity_state,
-            position_setpoint,
-            orientation_setpoint);
-          break;
-        }
+      case ControlModes::SIXDOF:
+      {
+        state->get(position_state, orientation_state, velocity_state);
+        setpoints->getPose(position_setpoint, orientation_setpoint);
+        tau = position_hold_controller->compute(position_state,
+                                                orientation_state,
+                                                velocity_state,
+                                                position_setpoint,
+                                                orientation_setpoint);
+        break;
+      }
 
       case ControlModes::RPY_DEPTH: // TODO: Find a way to do this with less code duplication
       {
@@ -139,10 +127,10 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
         setpoints->getPose(position_setpoint, orientation_setpoint);
         Eigen::Vector6d tau_sixdof;
         tau_sixdof = position_hold_controller->compute(position_state,
-         orientation_state,
-         velocity_state,
-         position_setpoint,
-         orientation_setpoint);
+                                                       orientation_state,
+                                                       velocity_state,
+                                                       position_setpoint,
+                                                       orientation_setpoint);
         Eigen::Vector6d tau_openloop;
         setpoints->getWrench(tau_openloop);
         tau(0) = tau_openloop(0);
@@ -150,6 +138,29 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
         for (int i = 2; i < tau.size(); ++i)
           tau(i) = tau_sixdof(i);
         break;
+      }
+
+      case ControlModes::DEPTH_HOLD:
+      {
+        state->get(position_state, orientation_state, velocity_state);
+        setpoints->getPose(position_setpoint, orientation_setpoint);
+        position_setpoint(0) = position_state(0);
+        position_setpoint(1) = position_state(1);
+        orientation_setpoint = orientation_state;
+        Eigen::Vector6d tau_sixdof;
+        tau_sixdof = position_hold_controller->compute(position_state,
+                                                       orientation_state,
+                                                       velocity_state,
+                                                       position_setpoint,
+                                                       orientation_setpoint);
+        Eigen::Vector6d tau_openloop;
+        setpoints->getWrench(tau_openloop);
+        tau_openloop(2) = 0;
+        tau = tau_sixdof + tau_openloop;
+        // Okay, so the idea here is to calculate the sixdof wrench with all setpoints except depth
+        // set equal to the state. That way, only the depth error will be counteracted by the
+        // controller. I also read the open loop setpoints (wrench), and overlay all of them except
+        // for the z-axis one. The two wrench vectors are then added together.
       }
 
       default:
@@ -238,12 +249,13 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
   for (int i = 0; i < msg.control_mode.size(); ++i)
     if (msg.control_mode[i])
       num_requested_modes++;
-    if (num_requested_modes != 1)
-    {
-      ROS_WARN_STREAM("Controller: Invalid control mode. Attempt to set "
-        << num_requested_modes << " control modes at once.");
-      return false;
-    }
 
-    return true;
+  if (num_requested_modes != 1)
+  {
+    ROS_WARN_STREAM("Controller: Invalid control mode. Attempt to set "
+                    << num_requested_modes << " control modes at once.");
+    return false;
   }
+
+  return true;
+}

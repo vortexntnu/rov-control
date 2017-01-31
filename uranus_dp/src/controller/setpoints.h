@@ -13,7 +13,7 @@ public:
             const Eigen::Vector6d &pose_rate);
   bool update(const double time, const Eigen::Vector6d &command);
   void get(Eigen::Vector6d &wrench);
-  void get(Eigen::Vector3d &position,
+  void get(Eigen::Vector3d    &position,
            Eigen::Quaterniond &orientation);
   void set(const Eigen::Vector3d    &position,
            const Eigen::Quaterniond &orientation);

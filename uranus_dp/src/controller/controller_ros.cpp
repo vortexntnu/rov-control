@@ -57,7 +57,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 
     // Reset setpoints to be equal to state
     state->get(position, orientation, velocity);
-    setpoints->setPose(position, orientation);
+    setpoints->set(position, orientation);
 
     ROS_INFO_STREAM("Controller: Changing mode to control mode " << control_mode << ".");
   }
@@ -105,14 +105,14 @@ void Controller::spin()
     {
       case ControlModes::OPEN_LOOP:
       {
-        setpoints->getWrench(tau);
+        setpoints->get(tau);
         break;
       }
 
       case ControlModes::SIXDOF:
       {
         state->get(position_state, orientation_state, velocity_state);
-        setpoints->getPose(position_setpoint, orientation_setpoint);
+        setpoints->get(position_setpoint, orientation_setpoint);
         tau = position_hold_controller->compute(position_state,
                                                 orientation_state,
                                                 velocity_state,
@@ -125,7 +125,7 @@ void Controller::spin()
       {
         // TODO: Actually, just rewrite this completely. Do something similar to DEPTH_HOLD
         state->get(position_state, orientation_state, velocity_state);
-        setpoints->getPose(position_setpoint, orientation_setpoint);
+        setpoints->get(position_setpoint, orientation_setpoint);
         Eigen::Vector6d tau_sixdof;
         tau_sixdof = position_hold_controller->compute(position_state,
                                                        orientation_state,
@@ -133,7 +133,7 @@ void Controller::spin()
                                                        position_setpoint,
                                                        orientation_setpoint);
         Eigen::Vector6d tau_openloop;
-        setpoints->getWrench(tau_openloop);
+        setpoints->get(tau_openloop);
         tau(0) = tau_openloop(0);
         tau(1) = tau_openloop(1);
         for (int i = 2; i < tau.size(); ++i)
@@ -144,7 +144,7 @@ void Controller::spin()
       case ControlModes::DEPTH_HOLD:
       {
         state->get(position_state, orientation_state, velocity_state);
-        setpoints->getPose(position_setpoint, orientation_setpoint);
+        setpoints->get(position_setpoint, orientation_setpoint);
         position_setpoint(0) = position_state(0);
         position_setpoint(1) = position_state(1);
         orientation_setpoint = orientation_state;
@@ -155,7 +155,7 @@ void Controller::spin()
                                                        position_setpoint,
                                                        orientation_setpoint);
         Eigen::Vector6d tau_openloop;
-        setpoints->getWrench(tau_openloop);
+        setpoints->get(tau_openloop);
         tau_openloop(2) = 0;
         tau = tau_sixdof + tau_openloop;
         // Okay, so the idea here is to calculate the sixdof wrench with all setpoints except depth

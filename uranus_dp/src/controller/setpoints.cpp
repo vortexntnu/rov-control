@@ -55,20 +55,20 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   return true;
 }
 
-void Setpoints::getWrench(Eigen::Vector6d &wrench)
+void Setpoints::get(Eigen::Vector6d &wrench)
 {
   wrench = wrench_;
 }
 
-void Setpoints::getPose(Eigen::Vector3d    &position,
-                        Eigen::Quaterniond &orientation)
+void Setpoints::get(Eigen::Vector3d    &position,
+                    Eigen::Quaterniond &orientation)
 {
   position    = position_;
   orientation = orientation_;
 }
 
-void Setpoints::setPose(const Eigen::Vector3d    &position,
-                        const Eigen::Quaterniond &orientation)
+void Setpoints::set(const Eigen::Vector3d    &position,
+                    const Eigen::Quaterniond &orientation)
 {
   position_    = position;
   orientation_ = orientation;

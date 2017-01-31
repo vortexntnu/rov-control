@@ -197,8 +197,8 @@ void Controller::initSetpoints()
   Eigen::Vector6d pose_command_rate = Eigen::Vector6d::Map(v.data(), v.size());
 
   setpoints = new Setpoints(wrench_command_scaling,
-    wrench_command_max,
-    pose_command_rate);
+                            wrench_command_max,
+                            pose_command_rate);
 }
 
 void Controller::initPositionHoldController()
@@ -230,7 +230,10 @@ void Controller::initPositionHoldController()
   double W = mass * acceleration_of_gravity;
   double B = density_of_water * displacement * acceleration_of_gravity;
 
-  position_hold_controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
+  position_hold_controller = new QuaternionPdController(gains["a"],
+                                                        gains["b"],
+                                                        gains["c"],
+                                                        W, B, r_G, r_B);
 }
 
 bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)

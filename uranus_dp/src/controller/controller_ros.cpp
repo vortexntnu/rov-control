@@ -123,6 +123,7 @@ void Controller::spin()
 
       case ControlModes::RPY_DEPTH: // TODO: Find a way to do this with less code duplication
       {
+        // TODO: Actually, just rewrite this completely. Do something similar to DEPTH_HOLD
         state->get(position_state, orientation_state, velocity_state);
         setpoints->getPose(position_setpoint, orientation_setpoint);
         Eigen::Vector6d tau_sixdof;

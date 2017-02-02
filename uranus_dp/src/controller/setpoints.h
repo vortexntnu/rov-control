@@ -12,8 +12,8 @@ public:
             const Eigen::Vector6d &wrench_max,
             const Eigen::Vector6d &pose_rate);
   bool update(const double time, const Eigen::Vector6d &command);
-  void get(Eigen::Vector6d &wrench);
-  void get(Eigen::Vector3d    &position,
+  bool get(Eigen::Vector6d &wrench);
+  bool get(Eigen::Vector3d    &position,
            Eigen::Quaterniond &orientation);
   void set(const Eigen::Vector3d    &position,
            const Eigen::Quaterniond &orientation);
@@ -29,6 +29,8 @@ private:
 
   double time_;
   bool   time_valid_;
+  bool   wrench_valid_;
+  bool   pose_valid_;
 };
 
 #endif

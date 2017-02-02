@@ -71,14 +71,15 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 
 void Controller::stateCallback(const nav_msgs::Odometry &msg)
 {
+  // TODO: add range check
+
   Eigen::Vector3d    position;
   Eigen::Quaterniond orientation;
   Eigen::Vector6d    velocity;
 
   tf::pointMsgToEigen(msg.pose.pose.position, position);
   tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
-  // tf::twistMsgToEigen(msg.twist.twist, velocity);
-  velocity.setZero();
+  tf::twistMsgToEigen(msg.twist.twist, velocity);
 
   state->set(position, orientation, velocity);
 }
@@ -91,77 +92,76 @@ void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t le
 
 void Controller::spin()
 {
-  Eigen::Vector6d    tau                  = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_command          = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_openloop         = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_sixdof           = Eigen::VectorXd::Zero(6);
+
   Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
   Eigen::Vector6d    velocity_state       = Eigen::VectorXd::Zero(6);
+
   Eigen::Vector3d    position_setpoint    = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
 
   ros::Rate rate(frequency);
   while (ros::ok())
   {
+    // TODO: check value of bool return from getters
+    state->get(position_state, orientation_state, velocity_state);
+    setpoints->get(position_setpoint, orientation_setpoint);
+
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
       {
-        setpoints->get(tau);
+        setpoints->get(tau_command);
         break;
       }
 
       case ControlModes::SIXDOF:
       {
-        state->get(position_state, orientation_state, velocity_state);
-        setpoints->get(position_setpoint, orientation_setpoint);
-        tau = position_hold_controller->compute(position_state,
-                                                orientation_state,
-                                                velocity_state,
-                                                position_setpoint,
-                                                orientation_setpoint);
+        tau_command = position_hold_controller->compute(position_state,
+                                                        orientation_state,
+                                                        velocity_state,
+                                                        position_setpoint,
+                                                        orientation_setpoint);
         break;
       }
 
-      case ControlModes::RPY_DEPTH: // TODO: Find a way to do this with less code duplication
+      case ControlModes::RPY_DEPTH:
       {
-        // TODO: Actually, just rewrite this completely. Do something similar to DEPTH_HOLD
-        state->get(position_state, orientation_state, velocity_state);
-        setpoints->get(position_setpoint, orientation_setpoint);
-        Eigen::Vector6d tau_sixdof;
-        tau_sixdof = position_hold_controller->compute(position_state,
-                                                       orientation_state,
-                                                       velocity_state,
-                                                       position_setpoint,
-                                                       orientation_setpoint);
-        Eigen::Vector6d tau_openloop;
-        setpoints->get(tau_openloop);
-        tau(0) = tau_openloop(0);
-        tau(1) = tau_openloop(1);
-        for (int i = 2; i < tau.size(); ++i)
-          tau(i) = tau_sixdof(i);
+        // TODO: make this similar to depth hold
+        tau_command(0) = tau_openloop(0);
+        tau_command(1) = tau_openloop(1);
+        tau_command(2) = tau_sixdof(2);
+        tau_command(3) = tau_sixdof(3);
+        tau_command(4) = tau_sixdof(4);
+        tau_command(5) = tau_sixdof(5);
         break;
       }
 
       case ControlModes::DEPTH_HOLD:
       {
-        state->get(position_state, orientation_state, velocity_state);
-        setpoints->get(position_setpoint, orientation_setpoint);
-        position_setpoint(0) = position_state(0);
-        position_setpoint(1) = position_state(1);
-        orientation_setpoint = orientation_state;
-        Eigen::Vector6d tau_sixdof;
-        tau_sixdof = position_hold_controller->compute(position_state,
-                                                       orientation_state,
-                                                       velocity_state,
-                                                       position_setpoint,
-                                                       orientation_setpoint);
-        Eigen::Vector6d tau_openloop;
         setpoints->get(tau_openloop);
-        tau_openloop(2) = 0;
-        tau = tau_sixdof + tau_openloop;
-        // Okay, so the idea here is to calculate the sixdof wrench with all setpoints except depth
-        // set equal to the state. That way, only the depth error will be counteracted by the
-        // controller. I also read the open loop setpoints (wrench), and overlay all of them except
-        // for the z-axis one. The two wrench vectors are then added together.
+
+        bool depth_change_commanded = abs(tau_openloop(2) > FORCE_DEADZONE_LIMIT);
+        if (depth_change_commanded)
+        {
+          tau_command = tau_openloop;
+        }
+        else
+        {
+          position_setpoint(0) = position_state(0);
+          position_setpoint(1) = position_state(1);
+          orientation_setpoint = orientation_state;
+          tau_sixdof = position_hold_controller->compute(position_state,
+                                                         orientation_state,
+                                                         velocity_state,
+                                                         position_setpoint,
+                                                         orientation_setpoint);
+          tau_command = tau_sixdof + tau_openloop;
+        }
+        break;
       }
 
       default:
@@ -172,7 +172,7 @@ void Controller::spin()
     }
 
     geometry_msgs::Wrench msg;
-    tf::wrenchEigenToMsg(tau, msg);
+    tf::wrenchEigenToMsg(tau_command, msg);
     wrench_pub.publish(msg);
 
     ros::spinOnce();

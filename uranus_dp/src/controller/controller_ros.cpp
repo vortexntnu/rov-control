@@ -4,6 +4,8 @@
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>
 
+#include "std_msgs/UInt8.h"
+
 #include <math.h>
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
@@ -11,6 +13,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
   state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
   wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+  mode_pub    = nh.advertise<std_msgs::UInt8>("controller/mode", 10);
 
   control_mode = ControlModes::OPEN_LOOP;
 
@@ -63,6 +66,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 
     ROS_INFO_STREAM("Controller: Changing mode to control mode " << control_mode << ".");
   }
+  publishControlMode();
 
   double time = msg.header.stamp.toSec();
   Eigen::Vector6d command;
@@ -270,4 +274,11 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
   }
 
   return true;
+}
+
+void Controller::publishControlMode()
+{
+  std_msgs::UInt8 msg;
+  msg.data = control_mode;
+  mode_pub.publish(msg);
 }

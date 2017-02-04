@@ -73,8 +73,6 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 
 void Controller::stateCallback(const nav_msgs::Odometry &msg)
 {
-  // TODO: add range check
-
   Eigen::Vector3d    position;
   Eigen::Quaterniond orientation;
   Eigen::Vector6d    velocity;

@@ -4,6 +4,8 @@
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>
 
+#include <math.h>
+
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
   command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
@@ -80,6 +82,14 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   tf::pointMsgToEigen(msg.pose.pose.position, position);
   tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
   tf::twistMsgToEigen(msg.twist.twist, velocity);
+
+  const double MAX_QUAT_NORM_DEVIATION = 0.1;
+  bool orientation_invalid = (abs(orientation.norm() - 1) > MAX_QUAT_NORM_DEVIATION);
+  if (isFucked(position) || isFucked(velocity) || orientation_invalid)
+  {
+    ROS_WARN("Controller: State not valid, ignoring...");
+    return;
+  }
 
   state->set(position, orientation, velocity);
 }

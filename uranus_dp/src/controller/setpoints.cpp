@@ -11,7 +11,9 @@ Setpoints::Setpoints(const Eigen::Vector6d &wrench_scaling,
   position_.setZero();
   orientation_.setIdentity();
 
-  time_valid_ = false;
+  time_valid_   = false;
+  wrench_valid_ = false;
+  pose_valid_   = false;
 }
 
 bool Setpoints::update(const double time, const Eigen::Vector6d &command)
@@ -19,6 +21,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   // Update wrench setpoint (independent of timestamp)
   for (int i = 0; i < 6; ++i)
     wrench_(i) = wrench_scaling_(i) * wrench_max_(i) * command(i);
+  wrench_valid_ = true;
 
   // Check difference and validity of timestamp
   if (!time_valid_)
@@ -52,26 +55,36 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   Eigen::Quaterniond q(R);
   orientation_ = q;
 
+  pose_valid_ = true;
   return true;
 }
 
-void Setpoints::getWrench(Eigen::Vector6d &wrench)
+bool Setpoints::get(Eigen::Vector6d &wrench)
 {
+  if (!wrench_valid_)
+    return false;
+
   wrench = wrench_;
+  return true;
 }
 
-void Setpoints::getPose(Eigen::Vector3d    &position,
-                        Eigen::Quaterniond &orientation)
+bool Setpoints::get(Eigen::Vector3d    &position,
+                    Eigen::Quaterniond &orientation)
 {
+  if (!pose_valid_)
+    return false;
+
   position    = position_;
   orientation = orientation_;
+  return true;
 }
 
-void Setpoints::setPose(const Eigen::Vector3d    &position,
-                        const Eigen::Quaterniond &orientation)
+void Setpoints::set(const Eigen::Vector3d    &position,
+                    const Eigen::Quaterniond &orientation)
 {
   position_    = position;
   orientation_ = orientation;
 
   time_valid_ = false;
+  pose_valid_ = true;
 }

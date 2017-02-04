@@ -29,6 +29,7 @@ private:
   ros::Subscriber command_sub;
   ros::Subscriber state_sub;
   ros::Publisher  wrench_pub;
+  ros::Publisher  mode_pub;
   dynamic_reconfigure::Server<uranus_dp::ControllerConfig> dr_srv;
 
   ControlMode control_mode;
@@ -42,6 +43,7 @@ private:
   void initSetpoints();
   void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
+  void publishControlMode();
 };
 
 #endif

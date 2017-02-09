@@ -65,7 +65,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     state->get(position, orientation, velocity);
     setpoints->set(position, orientation);
 
-    ROS_INFO_STREAM("Controller: Changing mode to control mode " << control_mode << ".");
+    ROS_INFO_STREAM("Controller: Changing mode to " << controlModeString(control_mode) << ".");
   }
   publishControlMode();
 

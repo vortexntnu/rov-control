@@ -1,10 +1,11 @@
 #include "controller_ros.h"
 
 #include "uranus_dp/eigen_helper.h"
+#include "uranus_dp/vortex_helper.h"
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>
 
-#include "std_msgs/UInt8.h"
+#include "std_msgs/String.h"
 
 #include <math.h>
 
@@ -13,7 +14,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
   state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
   wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
-  mode_pub    = nh.advertise<std_msgs::UInt8>("controller/mode", 10);
+  mode_pub    = nh.advertise<std_msgs::String>("controller/mode", 10);
 
   control_mode = ControlModes::OPEN_LOOP;
 
@@ -278,7 +279,8 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
 
 void Controller::publishControlMode()
 {
-  std_msgs::UInt8 msg;
-  msg.data = control_mode;
+  std::string s = controlModeString(control_mode);
+  std_msgs::String msg;
+  msg.data = s;
   mode_pub.publish(msg);
 }

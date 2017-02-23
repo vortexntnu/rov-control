@@ -18,11 +18,14 @@ class MotorInterface(object):
         self.PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/self.FREQUENCY_MEASURED
         self.THRUST_RANGE_LIMIT            = 100
 
+        self.ENABLE_RATE_LIMITER = False
+
         self.T100_thrust      = rospy.get_param('/thrusters/characteristics/thrust')
         self.T100_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
         self.num_thrusters    = rospy.get_param('/propulsion/thrusters/num')
         self.max_rate         = rospy.get_param('/thrusters/rate_of_change/max')
         self.motor_connection_enabled = rospy.get_param('/motor_interface/motor_connection_enabled')
+        self.rate_limiting_enabled    = rospy.get_param('/motor_interface/rate_limiting_enabled')
         self.prev_time = rospy.get_rostime()
         self.is_initialized = False
 
@@ -76,13 +79,18 @@ class MotorInterface(object):
     def update_reference(self, dt):
         rate_of_change = (self.thrust_setpoint - self.thrust_reference)/dt
 
-        for i in range(self.num_thrusters):
-            if rate_of_change[i] > self.max_rate:
-                self.thrust_reference[i] += dt * self.max_rate
-            elif rate_of_change[i] < -self.max_rate:
-                self.thrust_reference[i] -= dt * self.max_rate
-            else:
-                self.thrust_reference[i] = self.thrust_setpoint[i]
+    def update_reference(self, dt):
+        if self.rate_limiting_enabled:
+            rate_of_change = (self.thrust_setpoint - self.thrust_reference)/dt
+            for i in range(self.num_thrusters):
+                if rate_of_change[i] > self.max_rate:
+                    self.thrust_reference[i] += dt * self.max_rate
+                elif rate_of_change[i] < -self.max_rate:
+                    self.thrust_reference[i] -= dt * self.max_rate
+                else:
+                    self.thrust_reference[i] = self.thrust_setpoint[i]
+        else:
+            self.thrust_reference = self.thrust_setpoint
 
     def set_pwm(self):
         pwm_state = [None]*self.num_thrusters

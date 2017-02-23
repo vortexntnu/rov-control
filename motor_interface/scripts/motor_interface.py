@@ -40,7 +40,7 @@ class MotorInterface(object):
             pca9685.set_pwm_freq(FREQUENCY)
 
         # Initialize outputs to zero newton
-        neutral_pulse_width = self.pulse_width_in_bits(0)
+        neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
         if (self.motor_connection_enabled):
             for i in range(num_thrusters):
                 pca9685.set_pwm(i, 0, neutral_pulse_width)
@@ -71,13 +71,12 @@ class MotorInterface(object):
         self.update_reference(dt)
         self.set_pwm()
 
-    def pulse_width_in_bits(self, force):
-        pulse_width_in_microseconds = numpy.interp(force, self.T100_thrust, self.T100_pulse_width)
-        normalized_duty_cycle = pulse_width_in_microseconds/self.PERIOD_LENGTH_IN_MICROSECONDS
-        return int(round(self.PWM_BITS_PER_PERIOD * normalized_duty_cycle))
+    def thrust_to_microsecs(self, thrust):
+        return numpy.interp(thrust, self.T100_thrust, self.T100_pulse_width)
 
-    def update_reference(self, dt):
-        rate_of_change = (self.thrust_setpoint - self.thrust_reference)/dt
+    def microsecs_to_bits(self, microsecs):
+        duty_cycle_normalized = microsecs / self.PERIOD_LENGTH_IN_MICROSECONDS
+        return int(round(self.PWM_BITS_PER_PERIOD * duty_cycle_normalized))
 
     def update_reference(self, dt):
         if self.rate_limiting_enabled:
@@ -93,11 +92,12 @@ class MotorInterface(object):
             self.thrust_reference = self.thrust_setpoint
 
     def set_pwm(self):
-        pwm_state = [None]*self.num_thrusters
+        microsecs = [None]*self.num_thrusters
         for i in range(self.num_thrusters):
-            pwm_state[i] = self.pulse_width_in_bits(self.thrust_reference[i])
+            microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
+            pwm_bits = self.microsecs_to_bits(microsecs[i])
             if (self.motor_connection_enabled):
-                pca9685.set_pwm(i, 0, pwm_state[i])
+                pca9685.set_pwm(i, 0, pwm_bits)
 
         # Publish outputs for debug
         debug_msg = Float64ArrayStamped()

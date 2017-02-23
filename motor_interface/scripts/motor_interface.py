@@ -4,13 +4,13 @@ import rospy
 import numpy
 import math
 import Adafruit_PCA9685
-from vortex_msgs.msg import ThrusterForces, ThrusterPwm
+from vortex_msgs.msg import Float64ArrayStamped
 
 class MotorInterface(object):
     def __init__(self):
         rospy.init_node('motor_interface', anonymous=False)
-        self.pub = rospy.Publisher('debug/thruster_pwm', ThrusterPwm, queue_size=10)
-        self.sub = rospy.Subscriber('thruster_forces', ThrusterForces, self.callback)
+        self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
+        self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
 
         self.PWM_BITS_PER_PERIOD           = 4096.0 # 12 bit PWM
         self.FREQUENCY                     = 249    # Max 400 Hz
@@ -62,7 +62,7 @@ class MotorInterface(object):
 
         self.prev_time = curr_time
 
-        thrust_setpoint_list = msg.thrust
+        thrust_setpoint_list = msg.data
         self.thrust_setpoint = thrust_setpoint_list
 
         self.update_reference(dt)
@@ -92,17 +92,17 @@ class MotorInterface(object):
                 pca9685.set_pwm(i, 0, pwm_state[i])
 
         # Publish outputs for debug
-        pwm_msg = ThrusterPwm()
-        pwm_msg.header.stamp = rospy.get_rostime()
-        pwm_msg.pwm = pwm_state
-        self.pub.publish(pwm_msg)
+        debug_msg = Float64ArrayStamped()
+        debug_msg.header.stamp = rospy.get_rostime()
+        debug_msg.data = microsecs
+        self.pub.publish(debug_msg)
 
     def healthy_message(self, msg):
-        if (len(msg.thrust) != self.num_thrusters):
+        if (len(msg.data) != self.num_thrusters):
             rospy.logwarn_throttle(1, 'Motor interface: Wrong number of thrusters, ignoring...')
             return False
 
-        for t in msg.thrust:
+        for t in msg.data:
             if math.isnan(t) or math.isinf(t) or (abs(t) > self.THRUST_RANGE_LIMIT):
                 rospy.logwarn_throttle(1, 'Motor interface: Message out of range, ignoring...')
                 return False

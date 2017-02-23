@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
-  ThrusterForces.msg
+  Float64ArrayStamped.msg
   LightInput.msg
   PropulsionCommand.msg
   JoystickArmCommand.msg
@@ -22,7 +22,6 @@ add_message_files(
   ArmDutyCycle.msg
   EulerOrientations.msg
   Debug.msg
-  ThrusterPwm.msg
 )
 
 generate_messages(

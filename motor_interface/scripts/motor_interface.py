@@ -20,8 +20,8 @@ class MotorInterface(object):
 
         self.ENABLE_RATE_LIMITER = False
 
-        self.T100_thrust      = rospy.get_param('/thrusters/characteristics/thrust')
-        self.T100_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
+        self.lookup_thrust      = rospy.get_param('/thrusters/characteristics/thrust')
+        self.lookup_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
         self.num_thrusters    = rospy.get_param('/propulsion/thrusters/num')
         self.max_rate         = rospy.get_param('/thrusters/rate_of_change/max')
         self.motor_connection_enabled = rospy.get_param('/motor_interface/motor_connection_enabled')
@@ -72,7 +72,7 @@ class MotorInterface(object):
         self.set_pwm()
 
     def thrust_to_microsecs(self, thrust):
-        return numpy.interp(thrust, self.T100_thrust, self.T100_pulse_width)
+        return numpy.interp(thrust, self.lookup_thrust, self.lookup_pulse_width)
 
     def microsecs_to_bits(self, microsecs):
         duty_cycle_normalized = microsecs / self.PERIOD_LENGTH_IN_MICROSECONDS

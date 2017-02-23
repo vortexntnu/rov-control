@@ -46,7 +46,7 @@ class MotorInterface(object):
 
     def callback(self, msg):
         if not self.healthy_message(msg):
-            rospy.logwarn('Motor interface: Message out of range, ignoring.')
+            rospy.logwarn_throttle(1, 'Motor interface: Message out of range, ignoring...')
             return
 
         if not self.is_initialized:
@@ -57,9 +57,8 @@ class MotorInterface(object):
 
         curr_time = msg.header.stamp
         dt = (curr_time - self.prev_time).to_sec()
-
         if dt == 0:
-            rospy.logwarn('Zero time difference between thruster messages to motor_interface.')
+            rospy.logwarn_throttle(1, 'Zero time difference between thruster messages to motor_interface, ignoring...')
             return
 
         self.prev_time = curr_time

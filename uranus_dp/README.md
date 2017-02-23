@@ -7,7 +7,7 @@ A ROV control system written in ROS.
 
 ## Dependencies
 * The [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) C++ library
-`sudo apt install libeigen-dev`
+`sudo apt install libeigen3-dev`
 * The [eigen_conversions](http://wiki.ros.org/eigen_conversions) ROS package
 `sudo apt install ros-kinetic-eigen-conversions`
 

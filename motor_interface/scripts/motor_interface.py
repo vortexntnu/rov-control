@@ -59,7 +59,7 @@ class MotorInterface(object):
 
         curr_time = msg.header.stamp
         dt = (curr_time - self.prev_time).to_sec()
-        if dt == 0:
+        if (dt <= 0) and self.rate_limiting_enabled:
             rospy.logwarn_throttle(1, 'Motor interface: Zero time difference between messages, ignoring...')
             return
 

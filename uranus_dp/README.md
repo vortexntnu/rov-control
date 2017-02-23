@@ -8,19 +8,22 @@ A ROV control system written in ROS.
 ## Dependencies
 ### Eigen
 The [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) C++ library
+
 `sudo apt install libeigen3-dev`
 ### Eigen conversions ROS package
 The [eigen_conversions](http://wiki.ros.org/eigen_conversions) ROS package
+
 `sudo apt install ros-kinetic-eigen-conversions`
 ### Gtest
 The gtest package in the Ubuntu repository is not precompiled, 
 so it needs to be built and put in place.
-* `sudo apt install libgtest-dev`
-* `cd /usr/src/gtest`
-* `sudo cmake .`
-* `sudo make`
-* `sudo cp libg* /usr/lib/`
-
+```
+sudo apt install libgtest-dev
+cd /usr/src/gtest
+sudo cmake .
+sudo make
+sudo cp libg* /usr/lib/
+```
 
 ## Control modes
 Several control modes are implemented:

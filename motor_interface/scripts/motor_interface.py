@@ -37,13 +37,13 @@ class MotorInterface(object):
         # Initialize the PCA9685 using the default address (0x40)
         if (self.motor_connection_enabled):
             self.pca9685 = Adafruit_PCA9685.PCA9685()
-            pca9685.set_pwm_freq(FREQUENCY)
+            self.pca9685.set_pwm_freq(self.FREQUENCY)
 
         # Initialize outputs to zero newton
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
         if (self.motor_connection_enabled):
-            for i in range(num_thrusters):
-                pca9685.set_pwm(i, 0, neutral_pulse_width)
+            for i in range(self.num_thrusters):
+                self.pca9685.set_pwm(i, 0, neutral_pulse_width)
 
         print 'Launching node motor_interface at', self.FREQUENCY, 'Hz'
 
@@ -97,7 +97,7 @@ class MotorInterface(object):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
             if (self.motor_connection_enabled):
-                pca9685.set_pwm(i, 0, pwm_bits)
+                self.pca9685.set_pwm(i, 0, pwm_bits)
 
         # Publish outputs for debug
         debug_msg = Float64ArrayStamped()

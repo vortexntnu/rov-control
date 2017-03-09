@@ -6,11 +6,15 @@ import math
 import Adafruit_PCA9685
 from vortex_msgs.msg import Float64ArrayStamped
 
+from motor_interface.srv import *
+
 class MotorInterface(object):
     def __init__(self):
         rospy.init_node('motor_interface', anonymous=False)
         self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
+
+        self.srv = rospy.Service('thruster_disable', ThrusterDisable, self.handle_thruster_disable)
 
         self.PWM_BITS_PER_PERIOD           = 4096.0 # 12 bit PWM
         self.FREQUENCY                     = 249    # Max 400 Hz
@@ -70,6 +74,10 @@ class MotorInterface(object):
 
         self.update_reference(dt)
         self.set_pwm()
+
+    def handle_thruster_disable (self, disable_thruster):
+        rospy.loginfo('Disabling thrusters')
+        return ThrusterDisableResponse()
 
     def thrust_to_microsecs(self, thrust):
         return numpy.interp(thrust, self.lookup_thrust, self.lookup_pulse_width)

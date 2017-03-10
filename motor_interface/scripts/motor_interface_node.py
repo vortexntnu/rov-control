@@ -77,9 +77,15 @@ class MotorInterface(object):
         self.update_reference(dt)
         self.set_pwm()
 
-    def handle_thruster_disable (self, disable_thruster):
-        rospy.loginfo('Disabling thrusters')
-        return ThrusterDisableResponse()
+    def handle_thrusters_enable (self, req):
+        if req.thrusters_enable:
+            rospy.loginfo('%s: Enabling thrusters', rospy.get_name())
+            self.motor_connection_enabled = True
+        else:
+            rospy.loginfo('%s: Disabling thrusters', rospy.get_name())
+            self.output_to_zero()
+            self.motor_connection_enabled = False
+        return ThrustersEnableResponse()
 
     def thrust_to_microsecs(self, thrust):
         return numpy.interp(thrust, self.lookup_thrust, self.lookup_pulse_width)

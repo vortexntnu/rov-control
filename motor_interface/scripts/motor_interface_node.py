@@ -43,13 +43,15 @@ class MotorInterface(object):
             self.pca9685 = Adafruit_PCA9685.PCA9685()
             self.pca9685.set_pwm_freq(self.FREQUENCY)
 
-        # Initialize outputs to zero newton
+        self.output_to_zero()
+
+        rospy.loginfo("Launching node %s at %d Hz", rospy.get_name(), self.FREQUENCY)
+
+    def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
         if (self.motor_connection_enabled):
             for i in range(self.num_thrusters):
                 self.pca9685.set_pwm(i, 0, neutral_pulse_width)
-
-        print 'Launching node motor_interface at', self.FREQUENCY, 'Hz'
 
     def callback(self, msg):
         if not self.healthy_message(msg):
@@ -58,13 +60,13 @@ class MotorInterface(object):
         if not self.is_initialized:
             self.prev_time = msg.header.stamp
             self.is_initialized = True
-            rospy.loginfo('Initialized motor_interface')
+            rospy.loginfo('Initialized %s', rospy.get_name())
             return
 
         curr_time = msg.header.stamp
         dt = (curr_time - self.prev_time).to_sec()
         if (dt <= 0) and self.rate_limiting_enabled:
-            rospy.logwarn_throttle(1, 'Motor interface: Zero time difference between messages, ignoring...')
+            rospy.logwarn_throttle(1, '%s: Zero time difference between messages, ignoring...' % rospy.get_name())
             return
 
         self.prev_time = curr_time
@@ -115,12 +117,12 @@ class MotorInterface(object):
 
     def healthy_message(self, msg):
         if (len(msg.data) != self.num_thrusters):
-            rospy.logwarn_throttle(1, 'Motor interface: Wrong number of thrusters, ignoring...')
+            rospy.logwarn_throttle(1, '%s: Wrong number of thrusters, ignoring...' % rospy.get_name())
             return False
 
         for t in msg.data:
             if math.isnan(t) or math.isinf(t) or (abs(t) > self.THRUST_RANGE_LIMIT):
-                rospy.logwarn_throttle(1, 'Motor interface: Message out of range, ignoring...')
+                rospy.logwarn_throttle(1, '%s: Message out of range, ignoring...' % rospy.get_name())
                 return False
         return True
 

@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 add_service_files(FILES
-    ThrusterDisable.srv)
+    ThrustersEnable.srv)
 
 generate_messages()
 

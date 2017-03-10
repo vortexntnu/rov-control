@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import rospy
-import numpy
 import math
 import Adafruit_PCA9685
+import numpy
+import rospy
+
 from vortex_msgs.msg import Float64ArrayStamped
 
 from motor_interface.srv import ThrustersEnable, ThrustersEnableResponse
@@ -13,7 +14,6 @@ class MotorInterface(object):
         rospy.init_node('motor_interface', anonymous=False)
         self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
-
         self.srv = rospy.Service('thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
         self.PWM_BITS_PER_PERIOD           = 4096.0 # 12 bit PWM
@@ -39,7 +39,7 @@ class MotorInterface(object):
         self.thrust_reference = numpy.zeros(self.num_thrusters)
 
         # Initialize the PCA9685 using the default address (0x40)
-        if (self.motor_connection_enabled):
+        if self.motor_connection_enabled:
             self.pca9685 = Adafruit_PCA9685.PCA9685()
             self.pca9685.set_pwm_freq(self.FREQUENCY)
 
@@ -49,7 +49,7 @@ class MotorInterface(object):
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
-        if (self.motor_connection_enabled):
+        if self.motor_connection_enabled:
             for i in range(self.num_thrusters):
                 self.pca9685.set_pwm(i, 0, neutral_pulse_width)
 
@@ -112,7 +112,7 @@ class MotorInterface(object):
         for i in range(self.num_thrusters):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
-            if (self.motor_connection_enabled):
+            if self.motor_connection_enabled:
                 self.pca9685.set_pwm(i, 0, pwm_bits)
 
         # Publish outputs for debug

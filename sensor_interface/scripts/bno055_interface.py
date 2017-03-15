@@ -12,28 +12,7 @@ from Adafruit_BNO055 import BNO055
 class Bno055InterfaceNode(object):
     def __init__(self):
         rospy.init_node('imu_node')
-
-        self.pub_imu = rospy.Publisher(
-            'sensors/imu/data',
-            Imu,
-            queue_size=10)
-        self.pub_mag = rospy.Publisher(
-            'sensors/imu/mag',
-            MagneticField,
-            queue_size=10)
-        self.pub_imu_temp = rospy.Publisher(
-            'sensors/imu/temperature',
-            Temperature,
-            queue_size=10)
-        self.pub_diagnostics = rospy.Publisher(
-            'sensors/imu/diagnostics',
-            DiagnosticStatus,
-            queue_size=10)
-        self.pub_euler = rospy.Publisher(
-            'sensors/imu/euler',
-            Vector3Stamped,
-            queue_size=10)
-
+        self.init_publishers()
         self.bno = BNO055.BNO055(rst='P9_12')
         if not self.bno.begin():
             rospy.logfatal('%s: Failed to initialise BNO055! Is the sensor connected?', rospy.get_name())
@@ -59,6 +38,30 @@ class Bno055InterfaceNode(object):
         ), rospy.get_name(), self.sw_v, self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
         self.talker()
 
+
+    def init_publishers(self):
+        self.pub_imu = rospy.Publisher(
+            'sensors/imu/data',
+            Imu,
+            queue_size=10)
+        self.pub_mag = rospy.Publisher(
+            'sensors/imu/mag',
+            MagneticField,
+            queue_size=10)
+        self.pub_imu_temp = rospy.Publisher(
+            'sensors/imu/temperature',
+            Temperature,
+            queue_size=10)
+        self.pub_diagnostics = rospy.Publisher(
+            'sensors/imu/diagnostics',
+            DiagnosticStatus,
+            queue_size=10)
+        self.pub_euler = rospy.Publisher(
+            'sensors/imu/euler',
+            Vector3Stamped,
+            queue_size=10)
+
+
     def get_diagnostic(self):
         diag_msg = DiagnosticStatus()
 
@@ -70,6 +73,7 @@ class Bno055InterfaceNode(object):
 
         diag_msg.values = [sys, gyro, accel, mag]
         return diag_msg
+
 
     def talker(self):
         imu_msg = Imu()
@@ -101,6 +105,7 @@ class Bno055InterfaceNode(object):
             self.pub_diagnostics.publish(imu_diag_msg)
 
             rospy.Rate(10).sleep()
+
 
 if __name__ == '__main__':
     try:

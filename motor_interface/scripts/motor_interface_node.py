@@ -14,7 +14,7 @@ class MotorInterface(object):
         rospy.init_node('motor_interface', anonymous=False)
         self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
-        self.srv = rospy.Service('thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
+        self.srv = rospy.Service('/motor_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
         self.PWM_BITS_PER_PERIOD           = 4096.0 # 12 bit PWM
         self.FREQUENCY                     = 249    # Max 400 Hz
@@ -83,8 +83,8 @@ class MotorInterface(object):
             self.motor_connection_enabled = True
         else:
             rospy.loginfo('%s: Disabling thrusters', rospy.get_name())
-            self.output_to_zero()
             self.motor_connection_enabled = False
+            self.output_to_zero()
         return ThrustersEnableResponse()
 
     def thrust_to_microsecs(self, thrust):

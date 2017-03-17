@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
+import rospkg
 import rospy
 
 from sensor_msgs.msg import Imu, MagneticField, Temperature
 from std_msgs.msg import String
 from geometry_msgs.msg import Vector3, Vector3Stamped, Quaternion
 from diagnostic_msgs.msg import DiagnosticStatus, KeyValue
+from sensor_interface.srv import SaveImuCalibration, SaveImuCalibrationResponse
+from sensor_interface.srv import LoadImuCalibration, LoadImuCalibrationResponse
 
 from Adafruit_BNO055 import BNO055
 
@@ -13,6 +16,10 @@ class Bno055InterfaceNode(object):
     def __init__(self):
         rospy.init_node('imu_node')
         self.init_publishers()
+
+        self.srv = rospy.Service('save_imu_calibration', SaveImuCalibration, self.save_calibration)
+        self.srv = rospy.Service('load_imu_calibration', LoadImuCalibration, self.load_calibration)
+
         self.bno = BNO055.BNO055(rst='P9_12')
         if not self.bno.begin():
             rospy.logfatal('%s: Failed to initialise BNO055! Is the sensor connected?', rospy.get_name())
@@ -106,6 +113,29 @@ class Bno055InterfaceNode(object):
 
             rospy.Rate(10).sleep()
 
+
+    def save_calibration(self, req):
+        values = self.bno.get_calibration()
+        path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.txt"
+        with open(path, 'w') as outfile:
+            for value in values:
+                outfile.write(str(value)+"\n")
+        rospy.loginfo("%s: Successfully saved calibration data to %s", rospy.get_name(), path)
+        return SaveImuCalibrationResponse()
+
+    def load_calibration(self, req):
+        path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.txt"
+        try:
+            with open(path) as infile:
+                values = infile.readlines()
+            values = [int(value.strip()) for value in values]
+            self.bno.set_calibration(values)
+            rospy.loginfo("%s: Successfully loaded calibration data from %s", rospy.get_name(), path)
+        except IOError:
+            rospy.logwarn("%s: Unable to open %s", rospy.get_name(), path)
+        except ValueError as e:
+            rospy.logwarn("%s: Unexpected format: %s", rospy.get_name(), str(e))
+        return LoadImuCalibrationResponse()
 
 if __name__ == '__main__':
     try:

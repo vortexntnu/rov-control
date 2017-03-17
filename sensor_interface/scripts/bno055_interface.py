@@ -17,8 +17,14 @@ class Bno055InterfaceNode(object):
         rospy.init_node('imu_node')
         self.init_publishers()
 
-        self.srv = rospy.Service('save_imu_calibration', SaveImuCalibration, self.save_calibration)
-        self.srv = rospy.Service('load_imu_calibration', LoadImuCalibration, self.load_calibration)
+        self.srv_save_calibration = rospy.Service(
+            'sensors/imu/save_calibration',
+            SaveImuCalibration,
+            self.save_calibration)
+        self.srv_load_calibration = rospy.Service(
+            'sensors/imu/load_calibration',
+            LoadImuCalibration,
+            self.load_calibration)
 
         self.bno = BNO055.BNO055(rst='P9_12')
         if not self.bno.begin():

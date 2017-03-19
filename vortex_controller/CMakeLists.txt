@@ -8,7 +8,6 @@ project(vortex_controller)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cmake_modules
   dynamic_reconfigure
   eigen_conversions
   nav_msgs
@@ -19,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

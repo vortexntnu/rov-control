@@ -4,9 +4,8 @@ project(sensor_interface)
 find_package(catkin REQUIRED COMPONENTS
     rosserial_arduino
     rosserial_client
-    # message_generation
-    # geometry_msgs
     std_msgs
+    geometry_msgs
     vortex_msgs
     sensor_msgs
 )
@@ -20,9 +19,11 @@ rosserial_generate_ros_lib(
     SCRIPT make_libraries.py
 )
 
-# add_dependencies(sensor_interface_ros_lib
-#     maelstrom_msgs_generate_messages
-# )
+# add_executable(sensor_interface firmware/sensor_interface.cpp)
+
+# add_dependencies(sensor_interface ${catkin_EXPORTED_TARGETS})
+# add_dependencies(sensor_interface ${PROJECT_NAME}_EXPORTED_TARGETS)
+# add_dependencies(sensor_interface ${PROJECT_NAME}_generate_messages_cpp)
 
 rosserial_configure_client(
     DIRECTORY firmware

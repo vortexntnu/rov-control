@@ -7,9 +7,4 @@ find_package(catkin REQUIRED COMPONENTS
   vortex_msgs
 )
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
-
 catkin_package(CATKIN_DEPENDS rospy message_runtime vortex_msgs)

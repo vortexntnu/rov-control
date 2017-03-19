@@ -10,13 +10,11 @@
 class PseudoinverseAllocator
 {
 public:
-  PseudoinverseAllocator(const Eigen::MatrixXd &T_pinv,
-                         const Eigen::MatrixXd &K_inv);
+  PseudoinverseAllocator(const Eigen::MatrixXd &T_pinv);
   Eigen::VectorXd compute(const Eigen::VectorXd &tau);
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 private:
-  Eigen::MatrixXd T_pinv; // Pseudoinverse of thrust configuration matrix
-  Eigen::MatrixXd K_inv;  // TODO: what does this matrix even mean
+  Eigen::MatrixXd T_pinv;
 };
 
 #endif

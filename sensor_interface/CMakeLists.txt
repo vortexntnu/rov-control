@@ -20,9 +20,9 @@ rosserial_generate_ros_lib(
     SCRIPT make_libraries.py
 )
 
-add_dependencies(sensor_interface_ros_lib
-    maelstrom_msgs_generate_messages
-)
+# add_dependencies(sensor_interface_ros_lib
+#     maelstrom_msgs_generate_messages
+# )
 
 rosserial_configure_client(
     DIRECTORY firmware

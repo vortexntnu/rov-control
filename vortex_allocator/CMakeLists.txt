@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   eigen_conversions
   geometry_msgs
   roscpp
-  vortex_msgs
   vortex
+  vortex_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -35,8 +35,8 @@ catkin_package(
   eigen_conversions
   geometry_msgs
   roscpp
-  vortex_msgs
   vortex
+  vortex_msgs
 )
 
 ###########

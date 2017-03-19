@@ -1,4 +1,3 @@
-// #include "integration_filter.h"
 #include "simple_estimator.h"
 
 int main(int argc, char **argv)

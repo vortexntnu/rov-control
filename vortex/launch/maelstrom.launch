@@ -1,0 +1,11 @@
+<launch>
+  <rosparam command="load" file="$(find vortex)/config/robots/maelstrom.yaml"/>
+  <rosparam command="load" file="$(find vortex)/config/environments/trondheim_freshwater.yaml"/>
+  <rosparam command="load" file="$(find motor_interface)/config/thruster_T100.yaml"/>
+
+  <node pkg="vortex_controller" type="controller" name="controller" output="screen"/>
+  <node pkg="vortex_allocator"  type="allocator"  name="allocator"  output="screen"/>
+  <node pkg="vortex_estimator"  type="estimator"  name="estimator"  output="screen"/>
+
+  <!-- <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/> -->
+</launch>

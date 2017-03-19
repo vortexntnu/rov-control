@@ -1,7 +1,8 @@
-#ifndef VORTEX_HELPER_H
-#define VORTEX_HELPER_H
+#ifndef CONTROL_MODE_ENUM_H
+#define CONTROL_MODE_ENUM_H
 
-#include "uranus_dp/control_mode_enum.h"
+#include <string>
+#include "vortex_controller/control_mode_enum.h"
 
 inline std::string controlModeString(ControlMode control_mode)
 {

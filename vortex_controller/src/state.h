@@ -2,7 +2,7 @@
 #define STATE_H
 
 #include <Eigen/Dense>
-#include "uranus_dp/eigen_typedefs.h"
+#include "vortex/eigen_typedefs.h"
 
 class State
 {

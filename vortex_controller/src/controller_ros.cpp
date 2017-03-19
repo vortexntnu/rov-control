@@ -1,7 +1,7 @@
 #include "controller_ros.h"
 
-#include "uranus_dp/eigen_helper.h"
-#include "uranus_dp/vortex_helper.h"
+#include "vortex/eigen_helper.h"
+#include "vortex_controller/vortex_helper.h"
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>
 
@@ -29,7 +29,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   initPositionHoldController();
 
   // Set up a dynamic reconfigure server
-  dynamic_reconfigure::Server<uranus_dp::ControllerConfig>::CallbackType cb;
+  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig>::CallbackType cb;
   cb = boost::bind(&Controller::configCallback, this, _1, _2);
   dr_srv.setCallback(cb);
 
@@ -65,7 +65,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     state->get(position, orientation, velocity);
     setpoints->set(position, orientation);
 
-    ROS_INFO_STREAM("Controller: Changing mode to " << controlModeString(control_mode) << ".");
+    // ROS_INFO_STREAM("Controller: Changing mode to " << controlModeString(control_mode) << ".");
   }
   publishControlMode();
 
@@ -97,7 +97,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   state->set(position, orientation, velocity);
 }
 
-void Controller::configCallback(uranus_dp::ControllerConfig &config, uint32_t level)
+void Controller::configCallback(vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
   ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
   position_hold_controller->setGains(config.a, config.b, config.c);
@@ -280,6 +280,7 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
 void Controller::publishControlMode()
 {
   std::string s = controlModeString(control_mode);
+  // std::string s = "I dunno"; // TODO: Fix
   std_msgs::String msg;
   msg.data = s;
   mode_pub.publish(msg);

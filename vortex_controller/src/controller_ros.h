@@ -7,9 +7,9 @@
 #include "nav_msgs/Odometry.h"
 #include <dynamic_reconfigure/server.h>
 
-#include <uranus_dp/ControllerConfig.h>
-#include "uranus_dp/eigen_typedefs.h"
-#include "uranus_dp/control_mode_enum.h"
+#include <vortex_controller/VortexControllerConfig.h>
+#include "vortex/eigen_typedefs.h"
+#include "vortex_controller/control_mode_enum.h"
 #include "vortex_msgs/PropulsionCommand.h"
 
 #include "state.h"
@@ -22,7 +22,7 @@ public:
   Controller(ros::NodeHandle nh);
   void commandCallback(const vortex_msgs::PropulsionCommand &msg);
   void stateCallback(const nav_msgs::Odometry &msg);
-  void configCallback(uranus_dp::ControllerConfig& config, uint32_t level);
+  void configCallback(vortex_controller::VortexControllerConfig& config, uint32_t level);
   void spin();
 private:
   ros::NodeHandle nh;
@@ -30,7 +30,7 @@ private:
   ros::Subscriber state_sub;
   ros::Publisher  wrench_pub;
   ros::Publisher  mode_pub;
-  dynamic_reconfigure::Server<uranus_dp::ControllerConfig> dr_srv;
+  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig> dr_srv;
 
   ControlMode control_mode;
   int  frequency;

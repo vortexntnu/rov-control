@@ -7,7 +7,7 @@
 #define QUATERNION_PD_CONTROLLER_H
 
 #include <Eigen/Dense>
-#include "uranus_dp/eigen_typedefs.h"
+#include "vortex/eigen_typedefs.h"
 
 class QuaternionPdController
 {

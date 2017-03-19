@@ -5,8 +5,8 @@
 
 #include <eigen_conversions/eigen_msg.h>
 #include "vortex_msgs/Float64ArrayStamped.h"
-#include "uranus_dp/eigen_typedefs.h"
-#include "uranus_dp/eigen_helper.h"
+#include "vortex/eigen_typedefs.h"
+#include "vortex/eigen_helper.h"
 
 Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 {

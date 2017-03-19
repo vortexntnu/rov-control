@@ -2,8 +2,8 @@
 #define SETPOINTS_H
 
 #include <Eigen/Dense>
-#include "uranus_dp/eigen_typedefs.h"
-#include "uranus_dp/control_mode_enum.h"
+#include "vortex/eigen_typedefs.h"
+#include "vortex_controller/control_mode_enum.h"
 
 class Setpoints
 {

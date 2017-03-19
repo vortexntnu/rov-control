@@ -1,8 +1,17 @@
-#ifndef VORTEX_HELPER_H
-#define VORTEX_HELPER_H
+#ifndef CONTROL_MODES_H
+#define CONTROL_MODES_H
 
-#include <string>
-#include "vortex_controller/control_mode_enum.h"
+namespace ControlModes
+{
+enum ControlMode
+{
+  OPEN_LOOP  = 0,
+  SIXDOF     = 1,
+  RPY_DEPTH  = 2,
+  DEPTH_HOLD = 3
+};
+}
+typedef ControlModes::ControlMode ControlMode;
 
 inline std::string controlModeString(ControlMode control_mode)
 {

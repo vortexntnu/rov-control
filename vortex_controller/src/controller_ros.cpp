@@ -279,7 +279,6 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
 void Controller::publishControlMode()
 {
   std::string s = controlModeString(control_mode);
-  // std::string s = "I dunno"; // TODO: Fix
   std_msgs::String msg;
   msg.data = s;
   mode_pub.publish(msg);

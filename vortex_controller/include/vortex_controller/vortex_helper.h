@@ -1,5 +1,5 @@
-#ifndef CONTROL_MODE_ENUM_H
-#define CONTROL_MODE_ENUM_H
+#ifndef VORTEX_HELPER_H
+#define VORTEX_HELPER_H
 
 #include <string>
 #include "vortex_controller/control_mode_enum.h"

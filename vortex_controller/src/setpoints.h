@@ -3,7 +3,6 @@
 
 #include <Eigen/Dense>
 #include "vortex/eigen_typedefs.h"
-#include "vortex_controller/control_mode_enum.h"
 
 class Setpoints
 {

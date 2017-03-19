@@ -21,7 +21,7 @@ private:
     std::map<std::string,bool> dofs; // Map of controllable dofs
     double min_thrust;
     double max_thrust;
-    static const double FORCE_RANGE_LIMIT = 100;
+    const double FORCE_RANGE_LIMIT = 100;
 
     PseudoinverseAllocator *pseudoinverse_allocator;
 

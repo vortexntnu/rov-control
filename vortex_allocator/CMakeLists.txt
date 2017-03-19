@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Eigen3 REQUIRED)
+find_package(Eigen REQUIRED)
 
 ###################################
 ## catkin specific configuration ##
@@ -31,7 +31,6 @@ find_package(Eigen3 REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   CATKIN_DEPENDS
-  cmake_modules
   eigen_conversions
   geometry_msgs
   roscpp

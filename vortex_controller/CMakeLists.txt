@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Eigen3 REQUIRED)
+find_package(Eigen REQUIRED)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -43,7 +43,6 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS
-  cmake_modules
   dynamic_reconfigure
   eigen_conversions
   nav_msgs

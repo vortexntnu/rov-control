@@ -1,7 +1,6 @@
 #include "controller_ros.h"
 
 #include "vortex/eigen_helper.h"
-#include "vortex_controller/vortex_helper.h"
 #include <tf/transform_datatypes.h>
 #include <eigen_conversions/eigen_msg.h>
 

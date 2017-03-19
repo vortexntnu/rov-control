@@ -9,7 +9,7 @@
 
 #include <vortex_controller/VortexControllerConfig.h>
 #include "vortex/eigen_typedefs.h"
-#include "vortex_controller/control_mode_enum.h"
+#include "vortex_controller/control_modes.h"
 #include "vortex_msgs/PropulsionCommand.h"
 
 #include "state.h"

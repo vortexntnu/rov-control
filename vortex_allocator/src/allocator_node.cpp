@@ -8,6 +8,7 @@ int main(int argc, char **argv)
   ROS_INFO("Launching node allocator.");
   ros::NodeHandle nh;
   Allocator allocator(nh);
-  ros::spin();
+  while (ros::ok())
+    ros::spinOnce();
   return 0;
 }

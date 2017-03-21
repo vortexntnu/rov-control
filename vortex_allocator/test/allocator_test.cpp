@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include <gtest/gtest.h>
 #include "geometry_msgs/Wrench.h"
-#include "vortex_msgs/ThrusterForces.h"
+#include "vortex_msgs/Float64ArrayStamped.h"
 
 class AllocatorTest : public ::testing::Test
 {
@@ -50,7 +50,7 @@ public:
 
   int                 num_thrusters;
   std::vector<double> thrust;
-  static const double MAX_ERROR = 1e-4;
+  const double        MAX_ERROR = 1e-4;
 
  private:
   ros::NodeHandle nh;
@@ -58,9 +58,9 @@ public:
   ros::Subscriber sub;
   bool message_received;
 
-  void Callback(const vortex_msgs::ThrusterForces& msg)
+  void Callback(const vortex_msgs::Float64ArrayStamped& msg)
   {
-    thrust = msg.thrust;
+    thrust = msg.data;
     message_received = true;
   }
 

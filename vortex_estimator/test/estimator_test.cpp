@@ -43,12 +43,6 @@ public:
     pressurePub.publish(msg);
   }
 
-  // void ExpectThrustNear(double* arr)
-  // {
-  //   for (int i = 0; i < thrust.size(); ++i)
-  //     EXPECT_NEAR(thrust[i], arr[i], MAX_ERROR);
-  // }
-
   void WaitForMessage()
   {
     while (!message_received)
@@ -62,7 +56,8 @@ public:
   double q_z;
 
   double depth;
-  // const double        MAX_ERROR = 1e-4;
+
+  const double MAX_ERROR = 1e-4;
 
  private:
   ros::NodeHandle nh;
@@ -94,6 +89,23 @@ TEST_F(EstimatorTest, CheckResponsiveness)
   PublishOrientation(1, 0, 0, 0);
   PublishPressure(0);
   WaitForMessage();
+}
+
+TEST_F(EstimatorTest, OrientationCorrect)
+{
+  PublishOrientation(1, 2, 3, 4);
+  WaitForMessage();
+  EXPECT_NEAR(q_w, 1, MAX_ERROR);
+  EXPECT_NEAR(q_x, 2, MAX_ERROR);
+  EXPECT_NEAR(q_y, 3, MAX_ERROR);
+  EXPECT_NEAR(q_z, 4, MAX_ERROR);
+}
+
+TEST_F(EstimatorTest, DepthCorrect)
+{
+  PublishPressure(200000);
+  WaitForMessage();
+  EXPECT_NEAR(depth, 10.0728, MAX_ERROR);
 }
 
 int main(int argc, char **argv)

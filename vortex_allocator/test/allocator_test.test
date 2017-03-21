@@ -1,7 +1,7 @@
 <launch>
   <rosparam
     command="load"
-    file="$(find uranus_dp)/config/robots/maelstrom.yaml"
+    file="$(find vortex)/config/robots/maelstrom.yaml"
   />
 
   <rosparam
@@ -10,15 +10,15 @@
   />
 
   <node
+    pkg="vortex_allocator"
+    type="node"
     name="allocator"
-    pkg="uranus_dp"
-    type="allocator"
     output="screen"
   />
 
   <test
+    pkg="vortex_allocator"
+    type="vortex_allocator-test"
     test-name="allocator_test"
-    pkg="uranus_dp"
-    type="allocator_test"
   />
 </launch>

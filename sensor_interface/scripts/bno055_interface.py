@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import csv
 import rospkg
 import rospy
 
@@ -122,19 +123,21 @@ class Bno055InterfaceNode(object):
 
     def save_calibration(self, req):
         values = self.bno.get_calibration()
-        path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.txt"
-        with open(path, 'w') as outfile:
-            for value in values:
-                outfile.write(str(value)+"\n")
+        path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.csv"
+        with open(path, 'w', newline='') as outfile:
+            writer = csv.writer(outfile)
+            writer.writerow(values)
+
         rospy.loginfo("%s: Successfully saved calibration data to %s", rospy.get_name(), path)
         return SaveImuCalibrationResponse()
 
     def load_calibration(self, req):
-        path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.txt"
+        path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.csv"
         try:
-            with open(path) as infile:
-                values = infile.readlines()
-            values = [int(value.strip()) for value in values]
+            with open(path, newline='') as infile:
+                reader = csv.reader(infile)
+                values = next(reader)
+            values = [int(value) for value in values]
             self.bno.set_calibration(values)
             rospy.loginfo("%s: Successfully loaded calibration data from %s", rospy.get_name(), path)
         except IOError:

@@ -2,24 +2,27 @@ cmake_minimum_required(VERSION 2.8.3)
 project(sensor_interface)
 
 find_package(catkin REQUIRED COMPONENTS
-  rosserial_arduino
-  rosserial_client
+  rospy
+  sensor_msgs
   std_msgs
   vortex_msgs
-  sensor_msgs
+  message_generation
 )
 
-catkin_package()
-
-rosserial_generate_ros_lib(
-  PACKAGE rosserial_arduino
-  SCRIPT make_libraries.py
+add_service_files(FILES
+  SaveImuCalibration.srv
+  LoadImuCalibration.srv
 )
 
-rosserial_configure_client(
-  DIRECTORY firmware
-  TOOLCHAIN_FILE ${ROSSERIAL_ARDUINO_TOOLCHAIN}
+generate_messages()
+
+catkin_package(
+  CATKIN_DEPENDS
+  rospy
+  vortex_msgs
+  std_msgs message_runtime
 )
 
-rosserial_add_client_target(firmware sensor_interface ALL)
-rosserial_add_client_target(firmware sensor_interface-upload)
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)

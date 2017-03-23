@@ -124,7 +124,7 @@ class Bno055InterfaceNode(object):
     def save_calibration(self, req):
         values = self.bno.get_calibration()
         path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.csv"
-        with open(path, 'w', newline='') as outfile:
+        with open(path, 'w') as outfile:
             writer = csv.writer(outfile)
             writer.writerow(values)
 
@@ -134,7 +134,7 @@ class Bno055InterfaceNode(object):
     def load_calibration(self, req):
         path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.csv"
         try:
-            with open(path, newline='') as infile:
+            with open(path) as infile:
                 reader = csv.reader(infile)
                 values = next(reader)
             values = [int(value) for value in values]

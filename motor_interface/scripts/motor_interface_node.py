@@ -28,7 +28,7 @@ class MotorInterface(object):
         self.lookup_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
         self.num_thrusters    = rospy.get_param('/propulsion/thrusters/num')
         self.max_rate         = rospy.get_param('/thrusters/rate_of_change/max')
-        self.motor_connection_enabled = rospy.get_param('/motor_interface/motor_connection_enabled')
+        self.motors_connected = rospy.get_param('/motor_interface/motors_connected')
         self.rate_limiting_enabled    = rospy.get_param('/motor_interface/rate_limiting_enabled')
         self.prev_time = rospy.get_rostime()
         self.is_initialized = False
@@ -38,8 +38,10 @@ class MotorInterface(object):
         # The reference is the output value (rate limited)
         self.thrust_reference = numpy.zeros(self.num_thrusters)
 
+        self.motors_enabled = True
+
         # Initialize the PCA9685 using the default address (0x40)
-        if self.motor_connection_enabled:
+        if self.motors_connected:
             self.pca9685 = Adafruit_PCA9685.PCA9685()
             self.pca9685.set_pwm_freq(self.FREQUENCY)
 
@@ -49,7 +51,7 @@ class MotorInterface(object):
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
-        if self.motor_connection_enabled:
+        if self.motors_connected and self.motors_enabled:
             for i in range(self.num_thrusters):
                 self.pca9685.set_pwm(i, 0, neutral_pulse_width)
 
@@ -80,11 +82,11 @@ class MotorInterface(object):
     def handle_thrusters_enable (self, req):
         if req.thrusters_enable:
             rospy.loginfo('%s: Enabling thrusters', rospy.get_name())
-            self.motor_connection_enabled = True
+            self.motors_enabled = True
         else:
             rospy.loginfo('%s: Disabling thrusters', rospy.get_name())
-            self.motor_connection_enabled = False
             self.output_to_zero()
+            self.motors_enabled = False
         return ThrustersEnableResponse()
 
     def thrust_to_microsecs(self, thrust):
@@ -112,7 +114,7 @@ class MotorInterface(object):
         for i in range(self.num_thrusters):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
-            if self.motor_connection_enabled:
+            if self.motors_connected and self.motors_enabled:
                 self.pca9685.set_pwm(i, 0, pwm_bits)
 
         # Publish outputs for debug

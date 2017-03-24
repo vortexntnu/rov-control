@@ -12,4 +12,4 @@ This package is the interface between the ROV control system running on a Raspbe
 * Working [I2C on the Raspberry Pi](https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=104133)
 
 ## Notes
-To run the node without a PCA9685 connected, set `motor_connection_enabled = false` in the launch script. To connect the PWM board to the Raspberry Pi (or other host computer) connect VCC to a 3.3 V pin, SCL to SCL, SDA to SDA, and ground to ground.
+To run the node without a PCA9685 connected, set `motors_connected = false` in the launch script. To connect the PWM board to the Raspberry Pi (or other host computer) connect VCC to a 3.3 V pin, SCL to SCL, SDA to SDA, and ground to ground.

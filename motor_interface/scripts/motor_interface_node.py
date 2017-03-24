@@ -47,7 +47,7 @@ class MotorInterface(object):
 
         self.output_to_zero()
 
-        rospy.loginfo("Launching node %s at %d Hz", rospy.get_name(), self.FREQUENCY)
+        rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), self.FREQUENCY)
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
@@ -62,7 +62,7 @@ class MotorInterface(object):
         if not self.is_initialized:
             self.prev_time = msg.header.stamp
             self.is_initialized = True
-            rospy.loginfo('Initialized %s', rospy.get_name())
+            rospy.loginfo('%s: Successfully initialized', rospy.get_name())
             return
 
         curr_time = msg.header.stamp

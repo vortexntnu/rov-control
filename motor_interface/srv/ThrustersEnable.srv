@@ -1,2 +1,2 @@
-bool thrusters_enable #True for enabled, False for disabled
+bool thrusters_enable
 ---

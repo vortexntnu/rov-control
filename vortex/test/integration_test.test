@@ -1,0 +1,43 @@
+<launch>
+  <rosparam
+    command="load"
+    file="$(find uranus_dp)/config/robots/maelstrom.yaml"
+  />
+
+  <rosparam
+    command="load"
+    file="$(find uranus_dp)/config/environments/trondheim_freshwater.yaml"
+  />
+
+  <rosparam
+    command="load"
+    file="$(find motor_interface)/config/thruster_T100.yaml"
+  />
+
+  <node
+    name="allocator"
+    pkg="uranus_dp"
+    type="allocator"
+    output="screen"
+  />
+
+  <node
+    name="controller"
+    pkg="uranus_dp"
+    type="controller"
+    output="screen"
+  />
+
+  <node
+    name="estimator"
+    pkg="uranus_dp"
+    type="estimator"
+    output="screen"
+  />
+
+  <test
+    test-name="integration_test"
+    pkg="uranus_dp"
+    type="integration_test"
+  />
+</launch>

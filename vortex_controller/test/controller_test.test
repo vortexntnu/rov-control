@@ -1,4 +1,14 @@
 <launch>
+  <rosparam
+    command="load"
+    file="$(find vortex)/config/robots/maelstrom.yaml"
+  />
+
+  <rosparam
+    command="load"
+    file="$(find vortex)/config/environments/trondheim_freshwater.yaml"
+  />
+
   <node
     pkg="vortex_controller"
     type="node"

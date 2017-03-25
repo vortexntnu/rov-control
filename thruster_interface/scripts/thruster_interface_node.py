@@ -7,14 +7,14 @@ import rospy
 
 from vortex_msgs.msg import Float64ArrayStamped
 
-from motor_interface.srv import ThrustersEnable, ThrustersEnableResponse
+from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
-class MotorInterface(object):
+class ThrusterInterface(object):
     def __init__(self):
-        rospy.init_node('motor_interface', anonymous=False)
+        rospy.init_node('thruster_interface', anonymous=False)
         self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
-        self.srv = rospy.Service('/motor_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
+        self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
         self.PWM_BITS_PER_PERIOD           = 4096.0 # 12 bit PWM
         self.FREQUENCY                     = 249    # Max 400 Hz
@@ -28,8 +28,8 @@ class MotorInterface(object):
         self.lookup_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
         self.num_thrusters    = rospy.get_param('/propulsion/thrusters/num')
         self.max_rate         = rospy.get_param('/thrusters/rate_of_change/max')
-        self.motors_connected = rospy.get_param('/motor_interface/motors_connected')
-        self.rate_limiting_enabled    = rospy.get_param('/motor_interface/rate_limiting_enabled')
+        self.thrusters_connected = rospy.get_param('/thruster_interface/thrusters_connected')
+        self.rate_limiting_enabled    = rospy.get_param('/thruster_interface/rate_limiting_enabled')
         self.prev_time = rospy.get_rostime()
         self.is_initialized = False
 
@@ -38,10 +38,10 @@ class MotorInterface(object):
         # The reference is the output value (rate limited)
         self.thrust_reference = numpy.zeros(self.num_thrusters)
 
-        self.motors_enabled = True
+        self.thrusters_enabled = True
 
         # Initialize the PCA9685 using the default address (0x40)
-        if self.motors_connected:
+        if self.thrusters_connected:
             self.pca9685 = Adafruit_PCA9685.PCA9685()
             self.pca9685.set_pwm_freq(self.FREQUENCY)
 
@@ -51,7 +51,7 @@ class MotorInterface(object):
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
-        if self.motors_connected and self.motors_enabled:
+        if self.thrusters_connected and self.thrusters_enabled:
             for i in range(self.num_thrusters):
                 self.pca9685.set_pwm(i, 0, neutral_pulse_width)
 
@@ -82,11 +82,11 @@ class MotorInterface(object):
     def handle_thrusters_enable (self, req):
         if req.thrusters_enable:
             rospy.loginfo('%s: Enabling thrusters', rospy.get_name())
-            self.motors_enabled = True
+            self.thrusters_enabled = True
         else:
             rospy.loginfo('%s: Disabling thrusters', rospy.get_name())
             self.output_to_zero()
-            self.motors_enabled = False
+            self.thrusters_enabled = False
         return ThrustersEnableResponse()
 
     def thrust_to_microsecs(self, thrust):
@@ -114,7 +114,7 @@ class MotorInterface(object):
         for i in range(self.num_thrusters):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
-            if self.motors_connected and self.motors_enabled:
+            if self.thrusters_connected and self.thrusters_enabled:
                 self.pca9685.set_pwm(i, 0, pwm_bits)
 
         # Publish outputs for debug
@@ -138,7 +138,7 @@ class MotorInterface(object):
 
 if __name__ == '__main__':
     try:
-        motor_interface = MotorInterface()
+        thruster_interface = ThrusterInterface()
         rospy.spin()
     except rospy.ROSInterruptException:
         pass

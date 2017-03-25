@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 #include <eigen_conversions/eigen_msg.h>
+#include <vector>
+#include <boost/array.hpp>
 
 #include "vortex_msgs/PropulsionCommand.h"
 
@@ -21,10 +23,18 @@ public:
       ros::spinOnce();
   }
 
-  void PublishCommand()
+  void PublishCommand(boost::array<double,6> motion, std::vector<uint8_t> mode)
   {
     vortex_msgs::PropulsionCommand msg;
+    msg.motion = motion;
+    msg.control_mode = mode;
     cmdPub.publish(msg);
+  }
+
+  void ExpectTauNear(std::vector<double> arr)
+  {
+    for (int i = 0; i < tau.size(); ++i)
+      EXPECT_NEAR(tau[i], arr[i], MAX_ERROR);
   }
 
   void WaitForMessage()
@@ -34,6 +44,7 @@ public:
   }
 
   Eigen::Matrix<double,6,1> tau;
+  const double MAX_ERROR = 0.0001;
 
 private:
   ros::NodeHandle nh;
@@ -57,6 +68,15 @@ private:
 TEST_F(ControllerTest, CheckResponsiveness)
 {
   WaitForMessage();
+}
+
+TEST_F(ControllerTest, OpenLoop)
+{
+  PublishCommand({1, 0, 0, 0, 0, 0}, {1, 0, 0, 0});
+  ros::Duration(0.5).sleep();
+  WaitForMessage();
+
+  ExpectTauNear({48.895, 0, 0, 0, 0, 0});
 }
 
 int main(int argc, char **argv)

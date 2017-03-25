@@ -1,12 +1,12 @@
 <launch>
   <rosparam
     command="load"
-    file="$(find uranus_dp)/config/robots/maelstrom.yaml"
+    file="$(find vortex)/config/robots/maelstrom.yaml"
   />
 
   <rosparam
     command="load"
-    file="$(find uranus_dp)/config/environments/trondheim_freshwater.yaml"
+    file="$(find vortex)/config/environments/trondheim_freshwater.yaml"
   />
 
   <rosparam
@@ -15,29 +15,29 @@
   />
 
   <node
+    pkg="vortex_allocator"
+    type="node"
     name="allocator"
-    pkg="uranus_dp"
-    type="allocator"
     output="screen"
   />
 
   <node
+    pkg="vortex_controller"
+    type="node"
     name="controller"
-    pkg="uranus_dp"
-    type="controller"
     output="screen"
   />
 
   <node
+    pkg="vortex_estimator"
+    type="node"
     name="estimator"
-    pkg="uranus_dp"
-    type="estimator"
     output="screen"
   />
 
   <test
+    pkg="vortex"
+    type="vortex-test"
     test-name="integration_test"
-    pkg="uranus_dp"
-    type="integration_test"
   />
 </launch>

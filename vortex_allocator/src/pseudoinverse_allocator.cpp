@@ -1,4 +1,4 @@
-#include "pseudoinverse_allocator.h"
+#include "vortex_allocator/pseudoinverse_allocator.h"
 
 PseudoinverseAllocator::PseudoinverseAllocator(const Eigen::MatrixXd &T_pinv)
 : T_pinv(T_pinv) {}

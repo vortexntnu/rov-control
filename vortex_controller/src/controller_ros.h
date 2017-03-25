@@ -34,7 +34,7 @@ private:
 
   ControlMode control_mode;
   int  frequency;
-  static const double FORCE_DEADZONE_LIMIT = 0.01;
+  const double FORCE_DEADZONE_LIMIT = 0.01;
 
   State                  *state;
   Setpoints              *setpoints;

@@ -1,6 +1,6 @@
 # This file defines the thrust characteristics for the BlueRobotics T100
 # thruster, that is, the relationship between thrust in newton and the width
-# in microseconds of the PWM signal to the AfroEsc thruster controllers running
+# in microseconds of the PWM signal to the AfroEsc motor controllers running
 # BlueRobotics firmware.
 
 thrusters:

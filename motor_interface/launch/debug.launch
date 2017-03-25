@@ -1,7 +1,7 @@
 <launch>
   <rosparam command="load" file="$(find motor_interface)/config/thruster_T100.yaml" />
   <rosparam command="load" file="$(find vortex)/config/robots/maelstrom.yaml" />
-  <param name="motor_interface/motor_connection_enabled" type="bool" value="false" />
+  <param name="motor_interface/motors_connected" type="bool" value="false" />
   <param name="motor_interface/rate_limiting_enabled" type="bool" value="false" />
-  <node name="motor_interface" pkg="motor_interface" type="motor_interface.py" output="screen" />
+  <node name="motor_interface" pkg="motor_interface" type="motor_interface_node.py" output="screen" />
 </launch>

@@ -133,6 +133,23 @@ void Controller::spin()
         break;
       }
 
+      case ControlModes::ATTITUDE_HOLD:
+      {
+        // Linear motion in open loop
+        setpoints->get(tau_openloop);
+        tau_openloop.tail(3) = Eigen::Vector3d::Zero();
+
+        // Orientation in closed loop
+        position_state.setZero();
+        position_setpoint.setZero();
+        tau_feedback = position_hold_controller->compute(
+          position_state, orientation_state, velocity_state, position_setpoint, orientation_setpoint);
+
+        // sum the two
+        tau_command = tau_openloop + tau_feedback;
+        break;
+      }
+
       case ControlModes::SIXDOF:
       {
         tau_command = position_hold_controller->compute(position_state,

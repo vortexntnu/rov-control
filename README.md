@@ -8,7 +8,9 @@ The control system for Vortex NTNU's ROVs. The repository contains several ROS p
 ## Testing
 Run all tests at once with
 ```
+rostest vortex integration_test.test &&
 rostest vortex_allocator allocator_test.test &&
+rostest vortex_controller controller_test.test &&
 rostest vortex_estimator estimator_test.test
 ```
 

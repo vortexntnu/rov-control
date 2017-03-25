@@ -1,0 +1,3 @@
+<launch>
+<node name="bno055_interface" pkg="sensor_interface" type="bno055_interface.py" output="screen"/>
+</launch>

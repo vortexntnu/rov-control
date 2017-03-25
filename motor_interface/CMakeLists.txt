@@ -17,5 +17,6 @@ catkin_package(
   CATKIN_DEPENDS
   rospy
   vortex_msgs
-  std_msgs message_runtime
+  std_msgs
+  message_runtime
 )

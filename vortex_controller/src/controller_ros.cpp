@@ -109,7 +109,7 @@ void Controller::spin()
 {
   Eigen::Vector6d    tau_command          = Eigen::VectorXd::Zero(6);
   Eigen::Vector6d    tau_openloop         = Eigen::VectorXd::Zero(6);
-  Eigen::Vector6d    tau_sixdof           = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_feedback         = Eigen::VectorXd::Zero(6);
 
   Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
@@ -148,10 +148,10 @@ void Controller::spin()
         // TODO(mortenfyhn): make this similar to depth hold
         tau_command(0) = tau_openloop(0);
         tau_command(1) = tau_openloop(1);
-        tau_command(2) = tau_sixdof(2);
-        tau_command(3) = tau_sixdof(3);
-        tau_command(4) = tau_sixdof(4);
-        tau_command(5) = tau_sixdof(5);
+        tau_command(2) = tau_feedback(2);
+        tau_command(3) = tau_feedback(3);
+        tau_command(4) = tau_feedback(4);
+        tau_command(5) = tau_feedback(5);
         break;
       }
 
@@ -169,12 +169,12 @@ void Controller::spin()
           position_setpoint(0) = position_state(0);
           position_setpoint(1) = position_state(1);
           orientation_setpoint = orientation_state;
-          tau_sixdof = position_hold_controller->compute(position_state,
+          tau_feedback = position_hold_controller->compute(position_state,
                                                          orientation_state,
                                                          velocity_state,
                                                          position_setpoint,
                                                          orientation_setpoint);
-          tau_command = tau_sixdof + tau_openloop;
+          tau_command = tau_feedback + tau_openloop;
         }
         break;
       }

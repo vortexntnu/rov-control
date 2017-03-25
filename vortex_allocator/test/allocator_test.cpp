@@ -55,7 +55,7 @@ public:
   std::vector<double> thrust;
   const double        MAX_ERROR = 1e-4;
 
- private:
+private:
   ros::NodeHandle nh;
   ros::Publisher  pub;
   ros::Subscriber sub;

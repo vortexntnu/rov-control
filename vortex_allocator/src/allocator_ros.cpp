@@ -29,7 +29,7 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
     min_thrust = -std::numeric_limits<double>::infinity();
     max_thrust =  std::numeric_limits<double>::infinity();
     ROS_ERROR_STREAM("Failed to read parameters min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust <<
-      ".");
+                     ".");
   }
   else
   {
@@ -118,7 +118,7 @@ Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
   if (i != num_dof)
   {
     ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof <<
-      ". Returning zero thrust vector.");
+                    ". Returning zero thrust vector.");
     return Eigen::VectorXd::Zero(num_dof);
   }
 

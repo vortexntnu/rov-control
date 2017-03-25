@@ -11,6 +11,7 @@ public:
   ControllerTest()
   {
     cmdPub = nh.advertise<vortex_msgs::PropulsionCommand>("propulsion_command", 10);
+    sub = nh.subscribe("rov_forces", 10, &ControllerTest::Callback, this);
     message_received = false;
   }
 
@@ -55,8 +56,6 @@ private:
 
 TEST_F(ControllerTest, CheckResponsiveness)
 {
-  ros::Duration(0.5).sleep();
-  PublishCommand();
   WaitForMessage();
 }
 

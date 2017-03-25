@@ -5,6 +5,13 @@ The control system for Vortex NTNU's ROVs. The repository contains several ROS p
 * `roslaunch vortex maelstrom.launch` to start the system for the Maelstrom ROV.
 * `rosrun rqt_reconfigure rqt_reconfigure` to open the dynamic reconfigure GUI window.
 
+## Testing
+Run all tests at once with
+```
+rostest vortex_allocator allocator_test.test &&
+rostest vortex_estimator estimator_test.test
+```
+
 ## Dependencies
 ### Eigen
 The [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) C++ library

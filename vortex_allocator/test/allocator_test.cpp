@@ -1,7 +1,10 @@
+// Copyright 2017 Vortex NTNU
+
 #include "ros/ros.h"
 #include <gtest/gtest.h>
 #include "geometry_msgs/Wrench.h"
 #include "vortex_msgs/Float64ArrayStamped.h"
+#include <vector>
 
 class AllocatorTest : public ::testing::Test
 {
@@ -81,7 +84,7 @@ TEST_F(AllocatorTest, ZeroInput)
   Publish(0, 0, 0, 0, 0, 0);
   WaitForMessage();
 
-  double thrust_expected[] = {0,0,0,0,0,0};
+  double thrust_expected[] = {0, 0, 0, 0, 0, 0};
   ExpectThrustNear(thrust_expected);
 }
 

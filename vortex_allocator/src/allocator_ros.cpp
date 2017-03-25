@@ -1,3 +1,5 @@
+// Copyright 2017 Vortex NTNU
+
 #include "vortex_allocator/allocator_ros.h"
 
 #include <vector>
@@ -26,7 +28,8 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
   {
     min_thrust = -std::numeric_limits<double>::infinity();
     max_thrust =  std::numeric_limits<double>::infinity();
-    ROS_ERROR_STREAM("Failed to read parameters min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust << ".");
+    ROS_ERROR_STREAM("Failed to read parameters min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust <<
+      ".");
   }
   else
   {
@@ -78,7 +81,7 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
 
 Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
 {
-  // TODO: rewrite without a million ifs
+  // TODO(mortenfyhn): rewrite without a million ifs
   Eigen::VectorXd tau(num_dof);
   int i = 0;
   if (dofs["surge"])
@@ -114,7 +117,8 @@ Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
 
   if (i != num_dof)
   {
-    ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof << ". Returning zero thrust vector.");
+    ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof <<
+      ". Returning zero thrust vector.");
     return Eigen::VectorXd::Zero(num_dof);
   }
 

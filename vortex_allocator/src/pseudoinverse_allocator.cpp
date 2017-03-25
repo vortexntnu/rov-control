@@ -1,3 +1,5 @@
+// Copyright 2017 Vortex NTNU
+
 #include "vortex_allocator/pseudoinverse_allocator.h"
 
 PseudoinverseAllocator::PseudoinverseAllocator(const Eigen::MatrixXd &T_pinv)

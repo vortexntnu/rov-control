@@ -13,10 +13,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   vortex
   vortex_msgs
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(Eigen3 REQUIRED)
+
+roslint_cpp()
 
 ###################################
 ## catkin specific configuration ##

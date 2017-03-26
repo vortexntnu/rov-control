@@ -59,23 +59,23 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   return true;
 }
 
-bool Setpoints::get(Eigen::Vector6d &wrench)
+bool Setpoints::get(Eigen::Vector6d *wrench)
 {
   if (!wrench_valid_)
     return false;
 
-  wrench = wrench_;
+  *wrench = wrench_;
   return true;
 }
 
-bool Setpoints::get(Eigen::Vector3d    &position,
-                    Eigen::Quaterniond &orientation)
+bool Setpoints::get(Eigen::Vector3d    *position,
+                    Eigen::Quaterniond *orientation)
 {
   if (!pose_valid_)
     return false;
 
-  position    = position_;
-  orientation = orientation_;
+  *position    = position_;
+  *orientation = orientation_;
   return true;
 }
 

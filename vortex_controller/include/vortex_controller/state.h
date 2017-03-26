@@ -8,11 +8,11 @@ class State
 {
 public:
   State();
-  bool get(Eigen::Vector3d    &position,
-           Eigen::Quaterniond &orientation);
-  bool get(Eigen::Vector3d    &position,
-           Eigen::Quaterniond &orientation,
-           Eigen::Vector6d    &velocity);
+  bool get(Eigen::Vector3d    *position,
+           Eigen::Quaterniond *orientation);
+  bool get(Eigen::Vector3d    *position,
+           Eigen::Quaterniond *orientation,
+           Eigen::Vector6d    *velocity);
   void set(const Eigen::Vector3d    &position,
            const Eigen::Quaterniond &orientation,
            const Eigen::Vector6d    &velocity);

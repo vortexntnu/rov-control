@@ -64,7 +64,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     Eigen::Vector6d    velocity;
 
     // Reset setpoints to be equal to state
-    state->get(position, orientation, velocity);
+    state->get(&position, &orientation, &velocity);
     setpoints->set(position, orientation);
 
     ROS_INFO_STREAM("Controller: Changing mode to " << controlModeString(control_mode) << ".");
@@ -122,14 +122,14 @@ void Controller::spin()
   while (ros::ok())
   {
     // TODO(mortenfyhn): check value of bool return from getters
-    state->get(position_state, orientation_state, velocity_state);
-    setpoints->get(position_setpoint, orientation_setpoint);
+    state->get(&position_state, &orientation_state, &velocity_state);
+    setpoints->get(&position_setpoint, &orientation_setpoint);
 
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
       {
-        setpoints->get(tau_command);
+        setpoints->get(&tau_command);
         break;
       }
 
@@ -157,7 +157,7 @@ void Controller::spin()
 
       case ControlModes::DEPTH_HOLD:
       {
-        setpoints->get(tau_openloop);
+        setpoints->get(&tau_openloop);
 
         bool depth_change_commanded = abs(tau_openloop(2)) > FORCE_DEADZONE_LIMIT;
         if (depth_change_commanded)

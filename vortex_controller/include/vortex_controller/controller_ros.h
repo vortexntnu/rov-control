@@ -22,7 +22,7 @@ public:
   explicit Controller(ros::NodeHandle nh);
   void commandCallback(const vortex_msgs::PropulsionCommand &msg);
   void stateCallback(const nav_msgs::Odometry &msg);
-  void configCallback(vortex_controller::VortexControllerConfig& config, uint32_t level);
+  void configCallback(const vortex_controller::VortexControllerConfig& config, uint32_t level);
   void spin();
 private:
   ros::NodeHandle nh;

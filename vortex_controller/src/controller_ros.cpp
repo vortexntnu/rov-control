@@ -99,7 +99,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   state->set(position, orientation, velocity);
 }
 
-void Controller::configCallback(vortex_controller::VortexControllerConfig &config, uint32_t level)
+void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
   ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
   position_hold_controller->setGains(config.a, config.b, config.c);

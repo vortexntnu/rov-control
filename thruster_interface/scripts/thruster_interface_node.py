@@ -47,6 +47,8 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
 
+        rospy.on_shutdown(self.output_to_zero)
+
         rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), self.FREQUENCY)
 
     def output_to_zero(self):
@@ -133,7 +135,6 @@ class ThrusterInterface(object):
                 rospy.logwarn_throttle(1, '%s: Message out of range, ignoring...' % rospy.get_name())
                 return False
         return True
-
 
 
 if __name__ == '__main__':

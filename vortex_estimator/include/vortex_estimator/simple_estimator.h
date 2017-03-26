@@ -3,8 +3,8 @@
 // The velocity twist is always zero, and x- and y-axis position is always
 // zero.
 
-#ifndef SIMPLE_ESTIMATOR_H
-#define SIMPLE_ESTIMATOR_H
+#ifndef VORTEX_ESTIMATOR_SIMPLE_ESTIMATOR_H
+#define VORTEX_ESTIMATOR_SIMPLE_ESTIMATOR_H
 
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
@@ -35,4 +35,4 @@ class SimpleEstimator
     nav_msgs::Odometry state;
 };
 
-#endif
+#endif  // VORTEX_ESTIMATOR_SIMPLE_ESTIMATOR_H

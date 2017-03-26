@@ -37,10 +37,10 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 
   // Read thrust config matrix
   Eigen::MatrixXd thrust_configuration;
-  if (!getMatrixParam(nh, "propulsion/thrusters/configuration_matrix", thrust_configuration))
+  if (!getMatrixParam(nh, "propulsion/thrusters/configuration_matrix", &thrust_configuration))
     ROS_FATAL("Failed to read parameter thrust config matrix.");
   Eigen::MatrixXd thrust_configuration_pseudoinverse;
-  if (!pseudoinverse(thrust_configuration, thrust_configuration_pseudoinverse))
+  if (!pseudoinverse(thrust_configuration, &thrust_configuration_pseudoinverse))
     ROS_FATAL("Failed to compute pseudoinverse of thrust config matrix.");
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse);
@@ -48,7 +48,6 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
   ROS_INFO("Allocator: Initialized.");
 }
 
-// inline bool saturateVector(Eigen::VectorXd &v, double min, double max)
 void Allocator::callback(const geometry_msgs::Wrench &msg)
 {
   Eigen::VectorXd tau = rovForcesMsgToEigen(msg);
@@ -68,11 +67,11 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
     return;
   }
 
-  if (!saturateVector(u, min_thrust, max_thrust))
+  if (!saturateVector(&u, min_thrust, max_thrust))
     ROS_WARN("Thrust vector u required saturation.");
 
   vortex_msgs::Float64ArrayStamped u_msg;
-  arrayEigenToMsg(u, u_msg);
+  arrayEigenToMsg(u, &u_msg);
   u_msg.header.stamp = ros::Time::now();
   pub.publish(u_msg);
 }

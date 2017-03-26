@@ -7,12 +7,15 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   vortex_msgs
   message_generation
+  roslint
 )
 
 add_service_files(FILES
   SaveImuCalibration.srv
   LoadImuCalibration.srv
 )
+
+roslint_python()
 
 generate_messages()
 

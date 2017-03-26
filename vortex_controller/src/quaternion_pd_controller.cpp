@@ -1,4 +1,4 @@
-#include "quaternion_pd_controller.h"
+#include "vortex_controller/quaternion_pd_controller.h"
 
 QuaternionPdController::QuaternionPdController(double a,
                                                double b,

@@ -1,4 +1,4 @@
-#include "setpoints.h"
+#include "vortex_controller/setpoints.h"
 
 Setpoints::Setpoints(const Eigen::Vector6d &wrench_scaling,
                      const Eigen::Vector6d &wrench_max,

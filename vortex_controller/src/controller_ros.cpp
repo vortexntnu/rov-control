@@ -1,4 +1,4 @@
-#include "controller_ros.h"
+#include "vortex_controller/controller_ros.h"
 
 #include "vortex/eigen_helper.h"
 #include <tf/transform_datatypes.h>

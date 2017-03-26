@@ -156,7 +156,7 @@ void Controller::spin()
       {
         setpoints->get(tau_openloop);
 
-        bool depth_change_commanded = abs(tau_openloop(2) > FORCE_DEADZONE_LIMIT);
+        bool depth_change_commanded = abs(tau_openloop(2)) > FORCE_DEADZONE_LIMIT;
         if (depth_change_commanded)
         {
           tau_command = tau_openloop;

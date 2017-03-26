@@ -2,10 +2,12 @@
 
 import rospy
 
+
 class Ms5837InterfaceNode(object):
     def __init__(self):
         rospy.init_node('pressure_node')
-        #Stuff
+        # Stuff
+
 
 if __name__ == '__main__':
     try:

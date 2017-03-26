@@ -23,7 +23,7 @@ public:
       ros::spinOnce();
   }
 
-  void PublishCommand(boost::array<double,6> motion, std::vector<uint8_t> mode)
+  void PublishCommand(boost::array<double, 6> motion, std::vector<uint8_t> mode)
   {
     vortex_msgs::PropulsionCommand msg;
     msg.motion = motion;
@@ -43,7 +43,7 @@ public:
       ros::spinOnce();
   }
 
-  Eigen::Matrix<double,6,1> tau;
+  Eigen::Matrix<double, 6, 1> tau;
   const double MAX_ERROR = 0.0001;
 
 private:
@@ -72,11 +72,11 @@ TEST_F(ControllerTest, CheckResponsiveness)
 
 TEST_F(ControllerTest, OpenLoop)
 {
-  PublishCommand({1, 0, 0, 0, 0, 0}, {1, 0, 0, 0});
+  PublishCommand({1, 0, 0, 0, 0, 0}, {1, 0, 0, 0});  // NOLINT(whitespace/braces)
   ros::Duration(0.5).sleep();
   WaitForMessage();
 
-  ExpectTauNear({48.895, 0, 0, 0, 0, 0});
+  ExpectTauNear({48.895, 0, 0, 0, 0, 0});  // NOLINT(whitespace/braces)
 }
 
 int main(int argc, char **argv)

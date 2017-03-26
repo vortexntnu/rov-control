@@ -7,6 +7,9 @@
 #include "std_msgs/String.h"
 
 #include <math.h>
+#include <map>
+#include <string>
+#include <vector>
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
@@ -118,7 +121,7 @@ void Controller::spin()
   ros::Rate rate(frequency);
   while (ros::ok())
   {
-    // TODO: check value of bool return from getters
+    // TODO(mortenfyhn): check value of bool return from getters
     state->get(position_state, orientation_state, velocity_state);
     setpoints->get(position_setpoint, orientation_setpoint);
 
@@ -142,7 +145,7 @@ void Controller::spin()
 
       case ControlModes::RPY_DEPTH:
       {
-        // TODO: make this similar to depth hold
+        // TODO(mortenfyhn): make this similar to depth hold
         tau_command(0) = tau_openloop(0);
         tau_command(1) = tau_openloop(1);
         tau_command(2) = tau_sixdof(2);
@@ -216,7 +219,7 @@ void Controller::initSetpoints()
 void Controller::initPositionHoldController()
 {
   // Read controller gains from parameter server
-  std::map<std::string,double> gains;
+  std::map<std::string, double> gains;
   if (!nh.getParam("/controller/gains", gains))
     ROS_ERROR("Failed to read parameter controller gains.");
 

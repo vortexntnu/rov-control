@@ -1,5 +1,5 @@
-#ifndef SETPOINTS_H
-#define SETPOINTS_H
+#ifndef VORTEX_CONTROLLER_SETPOINTS_H
+#define VORTEX_CONTROLLER_SETPOINTS_H
 
 #include <Eigen/Dense>
 #include "vortex/eigen_typedefs.h"
@@ -32,4 +32,4 @@ private:
   bool   pose_valid_;
 };
 
-#endif
+#endif  // VORTEX_CONTROLLER_SETPOINTS_H

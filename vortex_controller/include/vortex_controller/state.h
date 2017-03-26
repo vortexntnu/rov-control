@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef VORTEX_CONTROLLER_STATE_H
+#define VORTEX_CONTROLLER_STATE_H
 
 #include <Eigen/Dense>
 #include "vortex/eigen_typedefs.h"
@@ -25,4 +25,4 @@ private:
   bool is_initialized_;
 };
 
-#endif
+#endif  // VORTEX_CONTROLLER_STATE_H

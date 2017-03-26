@@ -41,7 +41,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
 
   // Convert quaternion setpoint to euler angles (ZYX convention)
   Eigen::Vector3d euler;
-  euler = orientation_.toRotationMatrix().eulerAngles(2,1,0);
+  euler = orientation_.toRotationMatrix().eulerAngles(2, 1, 0);
 
   // Increment euler setpoint
   for (int i = 0; i < 3; ++i)

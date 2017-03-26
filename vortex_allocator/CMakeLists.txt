@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 find_package(Eigen3 REQUIRED)
 
+set(ROSLINT_CPP_OPTS "--filter=-legal/copyright")
 roslint_cpp()
 
 ###################################

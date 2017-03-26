@@ -1,5 +1,3 @@
-// Copyright 2017 Vortex NTNU
-
 // Implement the unweighted pseudoinverse-based allocator described in e.g.
 // Fossen 2011 Handbook of Marine Craft Hydrodynamics and Motion Control
 // (chapter 12.3.2).

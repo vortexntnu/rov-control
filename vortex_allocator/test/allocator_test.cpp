@@ -1,5 +1,3 @@
-// Copyright 2017 Vortex NTNU
-
 #include "ros/ros.h"
 #include <gtest/gtest.h>
 #include "geometry_msgs/Wrench.h"

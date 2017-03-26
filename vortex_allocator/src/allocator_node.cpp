@@ -1,5 +1,3 @@
-// Copyright 2017 Vortex NTNU
-
 #include "ros/ros.h"
 
 #include "vortex_allocator/allocator_ros.h"

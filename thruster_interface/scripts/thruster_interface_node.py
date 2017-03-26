@@ -47,7 +47,7 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
 
-        rospy.on_shutdown(self.shutdown)
+        rospy.on_shutdown(self.output_to_zero)
 
         rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), self.FREQUENCY)
 
@@ -136,8 +136,6 @@ class ThrusterInterface(object):
                 return False
         return True
 
-    def shutdown(self):
-        self.output_to_zero()
 
 if __name__ == '__main__':
     try:

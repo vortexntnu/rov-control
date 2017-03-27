@@ -15,10 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   vortex
   vortex_msgs
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(Eigen3 REQUIRED)
+
+set(ROSLINT_CPP_OPTS "--filter=-legal/copyright")
+roslint_cpp()
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

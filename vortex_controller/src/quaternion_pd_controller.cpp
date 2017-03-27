@@ -1,4 +1,4 @@
-#include "quaternion_pd_controller.h"
+#include "vortex_controller/quaternion_pd_controller.h"
 
 QuaternionPdController::QuaternionPdController(double a,
                                                double b,
@@ -15,8 +15,8 @@ QuaternionPdController::QuaternionPdController(double a,
 void QuaternionPdController::setGains(double a_new, double b_new, double c_new)
 {
   c   = c_new;
-  K_d = a_new * Eigen::MatrixXd::Identity(6,6);
-  K_x = b_new * Eigen::MatrixXd::Identity(3,3);
+  K_d = a_new * Eigen::MatrixXd::Identity(6, 6);
+  K_x = b_new * Eigen::MatrixXd::Identity(3, 3);
 }
 
 Eigen::Vector6d QuaternionPdController::compute(const Eigen::Vector3d    &x,
@@ -34,8 +34,8 @@ Eigen::Vector6d QuaternionPdController::compute(const Eigen::Vector3d    &x,
 
 Eigen::Matrix6d QuaternionPdController::proportionalGainMatrix(const Eigen::Matrix3d &R)
 {
-  return (Eigen::Matrix6d() << R.transpose() * K_x,        Eigen::MatrixXd::Zero(3,3),
-                               Eigen::MatrixXd::Zero(3,3), c*Eigen::MatrixXd::Identity(3,3)).finished();
+  return (Eigen::Matrix6d() << R.transpose() * K_x,        Eigen::MatrixXd::Zero(3, 3),
+                               Eigen::MatrixXd::Zero(3, 3), c*Eigen::MatrixXd::Identity(3, 3)).finished();
 }
 
 Eigen::Vector6d QuaternionPdController::errorVector(const Eigen::Vector3d    &x,

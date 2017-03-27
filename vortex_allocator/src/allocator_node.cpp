@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 
-#include "allocator_ros.h"
+#include "vortex_allocator/allocator_ros.h"
 
 int main(int argc, char **argv)
 {

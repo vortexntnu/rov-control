@@ -5,6 +5,8 @@
 #include "vortex_msgs/PropulsionCommand.h"
 #include "vortex_msgs/Float64ArrayStamped.h"
 
+#include <vector>
+
 class IntegrationTest : public ::testing::Test
 {
 public:
@@ -23,7 +25,7 @@ public:
 
   void PublishOpenloop(double forward, double right, double down, double roll_right, double tilt_up, double turn_right)
   {
-    boost::array<double,6> propulsion = { {forward, right, down, roll_right, tilt_up, turn_right} };
+    boost::array<double, 6> propulsion = { {forward, right, down, roll_right, tilt_up, turn_right} };
     const unsigned char arr[] = {1, 0};
     std::vector<unsigned char> mode (arr, arr + sizeof(arr) / sizeof(arr[0]) );
 
@@ -35,7 +37,7 @@ public:
 
   void PublishInvalidMode()
   {
-    boost::array<double,6> propulsion = { {1, 2, 3, 4, 5, 6} };
+    boost::array<double, 6> propulsion = { {1, 2, 3, 4, 5, 6} };
     const unsigned char arr[] = {0, 0};
     std::vector<unsigned char> mode (arr, arr + sizeof(arr) / sizeof(arr[0]) );
 
@@ -87,14 +89,14 @@ public:
 
 TEST_F(IntegrationTest, CheckResponsiveness)
 {
-  PublishOpenloop(0,0,0,0,0,0);
+  PublishOpenloop(0, 0, 0, 0, 0, 0);
   WaitForMessage();
 }
 
 // Command forward motion in open loop, assure correct forces for each thruster.
 TEST_F(IntegrationTest, ForwardOpenloop)
 {
-  PublishOpenloop(1,0,0,0,0,0);
+  PublishOpenloop(1, 0, 0, 0, 0, 0);
   // Spin long enough for the control node to respond to input (depends on control frequency)
   SpinSeconds(0.2);
   WaitForMessage();
@@ -106,7 +108,7 @@ TEST_F(IntegrationTest, ForwardOpenloop)
 // Give invalid control mode, assure no output change
 TEST_F(IntegrationTest, OutOfRange)
 {
-  PublishOpenloop(1,0,0,0,0,0);
+  PublishOpenloop(1, 0, 0, 0, 0, 0);
   PublishInvalidMode();
   SpinSeconds(0.2);
   WaitForMessage();

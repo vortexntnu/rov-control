@@ -6,10 +6,13 @@ find_package(catkin REQUIRED COMPONENTS
   vortex_msgs
   std_msgs
   message_generation
+  roslint
 )
 
 add_service_files(FILES
     ThrustersEnable.srv)
+
+roslint_python()
 
 generate_messages()
 

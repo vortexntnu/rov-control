@@ -102,7 +102,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
   ROS_INFO_STREAM("Setting gains [a=" << config.a << ", b=" << config.b << ", c=" << config.c << "].");
-  position_hold_controller->setGains(config.a, config.b, config.c);
+  controller->setGains(config.a, config.b, config.c);
 }
 
 void Controller::spin()
@@ -142,8 +142,8 @@ void Controller::spin()
         // Orientation in closed loop
         position_state.setZero();
         position_setpoint.setZero();
-        tau_feedback = position_hold_controller->compute(
-          position_state, orientation_state, velocity_state, position_setpoint, orientation_setpoint);
+        tau_feedback = controller->compute(position_state, orientation_state, velocity_state,
+                                           position_setpoint, orientation_setpoint);
 
         // sum the two
         tau_command = tau_openloop + tau_feedback;
@@ -152,11 +152,8 @@ void Controller::spin()
 
       case ControlModes::SIXDOF:
       {
-        tau_command = position_hold_controller->compute(position_state,
-                                                        orientation_state,
-                                                        velocity_state,
-                                                        position_setpoint,
-                                                        orientation_setpoint);
+        tau_command = controller->compute(position_state, orientation_state, velocity_state,
+                                          position_setpoint, orientation_setpoint);
         break;
       }
 
@@ -186,11 +183,8 @@ void Controller::spin()
           position_setpoint(0) = position_state(0);
           position_setpoint(1) = position_state(1);
           orientation_setpoint = orientation_state;
-          tau_feedback = position_hold_controller->compute(position_state,
-                                                         orientation_state,
-                                                         velocity_state,
-                                                         position_setpoint,
-                                                         orientation_setpoint);
+          tau_feedback = controller->compute(position_state, orientation_state, velocity_state,
+                                             position_setpoint, orientation_setpoint);
           tau_command = tau_feedback + tau_openloop;
         }
         break;
@@ -262,10 +256,7 @@ void Controller::initPositionHoldController()
   double W = mass * acceleration_of_gravity;
   double B = density_of_water * displacement * acceleration_of_gravity;
 
-  position_hold_controller = new QuaternionPdController(gains["a"],
-                                                        gains["b"],
-                                                        gains["c"],
-                                                        W, B, r_G, r_B);
+  controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
 }
 
 bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)

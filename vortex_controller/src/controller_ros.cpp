@@ -136,7 +136,7 @@ void Controller::spin()
       case ControlModes::ATTITUDE_HOLD:
       {
         // Linear motion in open loop
-        setpoints->get(tau_openloop);
+        setpoints->get(&tau_openloop);
         tau_openloop.tail(3) = Eigen::Vector3d::Zero();
 
         // Orientation in closed loop

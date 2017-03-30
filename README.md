@@ -1,4 +1,4 @@
-# rov-control
+# rov-control [![Build Status](https://travis-ci.org/vortexntnu/rov-control.svg?branch=master)](https://travis-ci.org/vortexntnu/rov-control)
 The control system for Vortex NTNU's ROVs. The repository contains several ROS packages.
 
 ## Launching

@@ -5,14 +5,8 @@ The control system for Vortex NTNU's ROVs. The repository contains several ROS p
 * `roslaunch vortex maelstrom.launch` to start the system for the Maelstrom ROV.
 * `rosrun rqt_reconfigure rqt_reconfigure` to open the dynamic reconfigure GUI window.
 
-## Testing
-Run all tests at once with
-```
-rostest vortex integration_test.test &&
-rostest vortex_allocator allocator_test.test &&
-rostest vortex_controller controller_test.test &&
-rostest vortex_estimator estimator_test.test
-```
+## Testing/linting
+Run all tests with `catkin_make run_tests` and lint with `catkin_make roslint`.
 
 ## Dependencies
 ### Eigen

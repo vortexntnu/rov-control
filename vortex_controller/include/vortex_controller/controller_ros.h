@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_ROS_H
-#define CONTROLLER_ROS_H
+#ifndef VORTEX_CONTROLLER_CONTROLLER_ROS_H
+#define VORTEX_CONTROLLER_CONTROLLER_ROS_H
 
 #include <Eigen/Dense>
 
@@ -12,17 +12,17 @@
 #include "vortex_controller/control_modes.h"
 #include "vortex_msgs/PropulsionCommand.h"
 
-#include "state.h"
-#include "setpoints.h"
-#include "quaternion_pd_controller.h"
+#include "vortex_controller/state.h"
+#include "vortex_controller/setpoints.h"
+#include "vortex_controller/quaternion_pd_controller.h"
 
 class Controller
 {
 public:
-  Controller(ros::NodeHandle nh);
+  explicit Controller(ros::NodeHandle nh);
   void commandCallback(const vortex_msgs::PropulsionCommand &msg);
   void stateCallback(const nav_msgs::Odometry &msg);
-  void configCallback(vortex_controller::VortexControllerConfig& config, uint32_t level);
+  void configCallback(const vortex_controller::VortexControllerConfig& config, uint32_t level);
   void spin();
 private:
   ros::NodeHandle nh;
@@ -46,4 +46,4 @@ private:
   void publishControlMode();
 };
 
-#endif
+#endif  // VORTEX_CONTROLLER_CONTROLLER_ROS_H

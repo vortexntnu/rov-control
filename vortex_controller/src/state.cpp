@@ -1,4 +1,4 @@
-#include "state.h"
+#include "vortex_controller/state.h"
 
 State::State()
 {
@@ -8,27 +8,27 @@ State::State()
   is_initialized_ = false;
 }
 
-bool State::get(Eigen::Vector3d    &position,
-                Eigen::Quaterniond &orientation)
+bool State::get(Eigen::Vector3d    *position,
+                Eigen::Quaterniond *orientation)
 {
   if (!is_initialized_)
     return false;
 
-  position    = position_;
-  orientation = orientation_;
+  *position    = position_;
+  *orientation = orientation_;
   return true;
 }
 
-bool State::get(Eigen::Vector3d    &position,
-                Eigen::Quaterniond &orientation,
-                Eigen::Vector6d    &velocity)
+bool State::get(Eigen::Vector3d    *position,
+                Eigen::Quaterniond *orientation,
+                Eigen::Vector6d    *velocity)
 {
   if (!is_initialized_)
     return false;
 
-  position    = position_;
-  orientation = orientation_;
-  velocity    = velocity_;
+  *position    = position_;
+  *orientation = orientation_;
+  *velocity    = velocity_;
   return true;
 }
 

@@ -1,4 +1,4 @@
-#include "controller_ros.h"
+#include "vortex_controller/controller_ros.h"
 
 int main(int argc, char **argv)
 {

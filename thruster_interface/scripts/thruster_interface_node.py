@@ -6,8 +6,8 @@ import numpy
 import rospy
 
 from vortex_msgs.msg import Float64ArrayStamped
-
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
+
 
 class ThrusterInterface(object):
     def __init__(self):
@@ -16,25 +16,25 @@ class ThrusterInterface(object):
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
         self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
-        self.PWM_BITS_PER_PERIOD           = 4096.0 # 12 bit PWM
-        self.FREQUENCY                     = 249    # Max 400 Hz
-        self.FREQUENCY_MEASURED            = 251.2  # Use this for better precision
-        self.PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0/self.FREQUENCY_MEASURED
-        self.THRUST_RANGE_LIMIT            = 100
+        self.PWM_BITS_PER_PERIOD = 4096.0  # 12 bit PWM
+        self.FREQUENCY = 249    # Max 400 Hz
+        self.FREQUENCY_MEASURED = 251.2  # Use this for better precision
+        self.PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / self.FREQUENCY_MEASURED
+        self.THRUST_RANGE_LIMIT = 100
 
         self.ENABLE_RATE_LIMITER = False
 
-        self.lookup_thrust      = rospy.get_param('/thrusters/characteristics/thrust')
+        self.lookup_thrust = rospy.get_param('/thrusters/characteristics/thrust')
         self.lookup_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
-        self.num_thrusters    = rospy.get_param('/propulsion/thrusters/num')
-        self.max_rate         = rospy.get_param('/thrusters/rate_of_change/max')
+        self.num_thrusters = rospy.get_param('/propulsion/thrusters/num')
+        self.max_rate = rospy.get_param('/thrusters/rate_of_change/max')
         self.thrusters_connected = rospy.get_param('/thruster_interface/thrusters_connected')
-        self.rate_limiting_enabled    = rospy.get_param('/thruster_interface/rate_limiting_enabled')
+        self.rate_limiting_enabled = rospy.get_param('/thruster_interface/rate_limiting_enabled')
         self.prev_time = rospy.get_rostime()
         self.is_initialized = False
 
         # The setpoint is the desired value (input)
-        self.thrust_setpoint  = numpy.zeros(self.num_thrusters)
+        self.thrust_setpoint = numpy.zeros(self.num_thrusters)
         # The reference is the output value (rate limited)
         self.thrust_reference = numpy.zeros(self.num_thrusters)
 
@@ -46,6 +46,8 @@ class ThrusterInterface(object):
             self.pca9685.set_pwm_freq(self.FREQUENCY)
 
         self.output_to_zero()
+
+        rospy.on_shutdown(self.output_to_zero)
 
         rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), self.FREQUENCY)
 
@@ -79,7 +81,7 @@ class ThrusterInterface(object):
         self.update_reference(dt)
         self.set_pwm()
 
-    def handle_thrusters_enable (self, req):
+    def handle_thrusters_enable(self, req):
         if req.thrusters_enable:
             rospy.loginfo('%s: Enabling thrusters', rospy.get_name())
             self.thrusters_enabled = True
@@ -98,7 +100,7 @@ class ThrusterInterface(object):
 
     def update_reference(self, dt):
         if self.rate_limiting_enabled:
-            rate_of_change = (self.thrust_setpoint - self.thrust_reference)/dt
+            rate_of_change = (self.thrust_setpoint - self.thrust_reference) / dt
             for i in range(self.num_thrusters):
                 if rate_of_change[i] > self.max_rate:
                     self.thrust_reference[i] += dt * self.max_rate
@@ -110,7 +112,7 @@ class ThrusterInterface(object):
             self.thrust_reference = self.thrust_setpoint
 
     def set_pwm(self):
-        microsecs = [None]*self.num_thrusters
+        microsecs = [None] * self.num_thrusters
         for i in range(self.num_thrusters):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
@@ -133,7 +135,6 @@ class ThrusterInterface(object):
                 rospy.logwarn_throttle(1, '%s: Message out of range, ignoring...' % rospy.get_name())
                 return False
         return True
-
 
 
 if __name__ == '__main__':

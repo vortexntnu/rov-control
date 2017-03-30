@@ -3,8 +3,8 @@
 // a nonlinear PD position and orientation controller.
 // All variables are named as they appear in the paper.
 
-#ifndef QUATERNION_PD_CONTROLLER_H
-#define QUATERNION_PD_CONTROLLER_H
+#ifndef VORTEX_CONTROLLER_QUATERNION_PD_CONTROLLER_H
+#define VORTEX_CONTROLLER_QUATERNION_PD_CONTROLLER_H
 
 #include <Eigen/Dense>
 #include "vortex/eigen_typedefs.h"
@@ -35,14 +35,14 @@ private:
   Eigen::Vector6d restoringForceVector(const Eigen::Matrix3d &R);
   int             sgn(double x);
 
-  double c;            // Orientation gain
-  Eigen::Matrix6d K_d; // Derivative gain matrix
-  Eigen::Matrix3d K_x; // Position error gain matrix
+  double c;             // Orientation gain
+  Eigen::Matrix6d K_d;  // Derivative gain matrix
+  Eigen::Matrix3d K_x;  // Position error gain matrix
 
-  Eigen::Vector3d r_G; // Center of gravity, expressed in body frame
-  Eigen::Vector3d r_B; // Center of buoyancy, expressed in body frame
-  double W;            // [N] Weight of ROV
-  double B;            // [N] Buoyancy of ROV
+  Eigen::Vector3d r_G;  // Center of gravity, expressed in body frame
+  Eigen::Vector3d r_B;  // Center of buoyancy, expressed in body frame
+  double W;             // [N] Weight of ROV
+  double B;             // [N] Buoyancy of ROV
 };
 
-#endif
+#endif  // VORTEX_CONTROLLER_QUATERNION_PD_CONTROLLER_H

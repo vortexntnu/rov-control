@@ -15,10 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   vortex
   vortex_msgs
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(Eigen3 REQUIRED)
+
+set(ROSLINT_CPP_OPTS "--filter=-legal/copyright")
+roslint_cpp()
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -92,8 +96,10 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Testing ##
 #############
 
-## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/controller_test.cpp)
-if(TARGET ${PROJECT_NAME}-test)
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(${PROJECT_NAME}-test test/controller_test.test test/controller_test.cpp)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+
+  roslint_add_test()
 endif()

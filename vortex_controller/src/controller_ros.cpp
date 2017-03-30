@@ -1,4 +1,4 @@
-#include "controller_ros.h"
+#include "vortex_controller/controller_ros.h"
 
 #include "vortex/eigen_helper.h"
 #include <tf/transform_datatypes.h>
@@ -7,6 +7,9 @@
 #include "std_msgs/String.h"
 
 #include <math.h>
+#include <map>
+#include <string>
+#include <vector>
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
@@ -61,7 +64,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     Eigen::Vector6d    velocity;
 
     // Reset setpoints to be equal to state
-    state->get(position, orientation, velocity);
+    state->get(&position, &orientation, &velocity);
     setpoints->set(position, orientation);
 
     ROS_INFO_STREAM("Controller: Changing mode to " << controlModeString(control_mode) << ".");
@@ -96,7 +99,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   state->set(position, orientation, velocity);
 }
 
-void Controller::configCallback(vortex_controller::VortexControllerConfig &config, uint32_t level)
+void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
   ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
   position_hold_controller->setGains(config.a, config.b, config.c);
@@ -118,15 +121,15 @@ void Controller::spin()
   ros::Rate rate(frequency);
   while (ros::ok())
   {
-    // TODO: check value of bool return from getters
-    state->get(position_state, orientation_state, velocity_state);
-    setpoints->get(position_setpoint, orientation_setpoint);
+    // TODO(mortenfyhn): check value of bool return from getters
+    state->get(&position_state, &orientation_state, &velocity_state);
+    setpoints->get(&position_setpoint, &orientation_setpoint);
 
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
       {
-        setpoints->get(tau_command);
+        setpoints->get(&tau_command);
         break;
       }
 
@@ -142,7 +145,7 @@ void Controller::spin()
 
       case ControlModes::RPY_DEPTH:
       {
-        // TODO: make this similar to depth hold
+        // TODO(mortenfyhn): make this similar to depth hold
         tau_command(0) = tau_openloop(0);
         tau_command(1) = tau_openloop(1);
         tau_command(2) = tau_sixdof(2);
@@ -154,9 +157,9 @@ void Controller::spin()
 
       case ControlModes::DEPTH_HOLD:
       {
-        setpoints->get(tau_openloop);
+        setpoints->get(&tau_openloop);
 
-        bool depth_change_commanded = abs(tau_openloop(2) > FORCE_DEADZONE_LIMIT);
+        bool depth_change_commanded = abs(tau_openloop(2)) > FORCE_DEADZONE_LIMIT;
         if (depth_change_commanded)
         {
           tau_command = tau_openloop;
@@ -216,7 +219,7 @@ void Controller::initSetpoints()
 void Controller::initPositionHoldController()
 {
   // Read controller gains from parameter server
-  std::map<std::string,double> gains;
+  std::map<std::string, double> gains;
   if (!nh.getParam("/controller/gains", gains))
     ROS_ERROR("Failed to read parameter controller gains.");
 

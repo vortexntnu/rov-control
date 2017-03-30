@@ -10,6 +10,7 @@ project(vortex)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   vortex_msgs
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -21,7 +22,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
-
+set(ROSLINT_CPP_OPTS "--filter=-legal/copyright")
+roslint_cpp()
 
 ###################################
 ## catkin specific configuration ##
@@ -120,8 +122,10 @@ include_directories(
 ## Testing ##
 #############
 
-## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/integration_test.cpp)
-if(TARGET ${PROJECT_NAME}-test)
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(${PROJECT_NAME}-test test/integration_test.test test/integration_test.cpp)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+
+  roslint_add_test()
 endif()

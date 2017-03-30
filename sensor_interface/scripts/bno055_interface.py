@@ -5,13 +5,13 @@ import rospkg
 import rospy
 
 from sensor_msgs.msg import Imu, MagneticField, Temperature
-from std_msgs.msg import String
 from geometry_msgs.msg import Vector3, Vector3Stamped, Quaternion
 from diagnostic_msgs.msg import DiagnosticStatus, KeyValue
 from sensor_interface.srv import SaveImuCalibration, SaveImuCalibrationResponse
 from sensor_interface.srv import LoadImuCalibration, LoadImuCalibrationResponse
 
 from Adafruit_BNO055 import BNO055
+
 
 class Bno055InterfaceNode(object):
     def __init__(self):
@@ -36,22 +36,21 @@ class Bno055InterfaceNode(object):
         rospy.loginfo("%s: System status: %s", rospy.get_name(), self.status)
         rospy.loginfo("%s: Self test result (0x0F is normal): 0x%02X", rospy.get_name(), self.self_test)
         if self.status == 0x01:
-            rospy.logwarn("%s: System status: 0x%02X\nSee datasheet section 4.3.59 for the meaning.", rospy.get_name(),  self.status)
+            rospy.logwarn("%s: System status: 0x%02X\n"
+                          "See datasheet section 4.3.59 for the meaning.", rospy.get_name(), self.status)
 
         self.sw_v, \
-        self.bootloader_v, \
-        self.accelerometer_id, \
-        self.magnetometer_id, \
-        self.gyro_id = self.bno.get_revision()
-        rospy.loginfo(( "%s:\n"
-        "Software version: %s\n"
-        "Bootloader version: %s\n"
-        "Accelerometer ID: 0x%02X\n"
-        "Magnetometer ID: 0x%02X\n"
-        "Gyroscope ID: 0x%02X\n"
-        ), rospy.get_name(), self.sw_v, self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
-        self.talker()
+            self.bootloader_v, \
+            self.accelerometer_id, \
+            self.magnetometer_id, \
+            self.gyro_id = self.bno.get_revision()
 
+        rospy.loginfo(("%s:\n"
+                       "Software version: %s\n" "Bootloader version: %s\n"
+                       "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
+                       "Gyroscope ID: 0x%02X\n"), rospy.get_name(), self.sw_v,
+                      self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
+        self.talker()
 
     def init_publishers(self):
         self.pub_imu = rospy.Publisher(
@@ -75,7 +74,6 @@ class Bno055InterfaceNode(object):
             Vector3Stamped,
             queue_size=10)
 
-
     def get_diagnostic(self):
         diag_msg = DiagnosticStatus()
 
@@ -87,7 +85,6 @@ class Bno055InterfaceNode(object):
 
         diag_msg.values = [sys, gyro, accel, mag]
         return diag_msg
-
 
     def talker(self):
         imu_msg = Imu()
@@ -120,7 +117,6 @@ class Bno055InterfaceNode(object):
 
             rospy.Rate(10).sleep()
 
-
     def save_calibration(self, req):
         values = self.bno.get_calibration()
         path = rospkg.RosPack().get_path('sensor_interface') + "/calibration.csv"
@@ -145,6 +141,7 @@ class Bno055InterfaceNode(object):
         except ValueError as e:
             rospy.logwarn("%s: Unexpected format: %s", rospy.get_name(), str(e))
         return LoadImuCalibrationResponse()
+
 
 if __name__ == '__main__':
     try:

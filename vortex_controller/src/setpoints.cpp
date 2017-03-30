@@ -1,4 +1,4 @@
-#include "setpoints.h"
+#include "vortex_controller/setpoints.h"
 
 Setpoints::Setpoints(const Eigen::Vector6d &wrench_scaling,
                      const Eigen::Vector6d &wrench_max,
@@ -41,7 +41,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
 
   // Convert quaternion setpoint to euler angles (ZYX convention)
   Eigen::Vector3d euler;
-  euler = orientation_.toRotationMatrix().eulerAngles(2,1,0);
+  euler = orientation_.toRotationMatrix().eulerAngles(2, 1, 0);
 
   // Increment euler setpoint
   for (int i = 0; i < 3; ++i)
@@ -59,23 +59,23 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   return true;
 }
 
-bool Setpoints::get(Eigen::Vector6d &wrench)
+bool Setpoints::get(Eigen::Vector6d *wrench)
 {
   if (!wrench_valid_)
     return false;
 
-  wrench = wrench_;
+  *wrench = wrench_;
   return true;
 }
 
-bool Setpoints::get(Eigen::Vector3d    &position,
-                    Eigen::Quaterniond &orientation)
+bool Setpoints::get(Eigen::Vector3d    *position,
+                    Eigen::Quaterniond *orientation)
 {
   if (!pose_valid_)
     return false;
 
-  position    = position_;
-  orientation = orientation_;
+  *position    = position_;
+  *orientation = orientation_;
   return true;
 }
 

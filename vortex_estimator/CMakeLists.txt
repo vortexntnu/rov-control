@@ -9,10 +9,14 @@ add_definitions(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
+set(ROSLINT_CPP_OPTS "--filter=-legal/copyright")
+roslint_cpp()
 
 ###################################
 ## catkin specific configuration ##
@@ -25,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+  INCLUDE_DIRS include
   CATKIN_DEPENDS
   roscpp
 )
@@ -35,6 +40,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
@@ -64,8 +70,10 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Testing ##
 #############
 
-## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/estimator_test.cpp)
-if(TARGET ${PROJECT_NAME}-test)
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(${PROJECT_NAME}-test test/estimator_test.test test/estimator_test.cpp)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+
+  roslint_add_test()
 endif()

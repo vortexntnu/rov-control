@@ -7,10 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
 add_message_files(
   DIRECTORY msg
   FILES
@@ -29,10 +25,6 @@ generate_messages(
   geometry_msgs
   std_msgs
 )
-
-###################################
-## catkin specific configuration ##
-###################################
 
 catkin_package(
   CATKIN_DEPENDS

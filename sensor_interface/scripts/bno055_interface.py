@@ -27,17 +27,22 @@ class Bno055InterfaceNode(object):
             LoadImuCalibration,
             self.load_calibration)
 
-        self.bno = BNO055.BNO055(rst='P9_12')
+        try:
+            self.bno = BNO055.BNO055(rst='P9_12')
+        except RuntimeError:
+            rospy.logfatal('Unsupported hardware, intiating clean shutdown.')
+            rospy.signal_shutdown('')
+            return
+
         if not self.bno.begin():
-            rospy.logfatal('%s: Failed to initialise BNO055! Is the sensor connected?', rospy.get_name())
+            rospy.logfatal('Failed to initialise BNO055! Is the sensor connected?')
             raise rospy.ROSInitException('Failed to initialise BNO055! Is the sensor connected?')
 
         self.status, self.self_test, self.error = self.bno.get_system_status()
-        rospy.loginfo("%s: System status: %s", rospy.get_name(), self.status)
-        rospy.loginfo("%s: Self test result (0x0F is normal): 0x%02X", rospy.get_name(), self.self_test)
+        rospy.loginfo("System status: %s", self.status)
+        rospy.loginfo("Self test result (0x0F is normal): 0x%02X", self.self_test)
         if self.status == 0x01:
-            rospy.logwarn("%s: System status: 0x%02X\n"
-                          "See datasheet section 4.3.59 for the meaning.", rospy.get_name(), self.status)
+            rospy.logwarn("System status: 0x%02X\n (see datasheet section 4.3.59).", self.status)
 
         self.sw_v, \
             self.bootloader_v, \
@@ -45,10 +50,9 @@ class Bno055InterfaceNode(object):
             self.magnetometer_id, \
             self.gyro_id = self.bno.get_revision()
 
-        rospy.loginfo(("%s:\n"
-                       "Software version: %s\n" "Bootloader version: %s\n"
+        rospy.loginfo(("Software version: %s\n" "Bootloader version: %s\n"
                        "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
-                       "Gyroscope ID: 0x%02X\n"), rospy.get_name(), self.sw_v,
+                       "Gyroscope ID: 0x%02X\n"), self.sw_v,
                       self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
         self.talker()
 
@@ -124,7 +128,7 @@ class Bno055InterfaceNode(object):
             writer = csv.writer(outfile)
             writer.writerow(values)
 
-        rospy.loginfo("%s: Successfully saved calibration data to %s", rospy.get_name(), path)
+        rospy.loginfo("Successfully saved calibration data to %s", path)
         return SaveImuCalibrationResponse()
 
     def load_calibration(self, req):
@@ -135,11 +139,11 @@ class Bno055InterfaceNode(object):
                 values = next(reader)
             values = [int(value) for value in values]
             self.bno.set_calibration(values)
-            rospy.loginfo("%s: Successfully loaded calibration data from %s", rospy.get_name(), path)
+            rospy.loginfo("Successfully loaded calibration data from %s", path)
         except IOError:
-            rospy.logwarn("%s: Unable to open %s", rospy.get_name(), path)
+            rospy.logwarn("Unable to open %s", path)
         except ValueError as e:
-            rospy.logwarn("%s: Unexpected format: %s", rospy.get_name(), str(e))
+            rospy.logwarn("Unexpected format: %s", str(e))
         return LoadImuCalibrationResponse()
 
 

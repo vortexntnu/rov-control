@@ -26,8 +26,7 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
   {
     min_thrust = -std::numeric_limits<double>::infinity();
     max_thrust =  std::numeric_limits<double>::infinity();
-    ROS_ERROR_STREAM("Failed to read parameters min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust <<
-                     ".");
+    ROS_WARN_STREAM("Failed to read params min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust << ".");
   }
   else
   {
@@ -45,7 +44,7 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse);
 
-  ROS_INFO("Allocator: Initialized.");
+  ROS_INFO("Node initialized.");
 }
 
 void Allocator::callback(const geometry_msgs::Wrench &msg)
@@ -54,7 +53,7 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
 
   if (!healthyWrench(tau))
   {
-    ROS_ERROR("Allocator: Wrench vector tau invalid, ignoring.");
+    ROS_ERROR("Wrench vector tau invalid, ignoring.");
     return;
   }
 
@@ -114,7 +113,7 @@ Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
 
   if (i != num_dof)
   {
-    ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof <<
+    ROS_WARN_STREAM("Invalid length of tau vector. Is " << i << ", should be " << num_dof <<
                     ". Returning zero thrust vector.");
     return Eigen::VectorXd::Zero(num_dof);
   }

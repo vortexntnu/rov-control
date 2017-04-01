@@ -35,14 +35,14 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   cb = boost::bind(&Controller::configCallback, this, _1, _2);
   dr_srv.setCallback(cb);
 
-  ROS_INFO("Controller: Initialized with dynamic reconfigure.");
+  ROS_INFO("Node initialized.");
 }
 
 void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 {
   if (!healthyMessage(msg))
   {
-    ROS_WARN("Controller: Propulsion command message out of range, ignoring...");
+    ROS_WARN("Propulsion command message out of range, ignoring...");
     return;
   }
 
@@ -67,7 +67,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     state->get(&position, &orientation, &velocity);
     setpoints->set(position, orientation);
 
-    ROS_INFO_STREAM("Controller: Changing mode to " << controlModeString(control_mode) << ".");
+    ROS_INFO_STREAM("Changing mode to " << controlModeString(control_mode) << ".");
   }
   publishControlMode();
 
@@ -92,7 +92,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   bool orientation_invalid = (abs(orientation.norm() - 1) > MAX_QUAT_NORM_DEVIATION);
   if (isFucked(position) || isFucked(velocity) || orientation_invalid)
   {
-    ROS_WARN("Controller: State not valid, ignoring...");
+    ROS_WARN("Requested state not valid, ignoring...");
     return;
   }
 
@@ -101,7 +101,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 
 void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
-  ROS_INFO_STREAM("Setting quat pd gains:   a = " << config.a << ",   b = " << config.b << ",   c = " << config.c);
+  ROS_INFO_STREAM("Setting gains [a=" << config.a << ", b=" << config.b << ", c=" << config.c << "].");
   position_hold_controller->setGains(config.a, config.b, config.c);
 }
 
@@ -181,7 +181,7 @@ void Controller::spin()
 
       default:
       {
-        ROS_ERROR("Default control mode reached in Controller::spin().");
+        ROS_ERROR("Default control mode reached.");
         break;
       }
     }
@@ -221,27 +221,27 @@ void Controller::initPositionHoldController()
   // Read controller gains from parameter server
   std::map<std::string, double> gains;
   if (!nh.getParam("/controller/gains", gains))
-    ROS_ERROR("Failed to read parameter controller gains.");
+    ROS_FATAL("Failed to read parameter controller gains.");
 
   // Read center of gravity and buoyancy vectors
   std::vector<double> r_G_vec, r_B_vec;
   if (!nh.getParam("/physical/center_of_mass", r_G_vec))
-    ROS_ERROR("Failed to read robot center of mass parameter.");
+    ROS_FATAL("Failed to read robot center of mass parameter.");
   if (!nh.getParam("/physical/center_of_buoyancy", r_B_vec))
-    ROS_ERROR("Failed to read robot center of buoyancy parameter.");
+    ROS_FATAL("Failed to read robot center of buoyancy parameter.");
   Eigen::Vector3d r_G(r_G_vec.data());
   Eigen::Vector3d r_B(r_B_vec.data());
 
   // Read and calculate ROV weight and buoyancy
   double mass, displacement, acceleration_of_gravity, density_of_water;
   if (!nh.getParam("/physical/mass_kg", mass))
-    ROS_ERROR("Failed to read parameter mass.");
+    ROS_FATAL("Failed to read parameter mass.");
   if (!nh.getParam("/physical/displacement_m3", displacement))
-    ROS_ERROR("Failed to read parameter displacement.");
+    ROS_FATAL("Failed to read parameter displacement.");
   if (!nh.getParam("/gravity/acceleration", acceleration_of_gravity))
-    ROS_ERROR("Failed to read parameter acceleration of gravity");
+    ROS_FATAL("Failed to read parameter acceleration of gravity");
   if (!nh.getParam("/water/density", density_of_water))
-    ROS_ERROR("Failed to read parameter density of water");
+    ROS_FATAL("Failed to read parameter density of water");
   double W = mass * acceleration_of_gravity;
   double B = density_of_water * displacement * acceleration_of_gravity;
 
@@ -258,7 +258,7 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
   {
     if (msg.motion[i] > 1 || msg.motion[i] < -1)
     {
-      ROS_WARN("Controller: Motion command out of range.");
+      ROS_WARN("Motion command out of range.");
       return false;
     }
   }
@@ -271,7 +271,7 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
 
   if (num_requested_modes != 1)
   {
-    ROS_WARN_STREAM("Controller: Invalid control mode. Attempt to set "
+    ROS_WARN_STREAM("Invalid control mode. Attempt to set "
                     << num_requested_modes << " control modes at once.");
     return false;
   }

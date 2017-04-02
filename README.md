@@ -6,7 +6,7 @@ The control system for Vortex NTNU's ROVs. The repository contains several ROS p
 * `rosrun rqt_reconfigure rqt_reconfigure` to open the dynamic reconfigure GUI window.
 
 ## Testing/linting
-Run all tests with `catkin_make run_tests` and lint with `catkin_make roslint`.
+Tests run automatically on a Travis server. Run tests manually with `catkin_make run_tests`. Linting is done when running tests, but you can do linting only with `catkin_make roslint`.
 
 ## Dependencies
 ### Eigen
@@ -28,15 +28,6 @@ sudo make
 sudo cp libg* /usr/lib/
 ```
 
-## Control modes
-Several control modes are implemented:
-* `OPEN_LOOP`: Joystick commands are directly mapped to forces and torques on the ROV.
-* `SIXDOF`: Stationkeeping (setpoint regulation) of six degrees of freedom. Joystick inputs move setpoints.
-* `RPY_DEPTH`: Setpoint regulation of roll, pitch, yaw, and depth. Corresponding joystick inputs move setpoints. Joystick inputs for forward/sideways motion are executed as in open loop.
-* `DEPTH_HOLD`: Setpoint regulation of depth. All other degrees of freedom are run in open loop.
-
 ## Preferred workflow
-* Create a feature branch for each new feature, solved issue, significant refactoring, etc.
-* Run any applicable tests before merging.
-* Merge into master when you are confident that your changes work as you intended.
-* Use `git merge --no-ff your-branch` to preserve history.
+* Create a feature branch out of `master` for each new feature, solved issue, significant refactor, etc.
+* Open a pull request to have your branch merged back into `master`.

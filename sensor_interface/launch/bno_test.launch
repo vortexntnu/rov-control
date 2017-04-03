@@ -1,3 +1,4 @@
 <launch>
+<env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
 <node name="bno055_interface" pkg="sensor_interface" type="bno055_interface.py" output="screen"/>
 </launch>

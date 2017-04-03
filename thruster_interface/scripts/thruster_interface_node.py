@@ -46,7 +46,7 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
-        rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), FREQUENCY)
+        rospy.loginfo("Launching at %d Hz", self.FREQUENCY)
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
@@ -61,13 +61,13 @@ class ThrusterInterface(object):
         if not self.is_initialized:
             self.prev_time = msg.header.stamp
             self.is_initialized = True
-            rospy.loginfo('%s: Successfully initialized', rospy.get_name())
+            rospy.loginfo('Successfully initialized.')
             return
 
         curr_time = msg.header.stamp
         dt = (curr_time - self.prev_time).to_sec()
         if (dt <= 0) and RATE_LIMITING_ENABLED:
-            rospy.logwarn_throttle(1, '%s: Zero time difference between messages, ignoring...' % rospy.get_name())
+            rospy.logwarn_throttle(10, 'Zero time difference between messages, ignoring...')
             return
 
         self.prev_time = curr_time
@@ -80,10 +80,10 @@ class ThrusterInterface(object):
 
     def handle_thrusters_enable(self, req):
         if req.thrusters_enable:
-            rospy.loginfo('%s: Enabling thrusters', rospy.get_name())
+            rospy.loginfo('Enabling thrusters')
             self.thrusters_enabled = True
         else:
-            rospy.loginfo('%s: Disabling thrusters', rospy.get_name())
+            rospy.loginfo('Disabling thrusters')
             self.output_to_zero()
             self.thrusters_enabled = False
         return ThrustersEnableResponse()
@@ -124,12 +124,13 @@ class ThrusterInterface(object):
 
     def healthy_message(self, msg):
         if (len(msg.data) != NUM_THRUSTERS):
-            rospy.logwarn_throttle(1, '%s: Wrong number of thrusters, ignoring...' % rospy.get_name())
+            rospy.logwarn_throttle(10, 'Wrong number of thrusters, ignoring...')
             return False
 
         for t in msg.data:
             if math.isnan(t) or math.isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
-                rospy.logwarn_throttle(1, '%s: Message out of range, ignoring...' % rospy.get_name())
+                rospy.logwarn_throttle(10, 'Message out of range, ignoring...')
+
                 return False
         return True
 

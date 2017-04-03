@@ -8,6 +8,19 @@ import rospy
 from vortex_msgs.msg import Float64ArrayStamped
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
+# Constants
+PWM_BITS_PER_PERIOD = 4096.0  # 12 bit PWM
+FREQUENCY = 249  # Max 400 Hz
+FREQUENCY_MEASURED = 251.2  # Use this for better precision
+PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
+THRUST_RANGE_LIMIT = 100
+
+LOOKUP_THRUST = rospy.get_param('/thrusters/characteristics/thrust')
+LOOKUP_PULSE_WIDTH = rospy.get_param('/thrusters/characteristics/pulse_width')
+NUM_THRUSTERS = rospy.get_param('/propulsion/thrusters/num')
+MAX_RATE = rospy.get_param('/thrusters/rate_of_change/max')
+RATE_LIMITING_ENABLED = rospy.get_param('/thruster_interface/rate_limiting_enabled')
+THRUSTERS_CONNECTED = rospy.get_param('/thruster_interface/thrusters_connected')
 
 class ThrusterInterface(object):
     def __init__(self):
@@ -16,45 +29,29 @@ class ThrusterInterface(object):
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
         self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
-        self.PWM_BITS_PER_PERIOD = 4096.0  # 12 bit PWM
-        self.FREQUENCY = 249    # Max 400 Hz
-        self.FREQUENCY_MEASURED = 251.2  # Use this for better precision
-        self.PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / self.FREQUENCY_MEASURED
-        self.THRUST_RANGE_LIMIT = 100
-
-        self.ENABLE_RATE_LIMITER = False
-
-        self.lookup_thrust = rospy.get_param('/thrusters/characteristics/thrust')
-        self.lookup_pulse_width = rospy.get_param('/thrusters/characteristics/pulse_width')
-        self.num_thrusters = rospy.get_param('/propulsion/thrusters/num')
-        self.max_rate = rospy.get_param('/thrusters/rate_of_change/max')
-        self.thrusters_connected = rospy.get_param('/thruster_interface/thrusters_connected')
-        self.rate_limiting_enabled = rospy.get_param('/thruster_interface/rate_limiting_enabled')
         self.prev_time = rospy.get_rostime()
         self.is_initialized = False
 
         # The setpoint is the desired value (input)
-        self.thrust_setpoint = numpy.zeros(self.num_thrusters)
+        self.thrust_setpoint = numpy.zeros(NUM_THRUSTERS)
         # The reference is the output value (rate limited)
-        self.thrust_reference = numpy.zeros(self.num_thrusters)
+        self.thrust_reference = numpy.zeros(NUM_THRUSTERS)
 
         self.thrusters_enabled = True
 
         # Initialize the PCA9685 using the default address (0x40)
-        if self.thrusters_connected:
+        if THRUSTERS_CONNECTED:
             self.pca9685 = Adafruit_PCA9685.PCA9685()
-            self.pca9685.set_pwm_freq(self.FREQUENCY)
+            self.pca9685.set_pwm_freq(FREQUENCY)
 
         self.output_to_zero()
-
         rospy.on_shutdown(self.output_to_zero)
-
-        rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), self.FREQUENCY)
+        rospy.loginfo("%s: Launching at %d Hz", rospy.get_name(), FREQUENCY)
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
-        if self.thrusters_connected and self.thrusters_enabled:
-            for i in range(self.num_thrusters):
+        if THRUSTERS_CONNECTED and self.thrusters_enabled:
+            for i in range(NUM_THRUSTERS):
                 self.pca9685.set_pwm(i, 0, neutral_pulse_width)
 
     def callback(self, msg):
@@ -69,7 +66,7 @@ class ThrusterInterface(object):
 
         curr_time = msg.header.stamp
         dt = (curr_time - self.prev_time).to_sec()
-        if (dt <= 0) and self.rate_limiting_enabled:
+        if (dt <= 0) and RATE_LIMITING_ENABLED:
             rospy.logwarn_throttle(1, '%s: Zero time difference between messages, ignoring...' % rospy.get_name())
             return
 
@@ -92,31 +89,31 @@ class ThrusterInterface(object):
         return ThrustersEnableResponse()
 
     def thrust_to_microsecs(self, thrust):
-        return numpy.interp(thrust, self.lookup_thrust, self.lookup_pulse_width)
+        return numpy.interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
 
     def microsecs_to_bits(self, microsecs):
-        duty_cycle_normalized = microsecs / self.PERIOD_LENGTH_IN_MICROSECONDS
-        return int(round(self.PWM_BITS_PER_PERIOD * duty_cycle_normalized))
+        duty_cycle_normalized = microsecs / PERIOD_LENGTH_IN_MICROSECONDS
+        return int(round(PWM_BITS_PER_PERIOD * duty_cycle_normalized))
 
     def update_reference(self, dt):
-        if self.rate_limiting_enabled:
+        if RATE_LIMITING_ENABLED:
             rate_of_change = (self.thrust_setpoint - self.thrust_reference) / dt
-            for i in range(self.num_thrusters):
-                if rate_of_change[i] > self.max_rate:
-                    self.thrust_reference[i] += dt * self.max_rate
-                elif rate_of_change[i] < -self.max_rate:
-                    self.thrust_reference[i] -= dt * self.max_rate
+            for i in range(NUM_THRUSTERS):
+                if rate_of_change[i] > MAX_RATE:
+                    self.thrust_reference[i] += dt * MAX_RATE
+                elif rate_of_change[i] < -MAX_RATE:
+                    self.thrust_reference[i] -= dt * MAX_RATE
                 else:
                     self.thrust_reference[i] = self.thrust_setpoint[i]
         else:
             self.thrust_reference = self.thrust_setpoint
 
     def set_pwm(self):
-        microsecs = [None] * self.num_thrusters
-        for i in range(self.num_thrusters):
+        microsecs = [None] * NUM_THRUSTERS
+        for i in range(NUM_THRUSTERS):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
-            if self.thrusters_connected and self.thrusters_enabled:
+            if THRUSTERS_CONNECTED and self.thrusters_enabled:
                 self.pca9685.set_pwm(i, 0, pwm_bits)
 
         # Publish outputs for debug
@@ -126,12 +123,12 @@ class ThrusterInterface(object):
         self.pub.publish(debug_msg)
 
     def healthy_message(self, msg):
-        if (len(msg.data) != self.num_thrusters):
+        if (len(msg.data) != NUM_THRUSTERS):
             rospy.logwarn_throttle(1, '%s: Wrong number of thrusters, ignoring...' % rospy.get_name())
             return False
 
         for t in msg.data:
-            if math.isnan(t) or math.isinf(t) or (abs(t) > self.THRUST_RANGE_LIMIT):
+            if math.isnan(t) or math.isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
                 rospy.logwarn_throttle(1, '%s: Message out of range, ignoring...' % rospy.get_name())
                 return False
         return True

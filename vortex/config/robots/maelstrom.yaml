@@ -3,21 +3,21 @@
 # When looking at the ROV from above, the thruster placement is:
 #  ___    ___
 # |   |__|   |
-# |F1      F2|    N
-# |    F5    |    ^
-# |          | W<-|->E
-# |    F6    |    v
-# |F4      F3|    S
+# | ↗1    2↖ |   N
+# |    5⨯    |   ↑
+# |          | W← →E
+# |    6⨯    |   ↓
+# | ↘4    3↙ |   S
 # |__________|
 #   REAR END
 #
 # Using the compass shown:
-# F1 is positive NE
-# F2 is positive NW
-# F3 is positive SW
-# F4 is positive SE
-# F5 is positive down
-# F6 is positive down
+# Thruster 1 is positive (↗) NE
+# Thruster 2 is positive (↖) NW
+# Thruster 3 is positive (↙) SW
+# Thruster 4 is positive (↘) SE
+# Thruster 5 is positive (⨯) down
+# Thruster 6 is positive (⨯) down
 
 physical:
   mass_kg: 15

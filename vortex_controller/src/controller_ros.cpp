@@ -31,9 +31,9 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   initPositionHoldController();
 
   // Set up a dynamic reconfigure server
-  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig>::CallbackType cb;
-  cb = boost::bind(&Controller::configCallback, this, _1, _2);
-  dr_srv.setCallback(cb);
+  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig>::CallbackType dr_cb;
+  dr_cb = boost::bind(&Controller::configCallback, this, _1, _2);
+  dr_srv.setCallback(dr_cb);
 
   ROS_INFO("Node initialized.");
 }
@@ -101,8 +101,9 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 
 void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
-  ROS_INFO_STREAM("Setting gains [a=" << config.a << ", b=" << config.b << ", c=" << config.c << "].");
-  controller->setGains(config.a, config.b, config.c);
+  ROS_INFO_STREAM("Setting gains: [velocity = " << config.velocity_gain << ", position = " << config.position_gain
+    << ", attitude = " << config.attitude_gain << "]");
+  controller->setGains(config.velocity_gain, config.position_gain, config.attitude_gain);
 }
 
 void Controller::spin()
@@ -230,9 +231,13 @@ void Controller::initSetpoints()
 void Controller::initPositionHoldController()
 {
   // Read controller gains from parameter server
-  std::map<std::string, double> gains;
-  if (!nh.getParam("/controller/gains", gains))
-    ROS_FATAL("Failed to read parameter controller gains.");
+  double a, b, c;
+  if (!nh.getParam("/controller/velocity_gain", a))
+    ROS_ERROR("Failed to read parameter velocity_gain.");
+  if (!nh.getParam("/controller/position_gain", b))
+    ROS_ERROR("Failed to read parameter position_gain.");
+  if (!nh.getParam("/controller/attitude_gain", c))
+    ROS_ERROR("Failed to read parameter attitude_gain.");
 
   // Read center of gravity and buoyancy vectors
   std::vector<double> r_G_vec, r_B_vec;
@@ -256,7 +261,7 @@ void Controller::initPositionHoldController()
   double W = mass * acceleration_of_gravity;
   double B = density_of_water * displacement * acceleration_of_gravity;
 
-  controller = new QuaternionPdController(gains["a"], gains["b"], gains["c"], W, B, r_G, r_B);
+  controller = new QuaternionPdController(a, b, c, W, B, r_G, r_B);
 }
 
 bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)

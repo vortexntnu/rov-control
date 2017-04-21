@@ -3,6 +3,7 @@
 import rospy
 import ms5837
 
+from sensor_msgs.msg import FluidPressure, Temperature
 
 class Ms5837InterfaceNode(object):
     def __init__(self):
@@ -15,6 +16,16 @@ class Ms5837InterfaceNode(object):
                 rospy.logfatal('Failed to read MS5837!')
             else:
                 rospy.loginfo('Successfully initialised MS5837')
+
+        self.pub_pressure = rospy.Publisher(
+            'sensors/pressure',
+            FluidPressure,
+            queue_size=10)
+
+        self.pub_temp = rospy.Publisher(
+            'sensors/temperature',
+            Temperature,
+            queue_size=10)
 
 
 if __name__ == '__main__':

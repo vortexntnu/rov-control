@@ -3,6 +3,8 @@ import rospy
 import vortex_msgs.msg
 from sensor_msgs.msg import Joy
 
+NUM_CONTROL_MODES = 4
+
 class JoystickInterfaceNode(object):
     def __init__(self):
         rospy.init_node('joystick_node')
@@ -63,9 +65,11 @@ class JoystickInterfaceNode(object):
         for i in range(6):
             self.motion_msg.motion[i] = motion_msg_motion[i]
 
-        self.motion_msg.control_mode = [None]*2
-        for i in range(2):
-            self.motion_msg.control_mode[i] = motion_msg_control_mode[i]
+        # self.motion_msg.control_mode = [None]*2
+        # for i in range(2):
+        #     self.motion_msg.control_mode[i] = motion_msg_control_mode[i]
+        self.motion_msg.control_mode = [False]*NUM_CONTROL_MODES
+        self.motion_msg.control_mode[0] = True
 
         self.motion_msg.header.stamp = rospy.get_rostime()
 

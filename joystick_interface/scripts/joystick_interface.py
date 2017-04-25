@@ -47,8 +47,8 @@ class JoystickInterfaceNode(object):
         motion_msg_motion = [
             axes['vertical_axis_left_stick'],
             -axes['horizontal_axis_left_stick'],
-            (buttons['RB'] - buttons['LB']),
-            (axes['RT'] - axes['LT'])/2,
+            (buttons['RT'] - buttons['LT']),
+            0,
             -axes['vertical_axis_right_stick'],
             -axes['horizontal_axis_right_stick']
         ]

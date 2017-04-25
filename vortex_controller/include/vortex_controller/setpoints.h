@@ -1,5 +1,5 @@
-#ifndef SETPOINTS_H
-#define SETPOINTS_H
+#ifndef VORTEX_CONTROLLER_SETPOINTS_H
+#define VORTEX_CONTROLLER_SETPOINTS_H
 
 #include <Eigen/Dense>
 #include "vortex/eigen_typedefs.h"
@@ -11,9 +11,9 @@ public:
             const Eigen::Vector6d &wrench_max,
             const Eigen::Vector6d &pose_rate);
   bool update(const double time, const Eigen::Vector6d &command);
-  bool get(Eigen::Vector6d &wrench);
-  bool get(Eigen::Vector3d    &position,
-           Eigen::Quaterniond &orientation);
+  bool get(Eigen::Vector6d *wrench);
+  bool get(Eigen::Vector3d    *position,
+           Eigen::Quaterniond *orientation);
   void set(const Eigen::Vector3d    &position,
            const Eigen::Quaterniond &orientation);
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -32,4 +32,4 @@ private:
   bool   pose_valid_;
 };
 
-#endif
+#endif  // VORTEX_CONTROLLER_SETPOINTS_H

@@ -1,5 +1,7 @@
-#ifndef CONTROL_MODES_H
-#define CONTROL_MODES_H
+#ifndef VORTEX_CONTROLLER_CONTROL_MODES_H
+#define VORTEX_CONTROLLER_CONTROL_MODES_H
+
+#include <string>
 
 namespace ControlModes
 {
@@ -16,7 +18,7 @@ typedef ControlModes::ControlMode ControlMode;
 inline std::string controlModeString(ControlMode control_mode)
 {
   std::string s;
-  switch(control_mode)
+  switch (control_mode)
   {
     case ControlModes::OPEN_LOOP:
     s = "Open Loop";
@@ -41,4 +43,4 @@ inline std::string controlModeString(ControlMode control_mode)
   return s;
 }
 
-#endif
+#endif  // VORTEX_CONTROLLER_CONTROL_MODES_H

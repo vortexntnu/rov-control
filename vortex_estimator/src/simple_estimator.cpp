@@ -1,4 +1,4 @@
-#include "simple_estimator.h"
+#include "vortex_estimator/simple_estimator.h"
 
 SimpleEstimator::SimpleEstimator()
 {
@@ -45,12 +45,12 @@ void SimpleEstimator::publish()
     if (imu_initialized && pressure_initialized)
     {
       is_initialized = true;
-      ROS_INFO("SimpleEstimator initialized.");
+      ROS_INFO("Node initialized.");
       state_pub.publish(state);
     }
     else
     {
-      ROS_WARN_ONCE("SimpleEstimator not yet initialized.");
+      ROS_WARN_THROTTLE(10, "Node not initialized.");
     }
   }
 }

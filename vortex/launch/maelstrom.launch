@@ -1,7 +1,9 @@
 <launch>
+  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
+
   <rosparam command="load" file="$(find vortex)/config/robots/maelstrom.yaml"/>
   <rosparam command="load" file="$(find vortex)/config/environments/trondheim_freshwater.yaml"/>
-  <rosparam command="load" file="$(find motor_interface)/config/thruster_T100.yaml"/>
+  <rosparam command="load" file="$(find thruster_interface)/config/thruster_T100.yaml"/>
 
   <node pkg="vortex_controller" type="node" name="controller" output="screen"/>
   <node pkg="vortex_allocator"  type="node" name="allocator"  output="screen"/>

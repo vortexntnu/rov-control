@@ -1,0 +1,43 @@
+<launch>
+  <rosparam
+    command="load"
+    file="$(find vortex)/config/robots/maelstrom.yaml"
+  />
+
+  <rosparam
+    command="load"
+    file="$(find vortex)/config/environments/trondheim_freshwater.yaml"
+  />
+
+  <rosparam
+    command="load"
+    file="$(find thruster_interface)/config/thruster_T100.yaml"
+  />
+
+  <node
+    pkg="vortex_allocator"
+    type="node"
+    name="allocator"
+    output="screen"
+  />
+
+  <node
+    pkg="vortex_controller"
+    type="node"
+    name="controller"
+    output="screen"
+  />
+
+  <node
+    pkg="vortex_estimator"
+    type="node"
+    name="estimator"
+    output="screen"
+  />
+
+  <test
+    pkg="vortex"
+    type="vortex-test"
+    test-name="integration_test"
+  />
+</launch>

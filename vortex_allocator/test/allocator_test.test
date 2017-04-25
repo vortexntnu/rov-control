@@ -6,7 +6,7 @@
 
   <rosparam
     command="load"
-    file="$(find motor_interface)/config/thruster_T100.yaml"
+    file="$(find thruster_interface)/config/thruster_T100.yaml"
   />
 
   <node

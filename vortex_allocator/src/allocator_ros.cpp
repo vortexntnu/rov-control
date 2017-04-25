@@ -1,4 +1,4 @@
-#include "allocator_ros.h"
+#include "vortex_allocator/allocator_ros.h"
 
 #include <vector>
 #include <limits>
@@ -26,7 +26,7 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
   {
     min_thrust = -std::numeric_limits<double>::infinity();
     max_thrust =  std::numeric_limits<double>::infinity();
-    ROS_ERROR_STREAM("Failed to read parameters min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust << ".");
+    ROS_WARN_STREAM("Failed to read params min/max thrust. Defaulting to " << min_thrust << "/" << max_thrust << ".");
   }
   else
   {
@@ -36,25 +36,24 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 
   // Read thrust config matrix
   Eigen::MatrixXd thrust_configuration;
-  if (!getMatrixParam(nh, "propulsion/thrusters/configuration_matrix", thrust_configuration))
+  if (!getMatrixParam(nh, "propulsion/thrusters/configuration_matrix", &thrust_configuration))
     ROS_FATAL("Failed to read parameter thrust config matrix.");
   Eigen::MatrixXd thrust_configuration_pseudoinverse;
-  if (!pseudoinverse(thrust_configuration, thrust_configuration_pseudoinverse))
+  if (!pseudoinverse(thrust_configuration, &thrust_configuration_pseudoinverse))
     ROS_FATAL("Failed to compute pseudoinverse of thrust config matrix.");
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse);
 
-  ROS_INFO("Allocator: Initialized.");
+  ROS_INFO("Node initialized.");
 }
 
-// inline bool saturateVector(Eigen::VectorXd &v, double min, double max)
 void Allocator::callback(const geometry_msgs::Wrench &msg)
 {
   Eigen::VectorXd tau = rovForcesMsgToEigen(msg);
 
   if (!healthyWrench(tau))
   {
-    ROS_ERROR("Allocator: Wrench vector tau invalid, ignoring.");
+    ROS_ERROR("Wrench vector tau invalid, ignoring.");
     return;
   }
 
@@ -67,18 +66,18 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
     return;
   }
 
-  if (!saturateVector(u, min_thrust, max_thrust))
+  if (!saturateVector(&u, min_thrust, max_thrust))
     ROS_WARN("Thrust vector u required saturation.");
 
   vortex_msgs::Float64ArrayStamped u_msg;
-  arrayEigenToMsg(u, u_msg);
+  arrayEigenToMsg(u, &u_msg);
   u_msg.header.stamp = ros::Time::now();
   pub.publish(u_msg);
 }
 
 Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
 {
-  // TODO: rewrite without a million ifs
+  // TODO(mortenfyhn): rewrite without a million ifs
   Eigen::VectorXd tau(num_dof);
   int i = 0;
   if (dofs["surge"])
@@ -114,7 +113,8 @@ Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)
 
   if (i != num_dof)
   {
-    ROS_WARN_STREAM("Allocator: Invalid length of tau vector. Is " << i << ", should be " << num_dof << ". Returning zero thrust vector.");
+    ROS_WARN_STREAM("Invalid length of tau vector. Is " << i << ", should be " << num_dof <<
+                    ". Returning zero thrust vector.");
     return Eigen::VectorXd::Zero(num_dof);
   }
 

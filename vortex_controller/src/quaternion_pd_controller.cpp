@@ -19,6 +19,24 @@ void QuaternionPdController::setGains(double a_new, double b_new, double c_new)
   K_x = b_new * Eigen::MatrixXd::Identity(3, 3);
 }
 
+Eigen::Vector6d QuaternionPdController::getRestoring(const Eigen::Quaterniond &q)
+{
+  Eigen::Matrix3d R = q.toRotationMatrix();
+  return restoringForceVector(R);
+}
+
+Eigen::Vector6d QuaternionPdController::getFeedback(const Eigen::Vector3d    &x,
+                                                    const Eigen::Quaterniond &q,
+                                                    const Eigen::Vector6d    &nu,
+                                                    const Eigen::Vector3d    &x_d,
+                                                    const Eigen::Quaterniond &q_d)
+{
+  Eigen::Matrix3d R   = q.toRotationMatrix();
+  Eigen::Matrix6d K_p = proportionalGainMatrix(R);
+  Eigen::Vector6d z   = errorVector(x, x_d, q, q_d);
+  return (Eigen::Vector6d() << -K_d*nu - K_p*z).finished();
+}
+
 Eigen::Vector6d QuaternionPdController::compute(const Eigen::Vector3d    &x,
                                                 const Eigen::Quaterniond &q,
                                                 const Eigen::Vector6d    &nu,

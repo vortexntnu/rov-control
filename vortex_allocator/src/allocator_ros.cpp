@@ -37,10 +37,16 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
   // Read thrust config matrix
   Eigen::MatrixXd thrust_configuration;
   if (!getMatrixParam(nh, "propulsion/thrusters/configuration_matrix", &thrust_configuration))
-    ROS_FATAL("Failed to read parameter thrust config matrix.");
+  {
+    ROS_FATAL("Failed to read parameter thrust config matrix. Killing node...");
+    ros::shutdown();
+  }
   Eigen::MatrixXd thrust_configuration_pseudoinverse;
   if (!pseudoinverse(thrust_configuration, &thrust_configuration_pseudoinverse))
-    ROS_FATAL("Failed to compute pseudoinverse of thrust config matrix.");
+  {
+    ROS_FATAL("Failed to compute pseudoinverse of thrust config matrix. Killing node...");
+    ros::shutdown();
+  }
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse);
 

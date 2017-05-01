@@ -1,0 +1,11 @@
+# This file defines the thrust characteristics for the Vortex Terrapin in-house
+# thruster, that is, the relationship between thrust in newton and the width
+# in microseconds of the PWM signal to the AfroEsc motor controllers running
+# BlueRobotics firmware.
+
+thrusters:
+  rate_of_change:
+    max: 1 # Maximum rate of change in newton per second for a thruster
+  characteristics:
+    thrust: [0, 0]
+    pulse_width: [0, 0]

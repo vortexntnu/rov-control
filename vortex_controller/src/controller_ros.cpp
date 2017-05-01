@@ -41,10 +41,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
 void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 {
   if (!healthyMessage(msg))
-  {
-    ROS_WARN("Propulsion command message out of range, ignoring...");
     return;
-  }
 
   ControlMode new_control_mode;
   {

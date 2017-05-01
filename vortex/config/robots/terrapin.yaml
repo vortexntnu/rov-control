@@ -1,0 +1,59 @@
+# This file defines parameters specific to the Terrapin ROV
+#
+# When looking at the ROV from above, the thruster placement is:
+#
+#    _______
+# 8 /       \ 1
+#  |         |      N
+# 7|         |2     ^
+#  |         |   W<-|->E
+# 6|         |3     v
+#  |         |      S
+# 5 \_______/ 5
+#
+# Using the compass shown:
+# F1 is positive NE
+# F2 is positive NW
+# F3 is positive SW
+# F4 is positive SE
+# F5 is positive down
+# F6 is positive down
+
+physical:
+  mass_kg: 0
+  displacement_m3: 0
+  center_of_mass: [0, 0, 0]
+  center_of_buoyancy: [0, 0, 0]
+
+propulsion:
+  dofs:
+    num: 6
+    which:
+      surge: true
+      sway:  true
+      heave: true
+      roll:  true
+      pitch: true
+      yaw:   true
+  thrusters:
+    num: 8
+    configuration_matrix:
+      [[     0.0,     0.0,     0.0,     0.0,     0.0,     0.0], # Surge
+       [     0.0,     0.0,     0.0,     0.0,     0.0,     0.0], # Sway
+       [     0.0,     0.0,     0.0,     0.0,     0.0,     0.0], # Heave
+       [     0.0,     0.0,     0.0,     0.0,     0.0,     0.0], # Roll
+       [     0.0,     0.0,     0.0,     0.0,     0.0,     0.0], # Pitch
+       [     0.0,     0.0,     0.0,     0.0,     0.0,     0.0]] # Yaw
+  command:
+    wrench:
+      max: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # 5 & 7 are rough estimates
+      scaling: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+    pose:
+      rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
+
+controller:
+  gains:
+    a: 0.0
+    b: 100.0
+    c: 20.0
+  frequency: 10

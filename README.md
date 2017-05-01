@@ -3,10 +3,11 @@ The control system for Vortex NTNU's ROVs. The repository contains several ROS p
 
 ## Launching
 * `roslaunch vortex maelstrom.launch` to start the system for the Maelstrom ROV.
+* `roslaunch vortex terrapin.launch` to start the system for the Terrapin ROV.
 * `rosrun rqt_reconfigure rqt_reconfigure` to open the dynamic reconfigure GUI window.
 
 ## Testing/linting
-Tests run automatically on a Travis server. Run tests manually with `catkin_make run_tests`. Linting is done when running tests, but you can do linting only with `catkin_make roslint`.
+Tests run automatically on a Travis server. Run tests manually with `catkin_make run_tests`. Linting is done when running tests, but you can do linting separately with `catkin_make roslint`.
 
 ## Dependencies
 ### Eigen

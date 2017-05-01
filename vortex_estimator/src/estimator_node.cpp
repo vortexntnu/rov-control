@@ -6,7 +6,6 @@ int main(int argc, char **argv)
   ROS_INFO("Launching node.");
   ros::NodeHandle nh;
   SimpleEstimator estimator;
-  while (ros::ok())
-    ros::spinOnce();
+  ros::spin();
   return 0;
 }

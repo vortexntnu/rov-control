@@ -149,7 +149,7 @@ void Controller::spin()
       {
         // Convert quaternion setpoint to euler angles (ZYX convention)
         Eigen::Vector3d euler;
-        euler = orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
+        euler = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
 
         // Set pitch and roll setpoints to zero
         euler(1) = 0;
@@ -163,7 +163,7 @@ void Controller::spin()
         Eigen::Quaterniond orientation_staylevel(R);
 
         tau_staylevel = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
-                                                Eigen::Vector3d::Zero(), orientation_setpoint);
+                                                Eigen::Vector3d::Zero(), orientation_staylevel);
 
         // Turn off openloop roll and pitch commands
         tau_openloop(3) = 0;

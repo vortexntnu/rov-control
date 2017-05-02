@@ -31,6 +31,11 @@ sudo make
 sudo cp libg* /usr/lib/
 ```
 
+### roslint
+roslint is used for linting of the ROS C++/Python code.
+
+`sudo apt install ros-kinetic-roslint`
+
 ## Preferred workflow
 * Create a feature branch out of `master` for each new feature, solved issue, significant refactor, etc.
 * Open a pull request to have your branch merged back into `master`.

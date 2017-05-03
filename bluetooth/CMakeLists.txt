@@ -3,19 +3,16 @@ project(bluetooth)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
-  std_msgs
-  message_generation
+  vortex_msgs
   roslint
 )
 
 roslint_python()
 
-generate_messages()
-
 catkin_package(
   CATKIN_DEPENDS
   rospy
-  std_msgs message_runtime
+  vortex_msgs
 )
 
 include_directories(

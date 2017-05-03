@@ -2,6 +2,7 @@
 
 import Adafruit_PCA9685
 import rospy
+from vortex_msgs.msg import Pwm
 
 FREQUENCY = 249
 
@@ -13,6 +14,12 @@ class Pca9685InterfaceNode(object):
         self.pca9685.set_pwm_frequency(FREQUENCY)
         self.pca9685.set_all_pwm(0, 0)
 
+        self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=10)
+
+    def callback(self, msg):
+        if len(msg.pins) == len(msg.on) == len(msg.off):
+            for i in range(len(msg.pins)):
+                self.pca9685.set_pwm(msg.pins[i], msg.on[i], msg.off[i])
 
 if __name__ == '__main__':
     try:

@@ -2,8 +2,7 @@
 import rospy
 import serial
 import Adafruit_BBIO.UART as UART
-from std_msgs.msg import String
-import binascii
+from vortex_msgs.msg import ContainerID
 
 class Hc05InterfaceNode(object):
     def __init__(self):
@@ -27,7 +26,7 @@ class Hc05InterfaceNode(object):
     def init_publisher(self):
         self.pub_bluetooth = rospy.Publisher(
             'bluetooth/container_id',
-            String,
+            ContainerID,
             queue_size=10)
 
     def read_bluetooth_data(self):

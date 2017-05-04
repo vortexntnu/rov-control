@@ -5,7 +5,7 @@ import Adafruit_PCA9685
 import numpy
 import rospy
 
-from vortex_msgs.msg import Float64ArrayStamped
+from vortex_msgs.msg import Float64ArrayStamped, Pwm
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 # Constants
@@ -22,10 +22,12 @@ MAX_RATE = rospy.get_param('/thrusters/rate_of_change/max')
 RATE_LIMITING_ENABLED = rospy.get_param('/thruster_interface/rate_limiting_enabled')
 THRUSTERS_CONNECTED = rospy.get_param('/thruster_interface/thrusters_connected')
 
+
 class ThrusterInterface(object):
     def __init__(self):
         rospy.init_node('thruster_interface', anonymous=False)
         self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
+        self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
         self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
@@ -39,11 +41,6 @@ class ThrusterInterface(object):
 
         self.thrusters_enabled = True
 
-        # Initialize the PCA9685 using the default address (0x40)
-        if THRUSTERS_CONNECTED:
-            self.pca9685 = Adafruit_PCA9685.PCA9685()
-            self.pca9685.set_pwm_freq(FREQUENCY)
-
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
         rospy.loginfo("Launching at %d Hz", FREQUENCY)
@@ -51,8 +48,12 @@ class ThrusterInterface(object):
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
+            pwm_msg = Pwm()
             for i in range(NUM_THRUSTERS):
-                self.pca9685.set_pwm(i, 0, neutral_pulse_width)
+                pwm_msg.pins.append(i)
+                pwm_msg.on.append(0)
+                pwm_msg.off.append(neutral_pulse_width)
+            self.pub_pwm.publish(pwm_msg)
 
     def callback(self, msg):
         if not self.healthy_message(msg):
@@ -110,11 +111,15 @@ class ThrusterInterface(object):
 
     def set_pwm(self):
         microsecs = [None] * NUM_THRUSTERS
+        pwm_msg = Pwm()
         for i in range(NUM_THRUSTERS):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
-            if THRUSTERS_CONNECTED and self.thrusters_enabled:
-                self.pca9685.set_pwm(i, 0, pwm_bits)
+            pwm_msg.pins.append(i)
+            pwm_msg.on.append(0)
+            pwm_msg.off.append(pwm_bits)
+        if THRUSTERS_CONNECTED and self.thrusters_enabled:
+            self.pub_pwm.publish(pwm_msg)
 
         # Publish outputs for debug
         debug_msg = Float64ArrayStamped()

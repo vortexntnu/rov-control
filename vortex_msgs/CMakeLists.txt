@@ -18,6 +18,7 @@ add_message_files(
   ArmDutyCycle.msg
   EulerOrientations.msg
   Debug.msg
+  ContainerID.msg
 )
 
 generate_messages(

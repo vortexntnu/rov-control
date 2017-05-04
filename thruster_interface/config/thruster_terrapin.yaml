@@ -7,5 +7,5 @@ thrusters:
   rate_of_change:
     max: 1 # Maximum rate of change in newton per second for a thruster
   characteristics:
-    thrust: [0, 0]
-    pulse_width: [0, 0]
+    thrust: [20, 20]
+    pulse_width: [1100, 1900]

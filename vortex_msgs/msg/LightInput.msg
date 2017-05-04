@@ -1,1 +1,2 @@
-int32 light_intensity
+string[] light
+bool[] on

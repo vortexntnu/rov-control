@@ -38,13 +38,12 @@ class Hc05InterfaceNode(object):
 
     def _readline(self):
         eol = b'\r'
-        leneol = len(eol)
         line = bytearray()
         while True:
             c = self.ser.read(1)
             if c:
                 line += c
-                if line[-leneol:] == eol:
+                if line[-len(eol):] == eol:
                     break
             else:
                 break

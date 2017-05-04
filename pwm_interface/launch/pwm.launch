@@ -1,0 +1,4 @@
+<launch>
+<env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
+<node name="pwm_interface" pkg="pwm_interface" type="pca9685_interface.py" output="screen"/>
+</launch>

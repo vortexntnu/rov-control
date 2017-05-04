@@ -57,3 +57,6 @@ controller:
     b: 100.0
     c: 20.0
   frequency: 10
+light:
+  gpio_pins: {"bluetooth":"P8_10", "raman":"P8_12"}
+  pwm_pins: {"front": 9}

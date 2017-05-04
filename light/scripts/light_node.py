@@ -31,19 +31,17 @@ class LightNode(object):
                 Pwm.on[0] = 0
                 if not self.light_state[light]:
                     Pwm.off = FULL_CYCLE
-                    self.light_state[light] = not self.light_state[light]
                 else:
                     Pwm.off = 0
-                    self.light_state[light] = not self.light_state[light]
+                self.light_state[light] = not self.light_state[light]
                 self.pub_pwm.publish(pwm_msg)
 
             else if light in GPIO_PIN_MAP:
                 if not self.light_state[light]:
                     GPIO.output(GPIO_PIN_MAP[light], GPIO.HIGH)
-                    self.light_state[light] = not self.light_state[light]
                 else:
                     GPIO.output(GPIO_PIN_MAP[light] ,GPIO.LOW)
-                    self.light_state[light] = not self.light_state[light]
+                self.light_state[light] = not self.light_state[light]
 
 
 if __name__ == '__main__':

@@ -73,7 +73,7 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
   }
 
   if (!saturateVector(&u, min_thrust, max_thrust))
-    ROS_WARN("Thrust vector u required saturation.");
+    ROS_WARN_THROTTLE(1, "Thrust vector u required saturation.");
 
   vortex_msgs::Float64ArrayStamped u_msg;
   arrayEigenToMsg(u, &u_msg);

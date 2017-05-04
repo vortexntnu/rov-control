@@ -4,6 +4,8 @@ import serial
 import Adafruit_BBIO.UART as UART
 from vortex_msgs.msg import ContainerID
 
+SPIN_RATE = 10
+
 class Hc05InterfaceNode(object):
     def __init__(self):
         rospy.init_node('bluetooth_node')
@@ -34,7 +36,7 @@ class Hc05InterfaceNode(object):
             BT_msg = self._readline()
             if len(BT_msg) > 0:
                 self.pub_bluetooth.publish(BT_msg)
-            rospy.Rate(10).sleep()
+            rospy.Rate(SPIN_RATE).sleep()
 
     def _readline(self):
         eol = b'\r'

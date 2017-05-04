@@ -46,7 +46,7 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
-        rospy.loginfo("Launching at %d Hz", self.FREQUENCY)
+        rospy.loginfo("Launching at %d Hz", FREQUENCY)
 
     def output_to_zero(self):
         neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))

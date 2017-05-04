@@ -19,6 +19,7 @@ add_message_files(
   EulerOrientations.msg
   Debug.msg
   Pwm.msg
+  ContainerID.msg
 )
 
 generate_messages(

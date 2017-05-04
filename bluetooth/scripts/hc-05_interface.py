@@ -17,11 +17,11 @@ class Hc05InterfaceNode(object):
     def init_serial(self):
         UART.setup("UART4")
         self.ser = serial.Serial(port=self.port,
-                        baudrate=9600,
-                        bytesize=serial.EIGHTBITS,
-                        parity=serial.PARITY_NONE,
-                        stopbits=serial.STOPBITS_ONE,
-                        timeout=1)
+                                 baudrate=9600,
+                                 bytesize=serial.EIGHTBITS,
+                                 parity=serial.PARITY_NONE,
+                                 stopbits=serial.STOPBITS_ONE,
+                                 timeout=1)
         if not self.ser.is_open:
             rospy.logwarn("Unable to open %s", self.ser)
 
@@ -50,6 +50,7 @@ class Hc05InterfaceNode(object):
             else:
                 break
         return bytes(line)
+
 
 if __name__ == '__main__':
     try:

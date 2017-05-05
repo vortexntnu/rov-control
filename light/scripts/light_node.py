@@ -13,8 +13,8 @@ class LightNode(object):
         rospy.init_node('light_node')
         self.sub = rospy.Subscriber('toggle_light', LightInput, self.callback, queue_size=10)
         self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
-        for key in GPIO_PIN_MAP:
-            GPIO.setup(GPIO_PIN_MAP[key], GPIO.OUT)
+        for light_name in GPIO_PIN_MAP:
+            GPIO.setup(GPIO_PIN_MAP[light_name], GPIO.OUT)
 
     def callback(self, msg):
         self.light_control(msg)

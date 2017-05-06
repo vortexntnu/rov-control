@@ -45,5 +45,8 @@ controller:
     b: 100.0
     c: 20.0
   frequency: 10
+  
 camera:
-  pin_map: {"feed0_0":"P8_9", "feed0_1":"P8_10", "feed0_2":"P8_11", "feed1_0":"P8_12", "feed1_1":"P8_13", "feed1_2:"P8_14", "feed2_0":"P8_15", "feed2_1":"P8_16", "feed2_2":"P8_17"}
+  pin_map_feed0: ["P8_9", "P8_10", "P8_11"]
+  pin_map_feed1: ["P8_12", "P8_13", "P8_14"] 
+  pin_map_feed2: ["P8_15", "P8_16", "P8_17"]

@@ -18,6 +18,7 @@ add_message_files(
   Pwm.msg
   ContainerID.msg
   Manipulator.msg
+  CameraFeedSelection.msg
 )
 
 generate_messages(

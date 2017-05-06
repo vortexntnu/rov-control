@@ -1,11 +1,9 @@
 # Manipulator servo/stepper commands
 
-# Normalized claw position
-# Must be in the range [-1, 1]
-float64 claw_position
+# Claw position
+# -1 for open, 1 for closed.
+int8 claw_position
 
 # Valve spinning
-# Set either true for corresponding action
-# Do not set both true
-bool open_valve
-bool close_valve
+# -1 for CCW, 0 for stop and 1 for CW.
+int8 valve_direction

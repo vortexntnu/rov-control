@@ -45,3 +45,17 @@ controller:
     b: 100.0
     c: 20.0
   frequency: 10
+
+servo:
+  lookup:
+    position: [-1, 1]
+    pulse_width: [1100, 1900]
+
+pwm:
+  pins:
+    claw_servo: 9
+  frequency:
+    set: 249.0
+    measured: 251.2
+  counter:
+    max: 4095

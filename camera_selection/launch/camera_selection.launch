@@ -1,4 +1,4 @@
 <launch>
-<env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
-<node name="camera_selection" pkg="camera_selection" type="camera_selection.py" output="screen"/>
+  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
+  <node name="camera_selection" pkg="camera_selection" type="camera_selection.py" output="screen"/>
 </launch>

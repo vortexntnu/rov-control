@@ -20,6 +20,7 @@ add_message_files(
   Debug.msg
   Pwm.msg
   ContainerID.msg
+  CameraFeedSelection.msg
 )
 
 generate_messages(

@@ -1,0 +1,4 @@
+<launch>
+  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
+  <node name="light" pkg="light" type="light_node.py" output="screen"/>
+</launch>

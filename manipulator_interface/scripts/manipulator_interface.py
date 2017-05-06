@@ -28,13 +28,22 @@ class ManipulatorInterface(object):
         # TODO(mortenfyhn): Consider setting neutral to fully open instead
         self.neutral_pulse_width = self.microsecs_to_bits(self.servo_position_to_microsecs(0))
 
-        valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
-        valve_stepper.set_speed(STEPPER_VALVE_RPM)
+        self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
+        self.valve_stepper.set_speed(STEPPER_VALVE_RPM)
+        self.valve_direction = 0
 
         rospy.sleep(0.1) # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
         rospy.on_shutdown(self.servo_set_to_zero)
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
+
+        self.spin()
+
+    def spin(self):
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            self.valve_stepper.step(self.valve_direction)
+            rate.sleep()
 
     def servo_set_to_zero(self):
         msg = Pwm()
@@ -49,6 +58,13 @@ class ManipulatorInterface(object):
             return
 
         self.set_claw_pwm(msg.claw_position)
+
+        if msg.open_valve:
+            self.valve_direction = 1
+        elif msg.close_valve:
+            self.valve_direction = -1
+        else:
+            self.valve_direction = 0
 
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
@@ -70,8 +86,13 @@ class ManipulatorInterface(object):
 
     def healthy_message(self, msg):
         if abs(msg.claw_position) > 1:
-            rospy.logwarn_throttle(1, 'Claw position out of range, ignoring...')
+            rospy.logwarn_throttle(1, 'Claw position out of range. Ignoring message...')
             return False
+
+        if msg.open_valve and msg.close_valve:
+            rospy.logwarn_throttle(1, 'Cannot open and close valve at the same time! Ignoring message...')
+            return False
+
         return True
 
 

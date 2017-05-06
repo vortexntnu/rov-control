@@ -7,6 +7,7 @@ PIN_MAP_FEED0 = rospy.get_param('/camera/pin_map_feed0')
 PIN_MAP_FEED1 = rospy.get_param('/camera/pin_map_feed1')
 PIN_MAP_FEED2 = rospy.get_param('/camera/pin_map_feed2')
 PIN_MAP_LIST = [PIN_MAP_FEED0,PIN_MAP_FEED1,PIN_MAP_FEED2]
+NUM_FEEDS = 3
 
 class CameraSelection(object):
     def __init__(self):
@@ -20,15 +21,16 @@ class CameraSelection(object):
 
 
     def callback(self, msg):
-        # Get pin map for relevant feed
-        feed_pin_map = PIN_MAP_LIST[msg.feed]
-        # Convert selected camera to binary array
-        cam_select = [int(bit) for bit in bin(msg.camera)[2:]]
-        for indx, output_pin in enumerate(cam_select):
-            if output_pin:
-                GPIO.output(feed_pin_map[indx], GPIO.HIGH)
-            else:
-                GPIO.output(feed_pin_map[indx], GPIO.LOW)
+        if msg.feed < NUM_FEEDS:
+            # Get pin map for relevant feed
+            feed_pin_map = PIN_MAP_LIST[msg.feed]
+            # Convert selected camera to binary array
+            cam_select = [int(bit) for bit in bin(msg.camera)[2:]]
+            for indx, output_pin in enumerate(cam_select):
+                if output_pin:
+                    GPIO.output(feed_pin_map[indx], GPIO.HIGH)
+                else:
+                    GPIO.output(feed_pin_map[indx], GPIO.LOW)
 
 
 

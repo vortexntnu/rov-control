@@ -17,6 +17,10 @@ import Adafruit_BBIO.GPIO as GPIO
 import rospy
 
 MICROSEC_PER_SEC = 1000 * 1000
+STEPPER_PIN_VALUES = [[1,0,1,0],
+                      [0,1,1,0],
+                      [0,1,0,1],
+                      [1,0,0,1]]
 
 
 def curr_time_in_microsec():
@@ -67,23 +71,11 @@ class Stepper():
 
     def step_motor(self, curr_step):
         """"Move motor forward or backward (low-level command)."""
-        if curr_step == 0:
-            GPIO.output(self.pins[0], GPIO.HIGH)
-            GPIO.output(self.pins[1], GPIO.LOW)
-            GPIO.output(self.pins[2], GPIO.HIGH)
-            GPIO.output(self.pins[3], GPIO.LOW)
-        elif curr_step == 1:
-            GPIO.output(self.pins[0], GPIO.LOW)
-            GPIO.output(self.pins[1], GPIO.HIGH)
-            GPIO.output(self.pins[2], GPIO.HIGH)
-            GPIO.output(self.pins[3], GPIO.LOW)
-        elif curr_step == 2:
-            GPIO.output(self.pins[0], GPIO.LOW)
-            GPIO.output(self.pins[1], GPIO.HIGH)
-            GPIO.output(self.pins[2], GPIO.LOW)
-            GPIO.output(self.pins[3], GPIO.HIGH)
-        elif curr_step == 3:
-            GPIO.output(self.pins[0], GPIO.HIGH)
-            GPIO.output(self.pins[1], GPIO.LOW)
-            GPIO.output(self.pins[2], GPIO.LOW)
-            GPIO.output(self.pins[3], GPIO.HIGH)
+        for i in range(len(self.pins)):
+            pin_value = STEPPER_PIN_VALUES[curr_step][i]
+            if pin_value == 1:
+                GPIO.output(pin[i], GPIO.HIGH)
+            elif pin_value == 0:
+                GPIO.output(pin[i], GPIO.LOW)
+            else:
+                rospy.logwarn('Invalid output pin value.')

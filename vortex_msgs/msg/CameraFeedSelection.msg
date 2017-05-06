@@ -1,3 +1,3 @@
-# Message for selecting active camera feeds
+# Message for selecting active cameras in each feed
 uint8 feed
-bool[] pin_values
+uint8 camera

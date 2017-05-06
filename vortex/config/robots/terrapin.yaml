@@ -46,6 +46,11 @@ controller:
     c: 20.0
   frequency: 10
 
+camera:
+  pin_map_feed0: ["P8_9", "P8_10", "P8_11"]
+  pin_map_feed1: ["P8_12", "P8_13", "P8_14"] 
+  pin_map_feed2: ["P8_15", "P8_16", "P8_17"]
+
 light:
   gpio_pins: {"bluetooth":"P8_7", "raman":"P8_8"}
   pwm_pins: {"front": 8}

@@ -20,6 +20,18 @@ public:
                          const Eigen::Vector3d &r_G,
                          const Eigen::Vector3d &r_B);
   void setGains(double a, double b, double c);
+
+  // Return restoring forces vector
+  Eigen::Vector6d getRestoring(const Eigen::Quaterniond &q);
+
+  // Return control vector without restoring forces
+  Eigen::Vector6d getFeedback(const Eigen::Vector3d    &x,
+                              const Eigen::Quaterniond &q,
+                              const Eigen::Vector6d    &nu,
+                              const Eigen::Vector3d    &x_d,
+                              const Eigen::Quaterniond &q_d);
+
+  // Return control vector with restoring forces
   Eigen::Vector6d compute(const Eigen::Vector3d    &x,
                           const Eigen::Quaterniond &q,
                           const Eigen::Vector6d    &nu,

@@ -7,10 +7,10 @@ namespace ControlModes
 {
 enum ControlMode
 {
-  OPEN_LOOP  = 0,
-  SIXDOF     = 1,
-  RPY_DEPTH  = 2,
-  DEPTH_HOLD = 3
+  OPEN_LOOP           = 0,
+  OPEN_LOOP_RESTORING = 1,
+  STAY_LEVEL          = 2,
+  DEPTH_HOLD          = 3
 };
 }
 typedef ControlModes::ControlMode ControlMode;
@@ -24,12 +24,12 @@ inline std::string controlModeString(ControlMode control_mode)
     s = "Open Loop";
     break;
 
-    case ControlModes::SIXDOF:
-    s = "Six DOF";
+    case ControlModes::OPEN_LOOP_RESTORING:
+    s = "Open Loop Restoring";
     break;
 
-    case ControlModes::RPY_DEPTH:
-    s = "RPY Depth";
+    case ControlModes::STAY_LEVEL:
+    s = "Stay Level";
     break;
 
     case ControlModes::DEPTH_HOLD:

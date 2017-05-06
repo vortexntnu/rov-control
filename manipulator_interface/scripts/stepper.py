@@ -17,14 +17,15 @@ import Adafruit_BBIO.GPIO as GPIO
 import rospy
 
 MICROSEC_PER_SEC = 1000 * 1000
-STEPPER_PIN_VALUES = [[1,0,1,0],
-                      [0,1,1,0],
-                      [0,1,0,1],
-                      [1,0,0,1]]
+STEPPER_PIN_VALUES = [[1, 0, 1, 0],
+                      [0, 1, 1, 0],
+                      [0, 1, 0, 1],
+                      [1, 0, 0, 1]]
 
 
 def curr_time_in_microsec():
     return rospy.Time.now().to_sec() * MICROSEC_PER_SEC
+
 
 class Stepper():
     def __init__(self, number_of_steps, pins):

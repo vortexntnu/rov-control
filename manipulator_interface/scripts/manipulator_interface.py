@@ -32,7 +32,7 @@ class ManipulatorInterface(object):
         self.valve_stepper.set_speed(STEPPER_VALVE_RPM)
         self.valve_direction = 0
 
-        rospy.sleep(0.1) # Initial set to zero seems to disappear without a short sleep here
+        rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
         rospy.on_shutdown(self.servo_set_to_zero)
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)

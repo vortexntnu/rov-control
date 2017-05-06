@@ -20,12 +20,15 @@ class CameraSelection(object):
 
 
     def callback(self, msg):
+        # Get pin map for relevant feed
         feed_pin_map = PIN_MAP_LIST[msg.feed]
-        for i, level in enumerate(msg.pin_values):
-            if level:
-                GPIO.output(feed_pin_map[i], GPIO.HIGH)
+        # Convert selected camera to binary array
+        cam_select = [int(bit) for bit in bin(msg.camera)[2:]]
+        for indx, output_pin in enumerate(cam_select):
+            if output_pin:
+                GPIO.output(feed_pin_map[indx], GPIO.HIGH)
             else
-                GPIO.output(feed_pin_map[i], GPIO.LOW)
+                GPIO.output(feed_pin_map[indx], GPIO.LOW)
 
 
 

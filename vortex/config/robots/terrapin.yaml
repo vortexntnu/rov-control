@@ -49,7 +49,7 @@ controller:
 servo:
   lookup:
     position: [-1, 1]
-    pulse_width: [1100, 1900]
+    pulse_width: [1500, 1100]
 
 stepper:
   default_speed_rpm: 30

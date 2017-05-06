@@ -4,7 +4,7 @@ import Adafruit_PCA9685
 import rospy
 from vortex_msgs.msg import Pwm
 
-FREQUENCY = 249
+FREQUENCY = rospy.get_param('/pwm/frequency/set')
 
 
 class Pca9685InterfaceNode(object):

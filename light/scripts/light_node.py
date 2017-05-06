@@ -3,9 +3,10 @@ import rospy
 import Adafruit_BBIO.GPIO as GPIO
 from vortex_msgs.msg import LightInput, Pwm
 
-FULL_CYCLE = 4096
+FULL_CYCLE = rospy.get_param('/pwm/counter/max')
 GPIO_PIN_MAP = rospy.get_param('/light/gpio_pins')
 PWM_PIN_MAP = rospy.get_param('/light/pwm_pins')
+PWM_SCALING = 100
 
 class LightNode(object):
     def __init__(self):
@@ -24,15 +25,13 @@ class LightNode(object):
                 pwm_msg = Pwm()
                 Pwm.pins[0] = PWM_PIN_MAP[light]
                 Pwm.on[0] = 0
-                Pwm.off = (FULL_CYCLE * msg.intensity[index]) // 100
+                Pwm.off[0] = (FULL_CYCLE * msg.intensity[index]) // PWM_SCALING
                 self.pub_pwm.publish(pwm_msg)
-
             else if light in GPIO_PIN_MAP:
                 if msg.intensity[index] > 0:
                     GPIO.output(GPIO_PIN_MAP[light], GPIO.HIGH)
                 else:
                     GPIO.output(GPIO_PIN_MAP[light] ,GPIO.LOW)
-
 
 if __name__ == '__main__':
     try:
@@ -40,4 +39,3 @@ if __name__ == '__main__':
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
-

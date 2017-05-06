@@ -51,6 +51,12 @@ servo:
     position: [-1, 1]
     pulse_width: [1100, 1900]
 
+stepper:
+  default_speed_rpm: 30
+  steps_per_rev: 200
+  pins:
+    valve: ['P9_01', 'P9_02', 'P9_03', 'P9_04']
+
 pwm:
   pins:
     claw_servo: 9

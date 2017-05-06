@@ -4,6 +4,7 @@ import numpy
 import rospy
 
 from vortex_msgs.msg import Manipulator, Pwm
+from stepper import Stepper
 
 PWM_COUNTER_MAX = rospy.get_param('/pwm/counter/max')
 FREQUENCY = rospy.get_param('/pwm/frequency/set')
@@ -12,6 +13,10 @@ SERVO_PWM_PIN = rospy.get_param('/pwm/pins/claw_servo')
 LOOKUP_POSITION = rospy.get_param('/servo/lookup/position')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/servo/lookup/pulse_width')
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
+
+STEPPER_NUM_STEPS = rospy.get_param('/stepper/steps_per_rev')
+STEPPER_VALVE_PINS = rospy.get_param('/stepper/pins/valve')
+STEPPER_VALVE_RPM = rospy.get_param('/stepper/default_speed_rpm')
 
 
 class ManipulatorInterface(object):
@@ -23,9 +28,11 @@ class ManipulatorInterface(object):
         # TODO(mortenfyhn): Consider setting neutral to fully open instead
         self.neutral_pulse_width = self.microsecs_to_bits(self.servo_position_to_microsecs(0))
 
+        valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
+        valve_stepper.set_speed(STEPPER_VALVE_RPM)
+
         rospy.sleep(0.1) # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
-
         rospy.on_shutdown(self.servo_set_to_zero)
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
 

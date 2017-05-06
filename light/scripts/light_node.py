@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import Adafruit_BBIO.GPIO as GPIO
-from vortex_msgs.msg import LightInput
-from vortex_msgs.msg import Pwm
+from vortex_msgs.msg import LightInput, Pwm
 
 FULL_CYCLE = 4096
 GPIO_PIN_MAP = rospy.get_param('/light/gpio_pins')
@@ -41,3 +40,4 @@ if __name__ == '__main__':
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
+

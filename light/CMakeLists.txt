@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 roslint_python()
 
-
 catkin_package(
   CATKIN_DEPENDS
   rospy

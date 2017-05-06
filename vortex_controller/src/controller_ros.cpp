@@ -44,12 +44,14 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
     return;
 
   ControlMode new_control_mode;
+  new_control_mode = control_mode;
+  for (int i = 0; i < msg.control_mode.size(); ++i)
   {
-    int i;
-    for (i = 0; i < msg.control_mode.size(); ++i)
-      if (msg.control_mode[i])
-        break;
-    new_control_mode = static_cast<ControlMode>(i);
+    if (msg.control_mode[i])
+    {
+      new_control_mode = static_cast<ControlMode>(i);
+      break;
+    }
   }
 
   if (new_control_mode != control_mode)
@@ -276,7 +278,7 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
     if (msg.control_mode[i])
       num_requested_modes++;
 
-  if (num_requested_modes != 1)
+  if (num_requested_modes > 1)
   {
     ROS_WARN_STREAM("Invalid control mode. Attempt to set "
                     << num_requested_modes << " control modes at once.");

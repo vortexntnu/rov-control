@@ -31,9 +31,9 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   initPositionHoldController();
 
   // Set up a dynamic reconfigure server
-  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig>::CallbackType cb;
-  cb = boost::bind(&Controller::configCallback, this, _1, _2);
-  dr_srv.setCallback(cb);
+  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig>::CallbackType dr_cb;
+  dr_cb = boost::bind(&Controller::configCallback, this, _1, _2);
+  dr_srv.setCallback(dr_cb);
 
   ROS_INFO("Node initialized.");
 }
@@ -41,10 +41,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
 void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 {
   if (!healthyMessage(msg))
-  {
-    ROS_WARN("Propulsion command message out of range, ignoring...");
     return;
-  }
 
   ControlMode new_control_mode;
   {
@@ -101,15 +98,18 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 
 void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
-  ROS_INFO_STREAM("Setting gains [a=" << config.a << ", b=" << config.b << ", c=" << config.c << "].");
-  position_hold_controller->setGains(config.a, config.b, config.c);
+  ROS_INFO_STREAM("Setting gains: [velocity = " << config.velocity_gain << ", position = " << config.position_gain
+    << ", attitude = " << config.attitude_gain << "]");
+  controller->setGains(config.velocity_gain, config.position_gain, config.attitude_gain);
 }
 
 void Controller::spin()
 {
   Eigen::Vector6d    tau_command          = Eigen::VectorXd::Zero(6);
   Eigen::Vector6d    tau_openloop         = Eigen::VectorXd::Zero(6);
-  Eigen::Vector6d    tau_sixdof           = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_restoring        = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_staylevel        = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_depthhold        = Eigen::VectorXd::Zero(6);
 
   Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
@@ -122,60 +122,66 @@ void Controller::spin()
   while (ros::ok())
   {
     // TODO(mortenfyhn): check value of bool return from getters
+
+    // Read state and setpoint
     state->get(&position_state, &orientation_state, &velocity_state);
     setpoints->get(&position_setpoint, &orientation_setpoint);
+
+    // Calculate terms of control vector
+    setpoints->get(&tau_openloop);
+    tau_restoring = controller->getRestoring(orientation_state);
 
     switch (control_mode)
     {
       case ControlModes::OPEN_LOOP:
       {
-        setpoints->get(&tau_command);
+        tau_command = tau_openloop;
         break;
       }
 
-      case ControlModes::SIXDOF:
+      case ControlModes::OPEN_LOOP_RESTORING:
       {
-        tau_command = position_hold_controller->compute(position_state,
-                                                        orientation_state,
-                                                        velocity_state,
-                                                        position_setpoint,
-                                                        orientation_setpoint);
+        tau_command = tau_openloop + tau_restoring;
         break;
       }
 
-      case ControlModes::RPY_DEPTH:
+      case ControlModes::STAY_LEVEL:
       {
-        // TODO(mortenfyhn): make this similar to depth hold
-        tau_command(0) = tau_openloop(0);
-        tau_command(1) = tau_openloop(1);
-        tau_command(2) = tau_sixdof(2);
-        tau_command(3) = tau_sixdof(3);
-        tau_command(4) = tau_sixdof(4);
-        tau_command(5) = tau_sixdof(5);
+        // Convert quaternion setpoint to euler angles (ZYX convention)
+        Eigen::Vector3d euler;
+        euler = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
+
+        // Set pitch and roll setpoints to zero
+        euler(1) = 0;
+        euler(2) = 0;
+
+        // Convert euler setpoint back to quaternions
+        Eigen::Matrix3d R;
+        R = Eigen::AngleAxisd(euler(0), Eigen::Vector3d::UnitZ())
+        * Eigen::AngleAxisd(euler(1), Eigen::Vector3d::UnitY())
+        * Eigen::AngleAxisd(euler(2), Eigen::Vector3d::UnitX());
+        Eigen::Quaterniond orientation_staylevel(R);
+
+        tau_staylevel = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
+                                                Eigen::Vector3d::Zero(), orientation_staylevel);
+
+        // Turn off openloop roll and pitch commands
+        tau_openloop(3) = 0;
+        tau_openloop(4) = 0;
+
+        tau_command = tau_openloop + tau_staylevel;
         break;
       }
 
       case ControlModes::DEPTH_HOLD:
       {
-        setpoints->get(&tau_openloop);
+        tau_depthhold = controller->getFeedback(position_state,
+                                                Eigen::Quaterniond::Identity(),
+                                                Eigen::VectorXd::Zero(6),
+                                                position_setpoint,
+                                                Eigen::Quaterniond::Identity());
 
-        bool depth_change_commanded = abs(tau_openloop(2)) > FORCE_DEADZONE_LIMIT;
-        if (depth_change_commanded)
-        {
-          tau_command = tau_openloop;
-        }
-        else
-        {
-          position_setpoint(0) = position_state(0);
-          position_setpoint(1) = position_state(1);
-          orientation_setpoint = orientation_state;
-          tau_sixdof = position_hold_controller->compute(position_state,
-                                                         orientation_state,
-                                                         velocity_state,
-                                                         position_setpoint,
-                                                         orientation_setpoint);
-          tau_command = tau_sixdof + tau_openloop;
-        }
+        tau_command = tau_openloop + tau_depthhold;
         break;
       }
 
@@ -219,9 +225,13 @@ void Controller::initSetpoints()
 void Controller::initPositionHoldController()
 {
   // Read controller gains from parameter server
-  std::map<std::string, double> gains;
-  if (!nh.getParam("/controller/gains", gains))
-    ROS_FATAL("Failed to read parameter controller gains.");
+  double a, b, c;
+  if (!nh.getParam("/controller/velocity_gain", a))
+    ROS_ERROR("Failed to read parameter velocity_gain.");
+  if (!nh.getParam("/controller/position_gain", b))
+    ROS_ERROR("Failed to read parameter position_gain.");
+  if (!nh.getParam("/controller/attitude_gain", c))
+    ROS_ERROR("Failed to read parameter attitude_gain.");
 
   // Read center of gravity and buoyancy vectors
   std::vector<double> r_G_vec, r_B_vec;
@@ -245,10 +255,7 @@ void Controller::initPositionHoldController()
   double W = mass * acceleration_of_gravity;
   double B = density_of_water * displacement * acceleration_of_gravity;
 
-  position_hold_controller = new QuaternionPdController(gains["a"],
-                                                        gains["b"],
-                                                        gains["c"],
-                                                        W, B, r_G, r_B);
+  controller = new QuaternionPdController(a, b, c, W, B, r_G, r_B);
 }
 
 bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)

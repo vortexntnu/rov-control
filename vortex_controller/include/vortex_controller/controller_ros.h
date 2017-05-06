@@ -38,7 +38,7 @@ private:
 
   State                  *state;
   Setpoints              *setpoints;
-  QuaternionPdController *position_hold_controller;
+  QuaternionPdController *controller;
 
   void initSetpoints();
   void initPositionHoldController();

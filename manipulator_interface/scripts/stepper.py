@@ -75,8 +75,8 @@ class Stepper():
         for i in range(len(self.pins)):
             pin_value = STEPPER_PIN_VALUES[curr_step][i]
             if pin_value == 1:
-                GPIO.output(pin[i], GPIO.HIGH)
+                GPIO.output(self.pins[i], GPIO.HIGH)
             elif pin_value == 0:
-                GPIO.output(pin[i], GPIO.LOW)
+                GPIO.output(self.pins[i], GPIO.LOW)
             else:
                 rospy.logwarn('Invalid output pin value.')

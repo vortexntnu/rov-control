@@ -68,10 +68,10 @@ class Stepper():
 
                 steps_left -= 1
 
-                self.step_motor(self.curr_step % 4)
+                self.step_once(self.curr_step % 4)
 
-    def step_motor(self, curr_step):
-        """"Move motor forward or backward (low-level command)."""
+    def step_once(self, curr_step):
+        """"Step motor once."""
         for i in range(len(self.pins)):
             pin_value = STEPPER_PIN_VALUES[curr_step][i]
             if pin_value == 1:

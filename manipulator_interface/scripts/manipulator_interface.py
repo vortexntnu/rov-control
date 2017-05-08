@@ -58,13 +58,7 @@ class ManipulatorInterface(object):
             return
 
         self.set_claw_pwm(msg.claw_position)
-
-        if msg.open_valve:
-            self.valve_direction = 1
-        elif msg.close_valve:
-            self.valve_direction = -1
-        else:
-            self.valve_direction = 0
+        self.valve_direction = msg.valve_direction
 
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
@@ -89,8 +83,8 @@ class ManipulatorInterface(object):
             rospy.logwarn_throttle(1, 'Claw position out of range. Ignoring message...')
             return False
 
-        if msg.open_valve and msg.close_valve:
-            rospy.logwarn_throttle(1, 'Cannot open and close valve at the same time! Ignoring message...')
+        if abs(msg.valve_direction) > 1:
+            rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
             return False
 
         return True

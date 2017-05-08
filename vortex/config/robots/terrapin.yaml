@@ -46,6 +46,26 @@ controller:
     c: 20.0
   frequency: 10
 
+servo:
+  lookup:
+    position: [-1, 1]
+    pulse_width: [1500, 1100]
+
+stepper:
+  default_speed_rpm: 30
+  steps_per_rev: 200
+  pins:
+    valve: ['P9_01', 'P9_02', 'P9_03', 'P9_04']
+
+pwm:
+  pins:
+    claw_servo: 9
+  frequency:
+    set: 249.0
+    measured: 251.2
+  counter:
+    max: 4095
+
 camera:
   pin_map_feed0: ["P8_9", "P8_10", "P8_11"]
   pin_map_feed1: ["P8_12", "P8_13", "P8_14"] 

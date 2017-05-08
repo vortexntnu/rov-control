@@ -2,8 +2,8 @@
 
 SimpleEstimator::SimpleEstimator()
 {
-  imu_sub      = nh.subscribe("imu/data", 10, &SimpleEstimator::imuCallback, this);
-  pressure_sub = nh.subscribe("imu/pressure", 10, &SimpleEstimator::pressureCallback, this);
+  imu_sub      = nh.subscribe("/sensors/imu/data", 10, &SimpleEstimator::imuCallback, this);
+  pressure_sub = nh.subscribe("/sensors/pressure", 10, &SimpleEstimator::pressureCallback, this);
   state_pub    = nh.advertise<nav_msgs::Odometry>("state_estimate", 10);
 
   if (!nh.getParam("atmosphere/pressure", atmospheric_pressure))

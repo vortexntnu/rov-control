@@ -17,8 +17,8 @@ import rospy
 
 COMPUTER = rospy.get_param('/computer');
 if COMPUTER == 'raspberry':
-    # import RPi.GPIO as GPIO
-    # GPIO.setmode(GPIO.BCM)
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
     pass
 elif COMPUTER == 'beaglebone':
     import Adafruit_BBIO.GPIO as GPIO

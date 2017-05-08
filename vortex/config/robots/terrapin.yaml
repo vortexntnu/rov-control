@@ -55,7 +55,11 @@ stepper:
   default_speed_rpm: 30
   steps_per_rev: 200
   pins:
-    valve: ['P9_01', 'P9_02', 'P9_03', 'P9_04']
+    valve: ['P8_28', 'P8_30', 'P8_27', 'P8_29']
+    erect: ['P8_32', 'P8_34', 'P8_31', 'P8_33']
+    screw: ['P8_36', 'P8_38', 'P8_35', 'P8_37']
+
+computer: 'beaglebone'
 
 pwm:
   pins:
@@ -68,7 +72,7 @@ pwm:
 
 camera:
   pin_map_feed0: ["P8_9", "P8_10", "P8_11"]
-  pin_map_feed1: ["P8_12", "P8_13", "P8_14"] 
+  pin_map_feed1: ["P8_12", "P8_13", "P8_14"]
   pin_map_feed2: ["P8_15", "P8_16", "P8_17"]
 
 light:

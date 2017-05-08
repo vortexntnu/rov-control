@@ -13,8 +13,18 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 
-import Adafruit_BBIO.GPIO as GPIO
 import rospy
+
+COMPUTER = rospy.get_param('/computer');
+if COMPUTER == 'raspberry':
+    # import RPi.GPIO as GPIO
+    # GPIO.setmode(GPIO.BCM)
+    pass
+elif COMPUTER == 'beaglebone':
+    import Adafruit_BBIO.GPIO as GPIO
+else:
+    rospy.logfatal('Invalid COMPUTER, shutting down...')
+    rospy.signal_shutdown('')
 
 MICROSEC_PER_SEC = 1000 * 1000
 STEPPER_PIN_VALUES = [[1, 0, 1, 0],

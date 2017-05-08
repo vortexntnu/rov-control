@@ -1,0 +1,21 @@
+pwm:
+  pins:
+    claw_servo: 9
+  frequency:
+    set: 249.0
+    measured: 251.2
+  counter:
+    max: 4095
+
+servo:
+  lookup:
+    position: [-1, 1]
+    pulse_width: [1500, 1100]
+
+stepper:
+  default_speed_rpm: 30
+  steps_per_rev: 200
+  pins:
+    valve: ['P8_28', 'P8_30', 'P8_27', 'P8_29']
+
+computer: 'beaglebone'

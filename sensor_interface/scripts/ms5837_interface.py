@@ -20,7 +20,7 @@ class Ms5837InterfaceNode(object):
             Temperature,
             queue_size=10)
 
-        self.ms5837 = ms5837.MS5837(model=ms5837.MODEL_30BA, bus=1)
+        self.ms5837 = ms5837.MS5837(model=ms5837.MODEL_30BA, bus=2)
         if not self.ms5837.init():
             rospy.logfatal('Failed to initialise MS5837! Is the sensor connected?')
         else:
@@ -39,7 +39,7 @@ class Ms5837InterfaceNode(object):
         while not rospy.is_shutdown():
             if self.ms5837.read():
                 pressure_msg.header.stamp = rospy.get_rostime()
-                pressure_msg.fluid_pressure = self.ms5837.pressure(self.ms5837.UNITS_Pa)
+                pressure_msg.fluid_pressure = self.ms5837.pressure(ms5837.UNITS_Pa)
 
                 temp_msg.header.stamp = rospy.get_rostime()
                 temp_msg.temperature = self.ms5837.temperature()

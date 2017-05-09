@@ -80,6 +80,14 @@ class Stepper():
 
                 self.step_once(self.curr_step % 4)
 
+    def step_now(self, direction):
+        """"Step motor once immediately, in given direction."""
+        if abs(direction) != 1:
+            return
+        self.direction = direction
+        self.curr_step += self.direction
+        self.step_once(self.curr_step % 4)
+
     def step_once(self, curr_step):
         """"Step motor once."""
         for i in range(len(self.pins)):

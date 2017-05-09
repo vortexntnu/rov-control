@@ -40,9 +40,9 @@ class ManipulatorInterface(object):
         self.spin()
 
     def spin(self):
-        rate = rospy.Rate(10)
+        rate = rospy.Rate((STEPPER_NUM_STEPS * STEPPER_VALVE_RPM) / 60)
         while not rospy.is_shutdown():
-            self.valve_stepper.step(self.valve_direction)
+            self.valve_stepper.step_now(self.valve_direction)
             rate.sleep()
 
     def servo_set_to_zero(self):

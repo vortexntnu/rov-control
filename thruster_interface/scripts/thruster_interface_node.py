@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import math
-import Adafruit_PCA9685
 import numpy
 import rospy
 

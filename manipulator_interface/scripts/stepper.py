@@ -15,7 +15,7 @@
 
 import rospy
 
-COMPUTER = rospy.get_param('/computer');
+COMPUTER = rospy.get_param('/computer')
 if COMPUTER == 'raspberry':
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)

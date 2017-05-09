@@ -10,8 +10,8 @@ from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 # Constants
 PWM_BITS_PER_PERIOD = 4096.0  # 12 bit PWM
-FREQUENCY = 249  # Max 400 Hz
-FREQUENCY_MEASURED = 251.2  # Use this for better precision
+FREQUENCY = rospy.get_param('/pwm/frequency/set')
+FREQUENCY_MEASURED = rospy.get_param('/pwm/frequency/measured')
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
 THRUST_RANGE_LIMIT = 100
 

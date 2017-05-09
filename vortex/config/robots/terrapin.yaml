@@ -63,6 +63,9 @@ computer: 'beaglebone'
 
 pwm:
   pins:
+    # Map from thruster number (list index) to pwm pin (list value)
+    thrusters: [4, 5, 6, 7, 0, 1, 2, 3]
+    headlights: 8
     claw_servo: 9
   frequency:
     set: 249.0

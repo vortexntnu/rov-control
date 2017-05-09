@@ -21,6 +21,7 @@ NUM_THRUSTERS = rospy.get_param('/propulsion/thrusters/num')
 MAX_RATE = rospy.get_param('/thrusters/rate_of_change/max')
 RATE_LIMITING_ENABLED = rospy.get_param('/thruster_interface/rate_limiting_enabled')
 THRUSTERS_CONNECTED = rospy.get_param('/thruster_interface/thrusters_connected')
+THRUSTER_PWM_PINS = rospy.get_param('/pwm/pins/thrusters')
 
 
 class ThrusterInterface(object):
@@ -50,7 +51,7 @@ class ThrusterInterface(object):
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
             pwm_msg = Pwm()
             for i in range(NUM_THRUSTERS):
-                pwm_msg.pins.append(i)
+                pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
                 pwm_msg.on.append(0)
                 pwm_msg.off.append(neutral_pulse_width)
             self.pub_pwm.publish(pwm_msg)
@@ -115,7 +116,7 @@ class ThrusterInterface(object):
         for i in range(NUM_THRUSTERS):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_bits = self.microsecs_to_bits(microsecs[i])
-            pwm_msg.pins.append(i)
+            pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
             pwm_msg.on.append(0)
             pwm_msg.off.append(pwm_bits)
         if THRUSTERS_CONNECTED and self.thrusters_enabled:

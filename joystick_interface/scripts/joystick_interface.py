@@ -12,7 +12,7 @@ class JoystickInterfaceNode(object):
         self.pub_motion = rospy.Publisher('propulsion_command',
                                           PropulsionCommand,
                                           queue_size=10)
-        self.pub_manipulator = rospy.Publisher('manipulator',
+        self.pub_manipulator = rospy.Publisher('manipulator_command',
                                                Manipulator,
                                                queue_size=10)
 

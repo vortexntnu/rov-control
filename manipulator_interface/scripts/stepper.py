@@ -22,9 +22,10 @@ if COMPUTER == 'raspberry':
     pass
 elif COMPUTER == 'beaglebone':
     import Adafruit_BBIO.GPIO as GPIO
+elif COMPUTER == 'pc-debug':
+    print('stepper.py: Starting in PC debug mode, no stepper connected.')
 else:
-    rospy.logfatal('Invalid COMPUTER, shutting down...')
-    rospy.signal_shutdown('')
+    print('stepper.py: Invalid COMPUTER!')
 
 MICROSEC_PER_SEC = 1000 * 1000
 STEPPER_PIN_VALUES = [[1, 0, 1, 0],
@@ -50,8 +51,9 @@ class Stepper():
         self.number_of_steps = number_of_steps
 
         self.pins = pins
-        for pin in pins:
-            GPIO.setup(pin, GPIO.OUT)
+        if COMPUTER != 'pc-debug':
+            for pin in pins:
+                GPIO.setup(pin, GPIO.OUT)
 
     def set_speed(self, speed):
         """"Set stepper speed in RPM."""
@@ -90,11 +92,17 @@ class Stepper():
 
     def step_once(self, curr_step):
         """"Step motor once."""
-        for i in range(len(self.pins)):
-            pin_value = STEPPER_PIN_VALUES[curr_step][i]
-            if pin_value == 1:
-                GPIO.output(self.pins[i], GPIO.HIGH)
-            elif pin_value == 0:
-                GPIO.output(self.pins[i], GPIO.LOW)
-            else:
-                rospy.logwarn('Invalid output pin value.')
+        if COMPUTER != 'pc-debug':
+            for i in range(len(self.pins)):
+                pin_value = STEPPER_PIN_VALUES[curr_step][i]
+                if pin_value == 1:
+                    GPIO.output(self.pins[i], GPIO.HIGH)
+                elif pin_value == 0:
+                    GPIO.output(self.pins[i], GPIO.LOW)
+                else:
+                    rospy.logwarn('Invalid output pin value.')
+
+    def shutdown(self):
+        if COMPUTER != 'pc-debug':
+            print('stepper.py: Shutting down and cleaning GPIO pins.')
+            GPIO.cleanup()

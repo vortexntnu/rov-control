@@ -28,15 +28,19 @@ class ManipulatorInterface(object):
         # TODO(mortenfyhn): Consider setting neutral to fully open instead
         self.neutral_pulse_width = self.microsecs_to_bits(self.servo_position_to_microsecs(0))
 
-        self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
-        self.valve_stepper.set_speed(STEPPER_VALVE_RPM)
-        self.valve_direction = 0
-
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
-        rospy.on_shutdown(self.servo_set_to_zero)
-        rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
+        rospy.on_shutdown(self.shutdown)
 
+        try:
+            self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
+            self.valve_stepper.set_speed(STEPPER_VALVE_RPM)
+            self.valve_direction = 0
+        except NameError:
+            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? Shutting down...')
+            rospy.signal_shutdown('')
+
+        rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
         self.spin()
 
     def spin(self):
@@ -52,6 +56,10 @@ class ManipulatorInterface(object):
         msg.off.append(self.neutral_pulse_width)
         self.pub.publish(msg)
         rospy.loginfo("Set to zero")
+
+    def shutdown(self):
+        self.servo_set_to_zero()
+        self.valve_stepper.shutdown()
 
     def callback(self, msg):
         if not self.healthy_message(msg):

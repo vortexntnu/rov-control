@@ -47,6 +47,7 @@ controller:
   frequency: 10
 
 servo:
+  angle_range_deg: 35
   lookup:
     position: [-1, 1]
     pulse_width: [1500, 1100]

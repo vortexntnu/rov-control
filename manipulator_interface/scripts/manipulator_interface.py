@@ -32,7 +32,7 @@ class ManipulatorInterface(object):
         self.servo_set_to_zero()
         rospy.on_shutdown(self.shutdown)
         self.claw_direction = 0.0; # 1 = open more, -1 = close more, 0 = do nothing
-        self.claw_position = 1.0 # 1 = open, -1 = closed
+        self.claw_position = 0.0 # 1 = open, -1 = closed
         self.claw_speed = 0.5
 
         try:

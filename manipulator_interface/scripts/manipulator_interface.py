@@ -16,6 +16,7 @@ PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
 
 STEPPER_NUM_STEPS = rospy.get_param('/stepper/steps_per_rev')
 STEPPER_VALVE_PINS = rospy.get_param('/stepper/pins/valve')
+STEPPER_VALVE_DISABLE_PIN = rospy.get_param('/stepper/pins/valve_disable')
 STEPPER_VALVE_RPM = rospy.get_param('/stepper/default_speed_rpm')
 
 
@@ -33,7 +34,7 @@ class ManipulatorInterface(object):
         rospy.on_shutdown(self.shutdown)
 
         try:
-            self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
+            self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS, STEPPER_VALVE_DISABLE_PIN)
             self.valve_stepper.set_speed(STEPPER_VALVE_RPM)
             self.valve_direction = 0
         except NameError:
@@ -67,6 +68,11 @@ class ManipulatorInterface(object):
 
         self.set_claw_pwm(msg.claw_position)
         self.valve_direction = msg.valve_direction
+
+        if self.valve_direction == 0:
+            self.valve_stepper.disable()
+        else:
+            self.valve_stepper.enable()
 
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)

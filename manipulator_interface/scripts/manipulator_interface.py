@@ -30,7 +30,9 @@ class ManipulatorInterface(object):
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
         rospy.on_shutdown(self.shutdown)
-	self.claw_state = -1 #-1 = closed, 1 = open.
+        self.claw_direction = 0.0; # 1 = open more, -1 = close more, 0 = do nothing
+        self.claw_position = 1.0 # 1 = open, -1 = closed
+        self.claw_speed = 0.5
 
         try:
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
@@ -46,10 +48,18 @@ class ManipulatorInterface(object):
         self.spin()
 
     def spin(self):
-        rate = rospy.Rate((STEPPER_NUM_STEPS * STEPPER_VALVE_RPM) / 60)
+        period = 60.0 / (STEPPER_NUM_STEPS * STEPPER_VALVE_RPM)
+        rate = rospy.Rate(1/period)
         while not rospy.is_shutdown():
-            #self.valve_stepper.step_now(self.valve_direction)
-	    self.set_claw_pwm(self.claw_state)
+            # Accumulate claw position
+            self.claw_position += self.claw_speed * period * self.claw_direction
+            # Saturate claw position to [-1, 1]
+            if self.claw_position >= 1:
+                self.claw_position = 1
+            elif self.claw_position <= -1:
+                self.claw_position = -1
+
+            self.set_claw_pwm(self.claw_position)
             self.valve_stepper.step(self.valve_direction)
             rate.sleep()
 
@@ -69,12 +79,7 @@ class ManipulatorInterface(object):
         if not self.healthy_message(msg):
             return
 
-	if msg.claw_position == 1:
-	    self.claw_state = 1
-	elif msg.claw_position == -1:
-	    self.claw_state = -1
-
-#        self.set_claw_pwm(msg.claw_position)
+        self.claw_direction = msg.claw_position
         self.valve_direction = msg.valve_direction
 
     def servo_position_to_microsecs(self, thrust):

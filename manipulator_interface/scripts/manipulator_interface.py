@@ -26,12 +26,14 @@ class ManipulatorInterface(object):
         self.pub = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
 
-        # TODO(mortenfyhn): Consider setting neutral to fully open instead
         self.neutral_pulse_width = self.microsecs_to_bits(self.servo_position_to_microsecs(0))
 
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
         rospy.on_shutdown(self.shutdown)
+        self.claw_direction = 0.0; # 1 = open more, -1 = close more, 0 = do nothing
+        self.claw_position = 1.0 # 1 = open, -1 = closed
+        self.claw_speed = 0.5
 
         try:
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS, STEPPER_VALVE_DISABLE_PIN)
@@ -41,13 +43,25 @@ class ManipulatorInterface(object):
             rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? Shutting down...')
             rospy.signal_shutdown('')
 
+        self.spinning_valve_locked = False
+
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
         self.spin()
 
     def spin(self):
-        rate = rospy.Rate((STEPPER_NUM_STEPS * STEPPER_VALVE_RPM) / 60)
+        period = 60.0 / (STEPPER_NUM_STEPS * STEPPER_VALVE_RPM)
+        rate = rospy.Rate(1/period)
         while not rospy.is_shutdown():
-            self.valve_stepper.step_now(self.valve_direction)
+            # Accumulate claw position
+            self.claw_position += self.claw_speed * period * self.claw_direction
+            # Saturate claw position to [-1, 1]
+            if self.claw_position >= 1:
+                self.claw_position = 1
+            elif self.claw_position <= -1:
+                self.claw_position = -1
+
+            self.set_claw_pwm(self.claw_position)
+            self.valve_stepper.step(self.valve_direction)
             rate.sleep()
 
     def servo_set_to_zero(self):
@@ -66,7 +80,7 @@ class ManipulatorInterface(object):
         if not self.healthy_message(msg):
             return
 
-        self.set_claw_pwm(msg.claw_position)
+        self.claw_direction = msg.claw_position
         self.valve_direction = msg.valve_direction
 
         if self.valve_direction == 0:

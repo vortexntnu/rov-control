@@ -17,7 +17,7 @@ SimpleEstimator::SimpleEstimator()
 
   is_initialized       = false;
   imu_initialized      = false;
-  pressure_initialized = false;
+  pressure_initialized = true;
 }
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)

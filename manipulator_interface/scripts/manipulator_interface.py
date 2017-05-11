@@ -25,7 +25,6 @@ class ManipulatorInterface(object):
         self.pub = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
 
-        # TODO(mortenfyhn): Consider setting neutral to fully open instead
         self.neutral_pulse_width = self.microsecs_to_bits(self.servo_position_to_microsecs(0))
 
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
@@ -77,15 +76,6 @@ class ManipulatorInterface(object):
 
 #        self.set_claw_pwm(msg.claw_position)
         self.valve_direction = msg.valve_direction
-
-#        if (not self.spinning_valve_locked) and (self.valve_direction != 0):
-#            rospy.loginfo("acquiring valve lock")
-#            self.spinning_valve_locked = True
-#            self.valve_stepper.step(self.valve_direction * 100)
-#            rospy.loginfo("releasing valve lock")
-#            self.spinning_valve_locked = False
-#        else:
-#            rospy.loginfo("failed to acquire lock")
 
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)

@@ -31,6 +31,7 @@ class ManipulatorInterface(object):
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
         rospy.on_shutdown(self.shutdown)
+	self.claw_state = -1 #-1 = closed, 1 = open.
 
         try:
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS)
@@ -40,13 +41,17 @@ class ManipulatorInterface(object):
             rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? Shutting down...')
             rospy.signal_shutdown('')
 
+        self.spinning_valve_locked = False
+
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
         self.spin()
 
     def spin(self):
         rate = rospy.Rate((STEPPER_NUM_STEPS * STEPPER_VALVE_RPM) / 60)
         while not rospy.is_shutdown():
-            self.valve_stepper.step_now(self.valve_direction)
+            #self.valve_stepper.step_now(self.valve_direction)
+	    self.set_claw_pwm(self.claw_state)
+            self.valve_stepper.step(self.valve_direction)
             rate.sleep()
 
     def servo_set_to_zero(self):
@@ -65,8 +70,22 @@ class ManipulatorInterface(object):
         if not self.healthy_message(msg):
             return
 
-        self.set_claw_pwm(msg.claw_position)
+	if msg.claw_position == 1:
+	    self.claw_state = 1
+	elif msg.claw_position == -1:
+	    self.claw_state = -1
+
+#        self.set_claw_pwm(msg.claw_position)
         self.valve_direction = msg.valve_direction
+
+#        if (not self.spinning_valve_locked) and (self.valve_direction != 0):
+#            rospy.loginfo("acquiring valve lock")
+#            self.spinning_valve_locked = True
+#            self.valve_stepper.step(self.valve_direction * 100)
+#            rospy.loginfo("releasing valve lock")
+#            self.spinning_valve_locked = False
+#        else:
+#            rospy.loginfo("failed to acquire lock")
 
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)

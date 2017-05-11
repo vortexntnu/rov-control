@@ -19,7 +19,6 @@ COMPUTER = rospy.get_param('/computer')
 if COMPUTER == 'raspberry':
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
-    pass
 elif COMPUTER == 'beaglebone':
     import Adafruit_BBIO.GPIO as GPIO
 elif COMPUTER == 'pc-debug':
@@ -39,7 +38,7 @@ def curr_time_in_microsec():
 
 
 class Stepper():
-    def __init__(self, number_of_steps, pins):
+    def __init__(self, number_of_steps, pins, disable_pin):
         """"Initialize 4-pin stepper motor.
 
         number_of_steps -- number of steps per revolution
@@ -51,9 +50,11 @@ class Stepper():
         self.number_of_steps = number_of_steps
 
         self.pins = pins
+        self.disable_pin = disable_pin
         if COMPUTER != 'pc-debug':
             for pin in pins:
                 GPIO.setup(pin, GPIO.OUT)
+            GPIO.setup(disable_pin, GPIO.OUT)
 
     def set_speed(self, speed):
         """"Set stepper speed in RPM."""
@@ -101,6 +102,14 @@ class Stepper():
                     GPIO.output(self.pins[i], GPIO.LOW)
                 else:
                     rospy.logwarn('Invalid output pin value.')
+
+    def enable(self):
+        if COMPUTER != 'pc-debug':
+            GPIO.output(self.disable_pin, GPIO.HIGH)
+
+    def disable(self):
+        if COMPUTER != 'pc-debug':
+            GPIO.output(self.disable_pin, GPIO.LOW)
 
     def shutdown(self):
         if COMPUTER != 'pc-debug':

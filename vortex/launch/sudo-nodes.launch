@@ -1,0 +1,22 @@
+<launch>
+  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
+
+  <rosparam command="load" file="$(find vortex)/config/robots/terrapin.yaml"/>
+  <rosparam command="load" file="$(find thruster_interface)/config/thruster_terrapin.yaml" />
+  <rosparam command="load" file="$(find vortex)/config/environments/trondheim_freshwater.yaml"/>
+
+  <param name="thruster_interface/thrusters_connected" type="bool" value="true" />
+  <param name="thruster_interface/rate_limiting_enabled" type="bool" value="false" />
+
+  <node name="light" pkg="light" type="light_node.py" output="screen"/>
+  <node name="camera_selection" pkg="camera_selection" type="camera_selection.py" output="screen"/>
+  <node name="manipulator_interface" pkg="manipulator_interface" type="manipulator_interface.py" output="screen" />
+  <node name="pwm_interface" pkg="pwm_interface" type="pca9685_interface.py" output="screen"/>
+ <!-- <node name="thruster_interface" pkg="thruster_interface" type="thruster_interface_node.py" output="screen" />-->
+  <node name="bno055_interface" pkg="sensor_interface" type="bno055_interface.py" output="screen"/>
+  <!--<node name= "pressure_node" pkg="sensor_interface" type="ms5837_interface.py" output="screen"/> -->
+ <!-- <node pkg="vortex_controller" type="node" name="controller" output="screen"/>-->
+  <!--<node pkg="vortex_allocator"  type="node" name="allocator"  output="screen"/>-->
+  <!--<node pkg="vortex_estimator"  type="node" name="estimator"  output="screen"/>-->
+</launch>
+

@@ -70,8 +70,8 @@ pwm:
     headlights: 8
     claw_servo: 9
   frequency:
-    set: 249.0
-    measured: 251.2
+    set: 50.0
+    measured: 51.5
   counter:
     max: 4095
 

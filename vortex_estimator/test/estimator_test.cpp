@@ -14,8 +14,8 @@ class EstimatorTest : public ::testing::Test
 public:
   EstimatorTest()
   {
-    imuPub = nh.advertise<sensor_msgs::Imu>("imu/data", 10);
-    pressurePub = nh.advertise<sensor_msgs::FluidPressure>("imu/pressure", 10);
+    imuPub = nh.advertise<sensor_msgs::Imu>("/sensors/imu/data", 10);
+    pressurePub = nh.advertise<sensor_msgs::FluidPressure>("/sensors/pressure", 10);
     sub = nh.subscribe("state_estimate", 10, &EstimatorTest::Callback, this);
     message_received = false;
   }

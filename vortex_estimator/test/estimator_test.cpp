@@ -49,6 +49,15 @@ public:
       ros::spinOnce();
   }
 
+  void SpinSeconds(double duration)
+  {
+    ros::Time start = ros::Time::now();
+    while (ros::Time::now() - start < ros::Duration(duration))
+    {
+      ros::spinOnce();
+    }
+  }
+
   // Orientation quaternion
   double q_w;
   double q_x;
@@ -94,7 +103,8 @@ TEST_F(EstimatorTest, CheckResponsiveness)
 TEST_F(EstimatorTest, OrientationCorrect)
 {
   PublishOrientation(1, 2, 3, 4);
-  WaitForMessage();
+  SpinSeconds(0.1);
+
   EXPECT_NEAR(q_w, 1, MAX_ERROR);
   EXPECT_NEAR(q_x, 2, MAX_ERROR);
   EXPECT_NEAR(q_y, 3, MAX_ERROR);
@@ -104,7 +114,8 @@ TEST_F(EstimatorTest, OrientationCorrect)
 TEST_F(EstimatorTest, DepthCorrect)
 {
   PublishPressure(200000);
-  WaitForMessage();
+  SpinSeconds(0.1);
+
   EXPECT_NEAR(depth, 10.0728, MAX_ERROR);
 }
 

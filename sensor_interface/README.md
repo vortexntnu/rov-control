@@ -3,6 +3,8 @@ These nodes interface with the IMU and the pressure sensors.
 
 ## Dependencies
 * [Adafruit python library](https://github.com/adafruit/Adafruit_Python_BNO055) for BNO055.
+* Python SMBus library for MS5837:
+`sudo apt install python-smbus`
 
 
 ## Physical connections

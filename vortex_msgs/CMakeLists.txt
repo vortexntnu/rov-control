@@ -13,13 +13,12 @@ add_message_files(
   Float64ArrayStamped.msg
   LightInput.msg
   PropulsionCommand.msg
-  JoystickArmCommand.msg
-  ArmState.msg
-  ArmDutyCycle.msg
   EulerOrientations.msg
   Debug.msg
   Pwm.msg
   ContainerID.msg
+  Manipulator.msg
+  CameraFeedSelection.msg
 )
 
 generate_messages(

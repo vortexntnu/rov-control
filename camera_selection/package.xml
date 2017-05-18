@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>camera_selection</name>
+  <version>0.0.0</version>
+  <description>The camera_selection package</description>
+  <author email="vegardkamsvaag@gmail.com">Vegard Kamsvåg</author>
+  <maintainer email="vegardkamsvaag@gmail.com">Vegard Kamsvåg</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>rospy</build_depend>
+  <build_depend>vortex_msgs</build_depend>
+  <build_depend>roslint</build_depend>
+  
+  <run_depend>rospy</run_depend>
+  <run_depend>vortex_msgs</run_depend>
+
+</package>

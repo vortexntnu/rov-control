@@ -1,11 +1,9 @@
-<?xml version="1.0"?>
-<package>
-  <name>manipulator</name>
+<package><name>light</name>
   <version>0.0.0</version>
-  <description>The manipulator node package</description>
-  <maintainer email="hakongimse@gmail.com">hawkon</maintainer>
+  <description>The light control node</description>
+  <author email="vegardkamsvaag@gmail.com">Vegard Kamsvåg</author>
+  <maintainer email="vegardkamsvaag@gmail.com">Vegard Kamsvåg</maintainer>
   <license>MIT</license>
-  <url type="website">http://vortexntnu.no/</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 

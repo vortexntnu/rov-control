@@ -14,8 +14,8 @@ class EstimatorTest : public ::testing::Test
 public:
   EstimatorTest()
   {
-    imuPub = nh.advertise<sensor_msgs::Imu>("imu/data", 10);
-    pressurePub = nh.advertise<sensor_msgs::FluidPressure>("imu/pressure", 10);
+    imuPub = nh.advertise<sensor_msgs::Imu>("/sensors/imu/data", 10);
+    pressurePub = nh.advertise<sensor_msgs::FluidPressure>("/sensors/pressure", 10);
     sub = nh.subscribe("state_estimate", 10, &EstimatorTest::Callback, this);
     message_received = false;
   }
@@ -47,6 +47,15 @@ public:
   {
     while (!message_received)
       ros::spinOnce();
+  }
+
+  void SpinSeconds(double duration)
+  {
+    ros::Time start = ros::Time::now();
+    while (ros::Time::now() - start < ros::Duration(duration))
+    {
+      ros::spinOnce();
+    }
   }
 
   // Orientation quaternion
@@ -94,7 +103,8 @@ TEST_F(EstimatorTest, CheckResponsiveness)
 TEST_F(EstimatorTest, OrientationCorrect)
 {
   PublishOrientation(1, 2, 3, 4);
-  WaitForMessage();
+  SpinSeconds(0.1);
+
   EXPECT_NEAR(q_w, 1, MAX_ERROR);
   EXPECT_NEAR(q_x, 2, MAX_ERROR);
   EXPECT_NEAR(q_y, 3, MAX_ERROR);
@@ -104,7 +114,8 @@ TEST_F(EstimatorTest, OrientationCorrect)
 TEST_F(EstimatorTest, DepthCorrect)
 {
   PublishPressure(200000);
-  WaitForMessage();
+  SpinSeconds(0.1);
+
   EXPECT_NEAR(depth, 10.0728, MAX_ERROR);
 }
 

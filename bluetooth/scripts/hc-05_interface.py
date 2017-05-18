@@ -6,6 +6,7 @@ from vortex_msgs.msg import ContainerID
 
 SPIN_RATE = 10
 
+
 class Hc05InterfaceNode(object):
     def __init__(self):
         rospy.init_node('bluetooth_node')

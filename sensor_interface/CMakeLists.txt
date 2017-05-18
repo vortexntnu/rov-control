@@ -15,7 +15,7 @@ add_service_files(FILES
   LoadImuCalibration.srv
 )
 
-roslint_python()
+roslint_python(scripts/bno055_interface.py  scripts/ms5837_interface.py)
 
 generate_messages()
 

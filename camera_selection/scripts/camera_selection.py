@@ -18,13 +18,14 @@ class CameraSelection(object):
         for pin_list in PIN_MAP_LIST:
             for pin in pin_list:
                 GPIO.setup(pin, GPIO.OUT)
+                GPIO.output(pin, GPIO.LOW)
 
     def callback(self, msg):
         if msg.feed < NUM_FEEDS:
             # Get pin map for relevant feed
             feed_pin_map = PIN_MAP_LIST[msg.feed]
             # Convert selected camera to binary array
-            cam_select = [int(bit) for bit in bin(msg.camera)[2:]]
+            cam_select = [int(bit) for bit in format(msg.camera, '03b')]
             for index, output_pin in enumerate(cam_select):
                 if output_pin:
                     GPIO.output(feed_pin_map[index], GPIO.HIGH)

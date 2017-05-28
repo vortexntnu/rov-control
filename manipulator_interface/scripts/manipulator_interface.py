@@ -15,9 +15,16 @@ LOOKUP_PULSE_WIDTH = rospy.get_param('/servo/lookup/pulse_width')
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
 
 STEPPER_NUM_STEPS = rospy.get_param('/stepper/steps_per_rev')
+STEPPER_RPM = rospy.get_param('/stepper/default_speed_rpm')
+
 STEPPER_VALVE_PINS = rospy.get_param('/stepper/pins/valve')
 STEPPER_VALVE_DISABLE_PIN = rospy.get_param('/stepper/pins/valve_disable')
-STEPPER_VALVE_RPM = rospy.get_param('/stepper/default_speed_rpm')
+
+STEPPER_ERECT_PINS = rospy.get_param('/stepper/pins/erect')
+STEPPER_ERECT_DISABLE_PIN = rospy.get_param('/stepper/pins/erect_disable')
+
+STEPPER_SCREW_PINS = rospy.get_param('/stepper/pins/screw')
+STEPPER_SCREW_DISABLE_PIN = rospy.get_param('/stepper/pins/screw_disable')
 
 
 class ManipulatorInterface(object):
@@ -37,19 +44,25 @@ class ManipulatorInterface(object):
 
         try:
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS, STEPPER_VALVE_DISABLE_PIN)
-            self.valve_stepper.set_speed(STEPPER_VALVE_RPM)
+            self.valve_stepper.set_speed(STEPPER_RPM)
             self.valve_direction = 0
-        except NameError:
-            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? Shutting down...')
-            rospy.signal_shutdown('')
 
-        self.spinning_valve_locked = False
+            self.erect_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_ERECT_PINS, STEPPER_ERECT_DISABLE_PIN)
+            self.erect_stepper.set_speed(STEPPER_RPM)
+            self.erect_direction = 0
+
+            self.screw_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_SCREW_PINS, STEPPER_SCREW_DISABLE_PIN)
+            self.screw_stepper.set_speed(STEPPER_RPM)
+            self.screw_direction = 0
+        except NameError:
+            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? Shutting down node...')
+            rospy.signal_shutdown('')
 
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
         self.spin()
 
     def spin(self):
-        period = 60.0 / (STEPPER_NUM_STEPS * STEPPER_VALVE_RPM)
+        period = 60.0 / (STEPPER_NUM_STEPS * STEPPER_RPM)
         rate = rospy.Rate(1/period)
         while not rospy.is_shutdown():
             # Accumulate claw position
@@ -62,6 +75,8 @@ class ManipulatorInterface(object):
 
             self.set_claw_pwm(self.claw_position)
             self.valve_stepper.step(self.valve_direction)
+            self.erect_stepper.step(self.erect_direction)
+            self.screw_stepper.step(self.screw_direction)
             rate.sleep()
 
     def servo_set_to_zero(self):

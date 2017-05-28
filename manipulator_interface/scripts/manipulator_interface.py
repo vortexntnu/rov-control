@@ -55,7 +55,8 @@ class ManipulatorInterface(object):
             self.screw_stepper.set_speed(STEPPER_RPM)
             self.screw_direction = 0
         except NameError:
-            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? Shutting down node...')
+            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly?'
+                           'Shutting down node...')
             rospy.signal_shutdown('')
 
         rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)

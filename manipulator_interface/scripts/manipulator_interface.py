@@ -97,11 +97,23 @@ class ManipulatorInterface(object):
 
         self.claw_direction = msg.claw_position
         self.valve_direction = msg.valve_direction
+        self.erect_direction = msg.erect_direction
+        self.screw_direction = msg.screw_direction
 
         if self.valve_direction == 0:
             self.valve_stepper.disable()
         else:
             self.valve_stepper.enable()
+
+        if self.erect_direction == 0:
+            self.erect_stepper.disable()
+        else:
+            self.erect_stepper.enable()
+
+        if self.screw_direction == 0:
+            self.screw_stepper.disable()
+        else:
+            self.screw_stepper.enable()
 
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
@@ -128,6 +140,14 @@ class ManipulatorInterface(object):
 
         if abs(msg.valve_direction) > 1:
             rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
+            return False
+
+        if abs(msg.erect_direction) > 1:
+            rospy.logwarn_throttle(1, 'Erector command out of range. Ignoring message...')
+            return False
+
+        if abs(msg.screw_direction) > 1:
+            rospy.logwarn_throttle(1, 'Screwer command out of range. Ignoring message...')
             return False
 
         return True

@@ -1,2 +1,2 @@
 uint16[] pins
-uint16[] microsecs
+uint16[] microseconds

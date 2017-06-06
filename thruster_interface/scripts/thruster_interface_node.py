@@ -8,10 +8,8 @@ from vortex_msgs.msg import Float64ArrayStamped, Pwm
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 # Constants
-PWM_BITS_PER_PERIOD = 4096.0  # 12 bit PWM
+
 FREQUENCY = rospy.get_param('/pwm/frequency/set')
-FREQUENCY_MEASURED = rospy.get_param('/pwm/frequency/measured')
-PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
 THRUST_RANGE_LIMIT = 100
 
 LOOKUP_THRUST = rospy.get_param('/thrusters/characteristics/thrust')
@@ -46,13 +44,12 @@ class ThrusterInterface(object):
         rospy.loginfo("Launching at %d Hz", FREQUENCY)
 
     def output_to_zero(self):
-        neutral_pulse_width = self.microsecs_to_bits(self.thrust_to_microsecs(0))
+        neutral_pulse_width = self.thrust_to_microsecs(0)
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
             pwm_msg = Pwm()
             for i in range(NUM_THRUSTERS):
                 pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
-                pwm_msg.on.append(0)
-                pwm_msg.off.append(neutral_pulse_width)
+                pwm_msg.microseconds.append(neutral_pulse_width)
             self.pub_pwm.publish(pwm_msg)
 
     def callback(self, msg):
@@ -92,10 +89,6 @@ class ThrusterInterface(object):
     def thrust_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
 
-    def microsecs_to_bits(self, microsecs):
-        duty_cycle_normalized = microsecs / PERIOD_LENGTH_IN_MICROSECONDS
-        return int(round(PWM_BITS_PER_PERIOD * duty_cycle_normalized))
-
     def update_reference(self, dt):
         if RATE_LIMITING_ENABLED:
             rate_of_change = (self.thrust_setpoint - self.thrust_reference) / dt
@@ -114,10 +107,8 @@ class ThrusterInterface(object):
         pwm_msg = Pwm()
         for i in range(NUM_THRUSTERS):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
-            pwm_bits = self.microsecs_to_bits(microsecs[i])
             pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
-            pwm_msg.on.append(0)
-            pwm_msg.off.append(pwm_bits)
+            pwm_msg.microseconds.append(microsecs[i])
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
             self.pub_pwm.publish(pwm_msg)
 

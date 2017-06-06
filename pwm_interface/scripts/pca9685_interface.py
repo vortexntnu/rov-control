@@ -23,9 +23,9 @@ class Pca9685InterfaceNode(object):
         rospy.loginfo("Ready for PWM messages")
 
     def callback(self, msg):
-        if len(msg.pins) == len(msg.on) == len(msg.off):
+        if len(msg.pins) == len(msg.microseconds):
             for i in range(len(msg.pins)):
-                self.pca9685.set_pwm(msg.pins[i], PWM_ON, self.microsecs_to_bits(msg.off[i]))
+                self.pca9685.set_pwm(msg.pins[i], PWM_ON, self.microsecs_to_bits(msg.microseconds[i]))
 
     def microsecs_to_bits(self, microsecs):
         duty_cycle_normalized = microsecs / PERIOD_LENGTH_IN_MICROSECONDS

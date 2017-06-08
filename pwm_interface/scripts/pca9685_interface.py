@@ -9,7 +9,7 @@ PWM_BITS_PER_PERIOD = rospy.get_param('/pwm/counter/max')
 FREQUENCY = rospy.get_param('/pwm/frequency/set')
 FREQUENCY_MEASURED = rospy.get_param('/pwm/frequency/measured')
 PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
-PWM_ON = 0 # Start of duty cycle
+PWM_ON = 0  # Start of duty cycle
 
 
 class Pca9685InterfaceNode(object):

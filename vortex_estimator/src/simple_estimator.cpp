@@ -14,6 +14,8 @@ SimpleEstimator::SimpleEstimator()
 
   if (!nh.getParam("/gravity/acceleration", gravitational_acceleration))
     ROS_ERROR("Could not read parameter gravititional acceleration.");
+
+  ROS_INFO("Node initialized.");
 }
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)

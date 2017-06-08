@@ -20,9 +20,6 @@ STEPPER_RPM = rospy.get_param('/stepper/default_speed_rpm')
 STEPPER_VALVE_PINS = rospy.get_param('/stepper/pins/valve')
 STEPPER_VALVE_DISABLE_PIN = rospy.get_param('/stepper/pins/valve_disable')
 
-STEPPER_ERECT_PINS = rospy.get_param('/stepper/pins/erect')
-STEPPER_ERECT_DISABLE_PIN = rospy.get_param('/stepper/pins/erect_disable')
-
 STEPPER_SCREW_PINS = rospy.get_param('/stepper/pins/screw')
 STEPPER_SCREW_DISABLE_PIN = rospy.get_param('/stepper/pins/screw_disable')
 
@@ -46,10 +43,6 @@ class ManipulatorInterface(object):
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS, STEPPER_VALVE_DISABLE_PIN)
             self.valve_stepper.set_speed(STEPPER_RPM)
             self.valve_direction = 0
-
-            self.erect_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_ERECT_PINS, STEPPER_ERECT_DISABLE_PIN)
-            self.erect_stepper.set_speed(STEPPER_RPM)
-            self.erect_direction = 0
 
             self.screw_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_SCREW_PINS, STEPPER_SCREW_DISABLE_PIN)
             self.screw_stepper.set_speed(STEPPER_RPM)
@@ -76,7 +69,6 @@ class ManipulatorInterface(object):
 
             self.set_claw_pwm(self.claw_position)
             self.valve_stepper.step(self.valve_direction)
-            self.erect_stepper.step(self.erect_direction)
             self.screw_stepper.step(self.screw_direction)
             rate.sleep()
 
@@ -98,18 +90,12 @@ class ManipulatorInterface(object):
 
         self.claw_direction = msg.claw_position
         self.valve_direction = msg.valve_direction
-        self.erect_direction = msg.erect_direction
         self.screw_direction = msg.screw_direction
 
         if self.valve_direction == 0:
             self.valve_stepper.disable()
         else:
             self.valve_stepper.enable()
-
-        if self.erect_direction == 0:
-            self.erect_stepper.disable()
-        else:
-            self.erect_stepper.enable()
 
         if self.screw_direction == 0:
             self.screw_stepper.disable()
@@ -141,10 +127,6 @@ class ManipulatorInterface(object):
 
         if abs(msg.valve_direction) > 1:
             rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
-            return False
-
-        if abs(msg.erect_direction) > 1:
-            rospy.logwarn_throttle(1, 'Erector command out of range. Ignoring message...')
             return False
 
         if abs(msg.screw_direction) > 1:

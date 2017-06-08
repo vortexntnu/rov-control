@@ -88,7 +88,7 @@ class ManipulatorInterface(object):
         if not self.healthy_message(msg):
             return
 
-        self.claw_direction = msg.claw_position
+        self.claw_direction = msg.claw_direction
         self.valve_direction = msg.valve_direction
         self.screw_direction = msg.screw_direction
 
@@ -121,7 +121,7 @@ class ManipulatorInterface(object):
         self.pub.publish(msg)
 
     def healthy_message(self, msg):
-        if abs(msg.claw_position) > 1:
+        if abs(msg.claw_direction) > 1:
             rospy.logwarn_throttle(1, 'Claw position out of range. Ignoring message...')
             return False
 

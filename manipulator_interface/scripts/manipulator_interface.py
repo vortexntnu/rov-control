@@ -62,10 +62,7 @@ class ManipulatorInterface(object):
             # Accumulate claw position
             self.claw_position += self.claw_speed * period * self.claw_direction
             # Saturate claw position to [-1, 1]
-            if self.claw_position >= 1:
-                self.claw_position = 1
-            elif self.claw_position <= -1:
-                self.claw_position = -1
+            self.claw_position = numpy.clip(self.claw_position, -1, 1)
 
             self.set_claw_pwm(self.claw_position)
             self.valve_stepper.step(self.valve_direction)

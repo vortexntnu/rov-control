@@ -49,7 +49,7 @@ class ThrusterInterface(object):
             pwm_msg = Pwm()
             for i in range(NUM_THRUSTERS):
                 pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
-                pwm_msg.microseconds.append(neutral_pulse_width)
+                pwm_msg.positive_width_us.append(neutral_pulse_width)
             self.pub_pwm.publish(pwm_msg)
 
     def callback(self, msg):
@@ -108,7 +108,7 @@ class ThrusterInterface(object):
         for i in range(NUM_THRUSTERS):
             microsecs[i] = self.thrust_to_microsecs(self.thrust_reference[i])
             pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
-            pwm_msg.microseconds.append(microsecs[i])
+            pwm_msg.positive_width_us.append(microsecs[i])
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
             self.pub_pwm.publish(pwm_msg)
 

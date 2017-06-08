@@ -26,7 +26,7 @@ class LightNode(object):
         if light in PWM_PIN_MAP:
             pwm_msg = Pwm()
             pwm_msg.pins.append(PWM_PIN_MAP[light])
-            pwm_msg.microseconds.append((PERIOD_LENGTH_IN_MICROSECONDS * msg.intensity) // PWM_SCALING)
+            pwm_msg.positive_width_us.append((PERIOD_LENGTH_IN_MICROSECONDS * msg.intensity) // PWM_SCALING)
             self.pub_pwm.publish(pwm_msg)
         elif light in GPIO_PIN_MAP:
             if msg.intensity > 0:

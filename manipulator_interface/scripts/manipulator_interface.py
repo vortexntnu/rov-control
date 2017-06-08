@@ -64,7 +64,7 @@ class ManipulatorInterface(object):
     def servo_set_to_zero(self):
         msg = Pwm()
         msg.pins.append(SERVO_PWM_PIN)
-        msg.microseconds.append(self.neutral_pulse_width)
+        msg.positive_width_us.append(self.neutral_pulse_width)
         self.pub.publish(msg)
         rospy.loginfo("Set to zero")
 
@@ -92,7 +92,7 @@ class ManipulatorInterface(object):
 
         msg = Pwm()
         msg.pins.append(SERVO_PWM_PIN)
-        msg.microseconds.append(microsecs)
+        msg.positive_width_us.append(microsecs)
 
         self.pub.publish(msg)
 

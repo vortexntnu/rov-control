@@ -35,7 +35,7 @@ class ManipulatorInterface(object):
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
         rospy.on_shutdown(self.shutdown)
-        self.claw_direction = 0.0  # 1 = open more, -1 = close more, 0 = do nothing
+        self.claw_direction = 0.0
         self.claw_position = 0.0  # 1 = open, -1 = closed
         self.claw_speed = 0.5
 

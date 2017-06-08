@@ -24,10 +24,6 @@ class SimpleEstimator
     ros::Subscriber pressure_sub;
     ros::Publisher  state_pub;
 
-    bool is_initialized;
-    bool imu_initialized;
-    bool pressure_initialized;
-
     double atmospheric_pressure;
     double water_density;
     double gravitational_acceleration;

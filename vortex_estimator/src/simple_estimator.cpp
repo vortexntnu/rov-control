@@ -14,43 +14,16 @@ SimpleEstimator::SimpleEstimator()
 
   if (!nh.getParam("/gravity/acceleration", gravitational_acceleration))
     ROS_ERROR("Could not read parameter gravititional acceleration.");
-
-  is_initialized       = false;
-  imu_initialized      = false;
-  pressure_initialized = true;
 }
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
 {
   state.pose.pose.orientation = msg.orientation;
-  imu_initialized = true;
-  publish();
+  state_pub.publish(state);
 }
 
 void SimpleEstimator::pressureCallback(const sensor_msgs::FluidPressure &msg)
 {
   state.pose.pose.position.z = (msg.fluid_pressure - atmospheric_pressure)/(water_density * gravitational_acceleration);
-  pressure_initialized = true;
-  publish();
-}
-
-void SimpleEstimator::publish()
-{
-  if (is_initialized)
-  {
-    state_pub.publish(state);
-  }
-  else
-  {
-    if (imu_initialized && pressure_initialized)
-    {
-      is_initialized = true;
-      ROS_INFO("Node initialized.");
-      state_pub.publish(state);
-    }
-    else
-    {
-      ROS_WARN_THROTTLE(10, "Node not initialized.");
-    }
-  }
+  state_pub.publish(state);
 }

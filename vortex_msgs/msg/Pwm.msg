@@ -1,5 +1,5 @@
-# PWM pin nrs
+# PWM pin numbers
 uint16[] pins
 
-# Corresponding width of positive pulse in microseconds
+# Corresponding positive pulse width in microseconds
 uint16[] positive_width_us

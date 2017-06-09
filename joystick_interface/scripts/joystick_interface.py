@@ -39,7 +39,7 @@ class JoystickInterfaceNode(object):
             axes[self.axes_map[j]] = msg.axes[j]
 
         manipulator_msg = Manipulator()
-        manipulator_msg.claw_position = axes['dpad_vertical']
+        manipulator_msg.claw_direction = axes['dpad_vertical']
         manipulator_msg.valve_direction = axes['dpad_horizontal']
         manipulator_msg.screw_direction = buttons['start'] - buttons['back']
 

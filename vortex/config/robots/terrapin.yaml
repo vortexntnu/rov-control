@@ -57,11 +57,9 @@ stepper:
   steps_per_rev: 200
   pins:
     valve: ['P8_28', 'P8_30', 'P8_27', 'P8_29']
-    valve_disable: 'P8_46'
-    erect: ['P8_32', 'P8_34', 'P8_31', 'P8_33']
-    erect_disable: 'P8_45'
-    screw: ['P8_36', 'P8_38', 'P8_35', 'P8_37']
-    screw_disable: 'P8_44'
+    agar:  ['P8_32', 'P8_34', 'P8_31', 'P8_33']
+    valve_enable: 'P8_46'
+    agar_enable:  'P8_44'
 
 computer: 'beaglebone'
 

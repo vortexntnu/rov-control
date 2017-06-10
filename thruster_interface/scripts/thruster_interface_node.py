@@ -24,7 +24,6 @@ THRUSTER_PWM_PINS = rospy.get_param('/pwm/pins/thrusters')
 class ThrusterInterface(object):
     def __init__(self):
         rospy.init_node('thruster_interface', anonymous=False)
-        self.pub = rospy.Publisher('debug/thruster_pwm', Float64ArrayStamped, queue_size=10)
         self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
         self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
@@ -111,12 +110,6 @@ class ThrusterInterface(object):
             pwm_msg.positive_width_us.append(microsecs[i])
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
             self.pub_pwm.publish(pwm_msg)
-
-        # Publish outputs for debug
-        debug_msg = Float64ArrayStamped()
-        debug_msg.header.stamp = rospy.get_rostime()
-        debug_msg.data = microsecs
-        self.pub.publish(debug_msg)
 
     def healthy_message(self, msg):
         if (len(msg.data) != NUM_THRUSTERS):

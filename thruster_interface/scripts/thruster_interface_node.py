@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import math
-import numpy
+from math import isnan, isinf
+from numpy import interp
 import rospy
 
 from vortex_msgs.msg import Float64ArrayStamped, Pwm
@@ -29,9 +29,9 @@ class ThrusterInterface(object):
         self.is_initialized = False
 
         # The setpoint is the desired value (input)
-        self.thrust_setpoint = numpy.zeros(NUM_THRUSTERS)
+        self.thrust_setpoint = [0] * NUM_THRUSTERS
         # The reference is the output value (rate limited)
-        self.thrust_reference = numpy.zeros(NUM_THRUSTERS)
+        self.thrust_reference = [0] * NUM_THRUSTERS
 
         self.thrusters_enabled = True
 
@@ -83,7 +83,7 @@ class ThrusterInterface(object):
         return ThrustersEnableResponse()
 
     def thrust_to_microsecs(self, thrust):
-        return numpy.interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
+        return interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
 
     def update_reference(self, dt):
         if RATE_LIMITING_ENABLED:
@@ -114,9 +114,8 @@ class ThrusterInterface(object):
             return False
 
         for t in msg.data:
-            if math.isnan(t) or math.isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
+            if isnan(t) or isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
                 rospy.logwarn_throttle(10, 'Message out of range, ignoring...')
-
                 return False
         return True
 

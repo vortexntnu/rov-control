@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import numpy
+from numpy import clip, interp
 import rospy
 
 from vortex_msgs.msg import Manipulator, Pwm
@@ -58,7 +58,7 @@ class ManipulatorInterface(object):
             # Accumulate claw position
             self.claw_position += self.claw_speed * period * self.claw_direction
             # Saturate claw position to [-1, 1]
-            self.claw_position = numpy.clip(self.claw_position, -1, 1)
+            self.claw_position = clip(self.claw_position, -1, 1)
 
             self.set_claw_pwm(self.claw_position)
             self.valve_stepper.step(self.valve_direction)
@@ -95,7 +95,7 @@ class ManipulatorInterface(object):
             self.screw_stepper.enable()
 
     def servo_position_to_microsecs(self, thrust):
-        return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
+        return interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
 
     def set_claw_pwm(self, position):
         microsecs = self.servo_position_to_microsecs(position)

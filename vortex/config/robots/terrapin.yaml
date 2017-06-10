@@ -85,3 +85,9 @@ camera:
 light:
   gpio_pins: {"bluetooth":"P8_16", "raman":"P8_17"}
   pwm_pins: {"front":8}
+
+sensors:
+  bno055:
+    # https://github.com/adafruit/Adafruit_Python_BNO055
+    mode: 'IMU'
+    # mode: 'NDOF'

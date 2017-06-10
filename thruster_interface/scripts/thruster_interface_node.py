@@ -7,9 +7,6 @@ import rospy
 from vortex_msgs.msg import Float64ArrayStamped, Pwm
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
-# Constants
-
-FREQUENCY = rospy.get_param('/pwm/frequency/set')
 THRUST_RANGE_LIMIT = 100
 
 LOOKUP_THRUST = rospy.get_param('/thrusters/characteristics/thrust')
@@ -40,7 +37,7 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
-        rospy.loginfo("Launching at %d Hz", FREQUENCY)
+        rospy.loginfo('Node initialized.')
 
     def output_to_zero(self):
         neutral_pulse_width = self.thrust_to_microsecs(0)

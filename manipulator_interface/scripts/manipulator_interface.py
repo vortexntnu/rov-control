@@ -6,7 +6,6 @@ import rospy
 from vortex_msgs.msg import Manipulator, Pwm
 from stepper import Stepper
 
-FREQUENCY = rospy.get_param('/pwm/frequency/set')
 SERVO_PWM_PIN = rospy.get_param('/pwm/pins/claw_servo')
 LOOKUP_POSITION = rospy.get_param('/servo/lookup/position')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/servo/lookup/pulse_width')
@@ -49,7 +48,7 @@ class ManipulatorInterface(object):
                            'Shutting down node...')
             rospy.signal_shutdown('')
 
-        rospy.loginfo("Launching for %d Hz PWM", FREQUENCY)
+        rospy.loginfo('Node initialized.')
         self.spin()
 
     def spin(self):
@@ -71,7 +70,7 @@ class ManipulatorInterface(object):
         msg.pins.append(SERVO_PWM_PIN)
         msg.positive_width_us.append(self.neutral_pulse_width)
         self.pub.publish(msg)
-        rospy.loginfo("Set to zero")
+        rospy.loginfo("Setting servo position to zero")
 
     def shutdown(self):
         self.servo_set_to_zero()

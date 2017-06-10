@@ -1,3 +1,5 @@
+# PWM pin numbers
 uint16[] pins
-uint16[] on
-uint16[] off
+
+# Corresponding positive pulse width in microseconds
+uint16[] positive_width_us

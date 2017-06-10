@@ -6,13 +6,10 @@ import rospy
 from vortex_msgs.msg import Manipulator, Pwm
 from stepper import Stepper
 
-PWM_COUNTER_MAX = rospy.get_param('/pwm/counter/max')
 FREQUENCY = rospy.get_param('/pwm/frequency/set')
-FREQUENCY_MEASURED = rospy.get_param('/pwm/frequency/measured')
 SERVO_PWM_PIN = rospy.get_param('/pwm/pins/claw_servo')
 LOOKUP_POSITION = rospy.get_param('/servo/lookup/position')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/servo/lookup/pulse_width')
-PERIOD_LENGTH_IN_MICROSECONDS = 1000000.0 / FREQUENCY_MEASURED
 
 STEPPER_NUM_STEPS = rospy.get_param('/stepper/steps_per_rev')
 STEPPER_RPM = rospy.get_param('/stepper/default_speed_rpm')
@@ -30,7 +27,7 @@ class ManipulatorInterface(object):
         self.pub = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
 
-        self.neutral_pulse_width = self.microsecs_to_bits(self.servo_position_to_microsecs(0))
+        self.neutral_pulse_width = self.servo_position_to_microsecs(0)
 
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
@@ -72,8 +69,7 @@ class ManipulatorInterface(object):
     def servo_set_to_zero(self):
         msg = Pwm()
         msg.pins.append(SERVO_PWM_PIN)
-        msg.on.append(0)
-        msg.off.append(self.neutral_pulse_width)
+        msg.positive_width_us.append(self.neutral_pulse_width)
         self.pub.publish(msg)
         rospy.loginfo("Set to zero")
 
@@ -102,18 +98,12 @@ class ManipulatorInterface(object):
     def servo_position_to_microsecs(self, thrust):
         return numpy.interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
 
-    def microsecs_to_bits(self, microsecs):
-        duty_cycle_normalized = microsecs / PERIOD_LENGTH_IN_MICROSECONDS
-        return int(round(PWM_COUNTER_MAX * duty_cycle_normalized))
-
     def set_claw_pwm(self, position):
         microsecs = self.servo_position_to_microsecs(position)
-        pwm_bits = self.microsecs_to_bits(microsecs)
 
         msg = Pwm()
         msg.pins.append(SERVO_PWM_PIN)
-        msg.on.append(0)
-        msg.off.append(pwm_bits)
+        msg.positive_width_us.append(microsecs)
 
         self.pub.publish(msg)
 

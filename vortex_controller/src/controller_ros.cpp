@@ -180,6 +180,10 @@ void Controller::spin()
 
       case ControlModes::DEPTH_HOLD:
       {
+        // Reset depth setpoint if nonzero depth motion command
+        if (abs(tau_openloop(2)) > FORCE_DEADZONE_LIMIT)
+          position_setpoint(2) = position_state(2);
+
         tau_depthhold = controller->getFeedback(position_state,
                                                 Eigen::Quaterniond::Identity(),
                                                 Eigen::VectorXd::Zero(6),

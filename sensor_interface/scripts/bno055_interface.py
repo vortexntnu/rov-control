@@ -28,13 +28,28 @@ class Bno055InterfaceNode(object):
             self.load_calibration)
 
         try:
+            mode_name = rospy.get_param('sensors/bno055/mode')
+        except KeyError:
+            rospy.logerr('Could not read mode parameter, defaulting to IMU mode.')
+            mode_name = 'IMU'
+
+        if mode_name == 'IMU':
+            mode = BNO055.OPERATION_MODE_IMUPLUS
+        elif mode_name == 'NDOF':
+            mode = BNO055.OPERATION_MODE_NDOF
+        else:
+            rospy.logerr('Invalid mode parameter, defaulting to IMU mode.')
+            mode_name = 'IMU'
+            mode = BNO055.OPERATION_MODE_IMUPLUS
+
+        try:
             self.bno = BNO055.BNO055(rst='P9_12')
         except RuntimeError:
             rospy.logfatal('Unsupported hardware, intiating clean shutdown.')
             rospy.signal_shutdown('')
             return
 
-        if not self.bno.begin():
+        if not self.bno.begin(mode):
             rospy.logfatal('Failed to initialise BNO055! Is the sensor connected?')
             raise rospy.ROSInitException('Failed to initialise BNO055! Is the sensor connected?')
 
@@ -54,6 +69,9 @@ class Bno055InterfaceNode(object):
                        "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
                        "Gyroscope ID: 0x%02X\n"), self.sw_v,
                       self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
+
+        rospy.loginfo('Initialized in %s mode.', mode_name)
+
         self.talker()
 
     def init_publishers(self):

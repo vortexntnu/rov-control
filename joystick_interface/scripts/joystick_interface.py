@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from vortex_msgs.msg import PropulsionCommand, Manipulator
+from vortex_msgs.msg import PropulsionCommand, Manipulator, StampedHeartbeat
 from sensor_msgs.msg import Joy
 
 
@@ -15,6 +15,10 @@ class JoystickInterfaceNode(object):
         self.pub_manipulator = rospy.Publisher('manipulator_command',
                                                Manipulator,
                                                queue_size=1)
+                                               queue_size=10)
+        self.pub_heartbeat = rospy.Publisher('joystick_heartbeat',
+                                             StampedHeartbeat,
+                                             queue_size=10)
 
         # Name buttons and axes based on index from joy-node
         self.buttons_map = ['A', 'B', 'X', 'Y', 'LB', 'RB', 'back',
@@ -30,6 +34,15 @@ class JoystickInterfaceNode(object):
         self.agar_state = False
         self.agar_msg_curr = False
         self.agar_msg_prev = False
+        self.heartbeat()
+
+    # Publish a heartbeat to let other nodes know the joystick interface is alive
+    def heartbeat(self):
+        heartbeat_msg = StampedHeartbeat()
+        while not rospy.is_shutdown():
+            heartbeat_msg.stamp = rospy.get_rostime()
+            self.pub_heartbeat.publish(heartbeat_msg)
+            rospy.Rate(2).sleep()
 
     def callback(self, msg):
         # Connect values to names in two dictionaries

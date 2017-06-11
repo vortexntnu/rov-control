@@ -4,7 +4,7 @@ from math import isnan, isinf
 from numpy import interp
 import rospy
 
-from vortex_msgs.msg import Float64ArrayStamped, Pwm
+from vortex_msgs.msg import Float64ArrayStamped, Pwm, StampedHeartbeat
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 THRUST_RANGE_LIMIT = 100
@@ -21,8 +21,15 @@ class ThrusterInterface(object):
     def __init__(self):
         rospy.init_node('thruster_interface', anonymous=False)
         self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
-        self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
-        self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
+        self.sub = rospy.Subscriber('thruster_forces',
+                                    Float64ArrayStamped,
+                                    self.callback)
+        self.srv = rospy.Service('/thruster_interface/thrusters_enable',
+                                 ThrustersEnable,
+                                 self.handle_thrusters_enable)
+        self.joystick_heartbeat_sub = rospy.Subscriber('joystick_heartbeat',
+                                                       StampedHeartbeat,
+                                                       self.heartbeat_callback)
 
         self.thrusters_enabled = True
 
@@ -39,7 +46,17 @@ class ThrusterInterface(object):
                 pwm_msg.positive_width_us.append(neutral_pulse_width)
             self.pub_pwm.publish(pwm_msg)
 
+    def heartbeat_callback(self, msg):
+        self.prev_heartbeat = msg.stamp
+
     def callback(self, msg):
+        if (rospy.get_rostime() - self.prev_heartbeat).to_sec() > 1.0:
+            # Too long between heartbeats! Joystick node is probably dead
+            rospy.logwarn('Joystick interface node not publishing heartbeat, ' \
+                         'setting thrusters to zero. Restart joystick_interface')
+            self.output_to_zero()
+            return
+
         if not self.healthy_message(msg):
             return
         thrust = list(msg.data)

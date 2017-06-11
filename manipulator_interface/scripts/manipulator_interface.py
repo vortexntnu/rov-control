@@ -115,7 +115,7 @@ class ManipulatorInterface(object):
             rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
             return False
 
-        if abs(msg.agar_direction) > 1:
+        if abs(msg.screw_direction) > 1:
             rospy.logwarn_throttle(1, 'Screwer command out of range. Ignoring message...')
             return False
 

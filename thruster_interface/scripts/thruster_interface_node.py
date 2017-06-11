@@ -52,8 +52,8 @@ class ThrusterInterface(object):
     def callback(self, msg):
         if (rospy.get_rostime() - self.prev_heartbeat).to_sec() > 1.0:
             # Too long between heartbeats! Joystick node is probably dead
-            rospy.logwarn('Joystick interface node not publishing heartbeat, ' \
-                         'setting thrusters to zero. Restart joystick_interface')
+            rospy.logwarn('Joystick interface node not publishing heartbeat, '
+                          'setting thrusters to zero. Restart joystick_interface')
             self.output_to_zero()
             return
 

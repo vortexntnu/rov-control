@@ -91,7 +91,7 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   bool orientation_invalid = (abs(orientation.norm() - 1) > MAX_QUAT_NORM_DEVIATION);
   if (isFucked(position) || isFucked(velocity) || orientation_invalid)
   {
-    ROS_WARN("Requested state not valid, ignoring...");
+    ROS_WARN_THROTTLE(1, "Invalid state estimate received, ignoring...");
     return;
   }
 

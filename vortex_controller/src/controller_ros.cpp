@@ -194,6 +194,34 @@ void Controller::spin()
         break;
       }
 
+      case ControlModes::HEADING_HOLD:
+      {
+        // Convert quaternion setpoint to euler angles (ZYX convention)
+        Eigen::Vector3d euler_state, euler_setpoint;
+        euler_state = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
+        euler_setpoint = orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
+
+        // Copy pitch and roll state to setpoint
+        euler_setpoint(1) = euler_state(1);
+        euler_setpoint(2) = euler_state(2);
+
+        // Convert euler setpoint back to quaternions
+        Eigen::Matrix3d R;
+        R = Eigen::AngleAxisd(euler_setpoint(0), Eigen::Vector3d::UnitZ())
+        * Eigen::AngleAxisd(euler_setpoint(1), Eigen::Vector3d::UnitY())
+        * Eigen::AngleAxisd(euler_setpoint(2), Eigen::Vector3d::UnitX());
+        Eigen::Quaterniond orientation_headinghold(R);
+
+        tau_staylevel = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, Eigen::VectorXd::Zero(6),
+                                                Eigen::Vector3d::Zero(), orientation_headinghold);
+
+        // Turn off openloop heading command
+        tau_openloop(3) = 0;
+
+        tau_command = tau_openloop + tau_staylevel;
+        break;
+      }
+
       default:
       {
         ROS_ERROR("Default control mode reached.");

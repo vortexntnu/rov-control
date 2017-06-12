@@ -20,7 +20,7 @@ class Ms5837InterfaceNode(object):
             Temperature,
             queue_size=10)
 
-        self.ms5837 = ms5837.MS5837(model=ms5837.MODEL_30BA, bus=2)
+        self.ms5837 = ms5837.MS5837(model=ms5837.MODEL_30BA)
         if not self.ms5837.init():
             rospy.logfatal('Failed to initialise MS5837! Is the sensor connected?')
         else:

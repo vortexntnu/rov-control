@@ -41,7 +41,7 @@ class JoystickInterfaceNode(object):
         manipulator_msg = Manipulator()
         manipulator_msg.claw_direction = axes['dpad_vertical']
         manipulator_msg.valve_direction = axes['dpad_horizontal']
-        manipulator_msg.screw_direction = buttons['start'] - buttons['back']
+        manipulator_msg.agar_direction = buttons['start'] - buttons['back']
 
         motion_msg = PropulsionCommand()
         motion_msg.motion = [

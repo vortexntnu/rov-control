@@ -10,4 +10,4 @@ int8 valve_direction
 
 # Agar screw
 # -1 for CCW, 0 for stop, and 1 for CW.
-int8 screw_direction
+int8 agar_direction

@@ -82,7 +82,7 @@ class ManipulatorInterface(object):
 
         self.claw_direction = msg.claw_direction
         self.valve_direction = msg.valve_direction
-        self.agar_direction = msg.screw_direction
+        self.agar_direction = msg.agar_direction
 
         if self.valve_direction == 0:
             self.valve_stepper.disable()
@@ -115,8 +115,8 @@ class ManipulatorInterface(object):
             rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
             return False
 
-        if abs(msg.screw_direction) > 1:
-            rospy.logwarn_throttle(1, 'Screwer command out of range. Ignoring message...')
+        if abs(msg.agar_direction) > 1:
+            rospy.logwarn_throttle(1, 'Agar screwer command out of range. Ignoring message...')
             return False
 
         return True

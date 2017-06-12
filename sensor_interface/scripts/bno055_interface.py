@@ -169,5 +169,7 @@ if __name__ == '__main__':
     try:
         imu_node = Bno055InterfaceNode()
         rospy.spin()
+    except IOError:
+        rospy.logerr('IOError caught, shutting down.')
     except rospy.ROSInterruptException:
         pass

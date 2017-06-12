@@ -56,5 +56,7 @@ if __name__ == '__main__':
     try:
         pressure_node = Ms5837InterfaceNode()
         rospy.spin()
+    except IOError:
+        rospy.logerr('IOError caught, shutting down.')
     except rospy.ROSInterruptException:
         pass

@@ -36,5 +36,7 @@ if __name__ == '__main__':
     try:
         pwm_node = Pca9685InterfaceNode()
         rospy.spin()
+    except IOError:
+        rospy.logerr('IOError caught, shutting down.')
     except rospy.ROSInterruptException:
         pass

@@ -55,6 +55,7 @@ class JoystickInterfaceNode(object):
 
         motion_msg.control_mode = [
             (buttons['A'] == 1),
+            (False),
             (buttons['B'] == 1),
             (buttons['X'] == 1),
             (buttons['Y'] == 1)

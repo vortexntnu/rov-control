@@ -40,11 +40,10 @@ propulsion:
       rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
 
 controller:
-  gains:
-    a: 0.0
-    b: 100.0
-    c: 20.0
   frequency: 10
+  position_gain: 0.0
+  attitude_gain: 0.0
+  velocity_gain: 0.0
 
 servo:
   angle_range_deg: 35

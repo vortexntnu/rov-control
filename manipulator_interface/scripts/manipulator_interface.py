@@ -54,15 +54,23 @@ class ManipulatorInterface(object):
     def spin(self):
         period = 60.0 / (STEPPER_NUM_STEPS * STEPPER_RPM)
         rate = rospy.Rate(1/period)
+        prev_time = rospy.get_rostime()
+        min_pwm_interval = rospy.Duration(0.1)
+
         while not rospy.is_shutdown():
             # Accumulate claw position
             self.claw_position += self.claw_speed * period * self.claw_direction
             # Saturate claw position to [-1, 1]
             self.claw_position = clip(self.claw_position, -1, 1)
 
-            self.set_claw_pwm(self.claw_position)
             self.valve_stepper.step(self.valve_direction)
             self.agar_stepper.step(self.agar_direction)
+
+            # Avoid too frequent PWM commands
+            if (rospy.get_rostime() - prev_time) > min_pwm_interval:
+                self.set_claw_pwm(self.claw_position)
+                prev_time = rospy.get_rostime()
+
             rate.sleep()
 
     def servo_set_to_zero(self):

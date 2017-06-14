@@ -72,6 +72,11 @@ class Bno055InterfaceNode(object):
 
         rospy.loginfo('Initialized in %s mode.', mode_name)
 
+        self.bno.set_axis_remap(
+            BNO055.AXIS_REMAP_X, BNO055.AXIS_REMAP_Y, BNO055.AXIS_REMAP_Z,
+            BNO055.AXIS_REMAP_POSITIVE, BNO055.AXIS_REMAP_POSITIVE, BNO055.AXIS_REMAP_POSITIVE)
+        rospy.loginfo('IMU axis config is {0}'.format(self.bno.get_axis_remap()))
+
         self.talker()
 
     def init_publishers(self):

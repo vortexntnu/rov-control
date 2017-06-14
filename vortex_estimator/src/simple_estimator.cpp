@@ -1,5 +1,8 @@
 #include "vortex_estimator/simple_estimator.h"
 
+#include <eigen_conversions/eigen_msg.h>
+#include <Eigen/Dense>
+
 SimpleEstimator::SimpleEstimator()
 {
   imu_sub      = nh.subscribe("/sensors/imu/data", 10, &SimpleEstimator::imuCallback, this);
@@ -25,7 +28,25 @@ SimpleEstimator::SimpleEstimator()
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
 {
-  state.pose.pose.orientation = msg.orientation;
+  // IMU orientation is in north-west-up
+  // Must rotate to give orientation in north-east-down
+
+  // Rotation from ROV north-west-up frame to IMU
+  Eigen::Quaterniond q_nwu_imu;
+  tf::quaternionMsgToEigen(msg.orientation, q_nwu_imu);
+  Eigen::Matrix3d R_nwu_imu = q_nwu_imu.toRotationMatrix();
+
+  // Rotation from north-west-up to north-east-down
+  Eigen::Matrix3d R_ned_nwu;
+  R_ned_nwu << 1.0,  0.0,  0.0,
+               0.0, -1.0,  0.0,
+               0.0,  0.0, -1.0;
+
+  // Rotation from north-east-down to imu
+  Eigen::Matrix3d R_ned_imu = R_ned_nwu * R_ned_imu;
+  Eigen::Quaterniond q_ned_imu(R_ned_imu);
+
+  tf::quaternionEigenToMsg(q_ned_imu, state.pose.pose.orientation);
   state_pub.publish(state);
 }
 

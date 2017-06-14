@@ -66,8 +66,8 @@ class ThrusterInterface(object):
 
         self.prev_time = curr_time
 
-        thrust_setpoint_list = msg.data
-        self.thrust_setpoint = thrust_setpoint_list
+        thrust_setpoint_tuple = msg.data
+        self.thrust_setpoint = list(thrust_setpoint_tuple)
 
         self.update_reference(dt)
         self.set_pwm()

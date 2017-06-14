@@ -18,6 +18,7 @@ class Pca9685InterfaceNode(object):
         self.pca9685 = Adafruit_PCA9685.PCA9685()
         self.pca9685.set_pwm_freq(FREQUENCY)
         self.pca9685.set_all_pwm(0, 0)
+        self.current_pwm = [0]*16
 
         self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=10)
         rospy.loginfo("Ready for PWM messages")
@@ -25,7 +26,9 @@ class Pca9685InterfaceNode(object):
     def callback(self, msg):
         if len(msg.pins) == len(msg.positive_width_us):
             for i in range(len(msg.pins)):
-                self.pca9685.set_pwm(msg.pins[i], PWM_ON, self.microsecs_to_bits(msg.positive_width_us[i]))
+                if msg.positive_width_us[i] != self.current_pwm[msg.pins[i]]:
+                    self.pca9685.set_pwm(msg.pins[i], PWM_ON, self.microsecs_to_bits(msg.positive_width_us[i]))
+                    self.current_pwm[msg.pins[i]] = msg.positive_width_us[i]
 
     def microsecs_to_bits(self, microsecs):
         duty_cycle_normalized = microsecs / PERIOD_LENGTH_IN_MICROSECONDS

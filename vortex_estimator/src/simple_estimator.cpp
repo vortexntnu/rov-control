@@ -15,6 +15,11 @@ SimpleEstimator::SimpleEstimator()
   if (!nh.getParam("/gravity/acceleration", gravitational_acceleration))
     ROS_ERROR("Could not read parameter gravititional acceleration.");
 
+  state.pose.pose.orientation.w = 1.0;
+  state.pose.pose.orientation.x = 0.0;
+  state.pose.pose.orientation.y = 0.0;
+  state.pose.pose.orientation.z = 0.0;
+
   ROS_INFO("Node initialized.");
 }
 

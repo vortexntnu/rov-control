@@ -28,6 +28,8 @@ class SimpleEstimator
     double water_density;
     double gravitational_acceleration;
 
+    const double PI = 3.141592653589793;
+
     nav_msgs::Odometry state;
 };
 

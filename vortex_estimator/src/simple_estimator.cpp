@@ -28,25 +28,23 @@ SimpleEstimator::SimpleEstimator()
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
 {
-  // IMU orientation is in north-west-up
-  // Must rotate to give orientation in north-east-down
+  // Rotation measured by IMU
+  Eigen::Quaterniond quat_imu;
+  tf::quaternionMsgToEigen(msg.orientation, quat_imu);
+  Eigen::Vector3d euler_imu = quat_imu.toRotationMatrix().eulerAngles(2, 1, 0);
 
-  // Rotation from ROV north-west-up frame to IMU
-  Eigen::Quaterniond q_nwu_imu;
-  tf::quaternionMsgToEigen(msg.orientation, q_nwu_imu);
-  Eigen::Matrix3d R_nwu_imu = q_nwu_imu.toRotationMatrix();
+  // Alter IMU measurements to Z down, Y right, X forward
+  Eigen::Vector3d euler_ned(-euler_imu(0), euler_imu(2) + PI, euler_imu(1) + PI);
 
-  // Rotation from north-west-up to north-east-down
-  Eigen::Matrix3d R_ned_nwu;
-  R_ned_nwu << 1.0,  0.0,  0.0,
-               0.0, -1.0,  0.0,
-               0.0,  0.0, -1.0;
+  // Transform back to quaternion
+  Eigen::Matrix3d R_ned;
+  R_ned = Eigen::AngleAxisd(euler_ned(0), Eigen::Vector3d::UnitZ())
+        * Eigen::AngleAxisd(euler_ned(1), Eigen::Vector3d::UnitY())
+        * Eigen::AngleAxisd(euler_ned(2), Eigen::Vector3d::UnitX());
+  Eigen::Quaterniond quat_ned;
 
-  // Rotation from north-east-down to imu
-  Eigen::Matrix3d R_ned_imu = R_ned_nwu * R_ned_imu;
-  Eigen::Quaterniond q_ned_imu(R_ned_imu);
-
-  tf::quaternionEigenToMsg(q_ned_imu, state.pose.pose.orientation);
+  // Convert to quaternion message and publish
+  tf::quaternionEigenToMsg(quat_ned, state.pose.pose.orientation);
   state_pub.publish(state);
 }
 

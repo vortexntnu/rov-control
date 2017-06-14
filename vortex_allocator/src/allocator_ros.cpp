@@ -50,7 +50,7 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse);
 
-  ROS_INFO("Node initialized.");
+  ROS_INFO("Initialized.");
 }
 
 void Allocator::callback(const geometry_msgs::Wrench &msg)

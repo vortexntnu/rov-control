@@ -48,7 +48,7 @@ class ManipulatorInterface(object):
                            'Shutting down node...')
             rospy.signal_shutdown('')
 
-        rospy.loginfo('Node initialized.')
+        rospy.loginfo('Initialized.')
         self.spin()
 
     def spin(self):

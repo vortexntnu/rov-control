@@ -5,7 +5,6 @@
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "allocator");
-  ROS_INFO("Launching node.");
   ros::NodeHandle nh;
   Allocator allocator(nh);
   ros::spin();

@@ -23,7 +23,7 @@ SimpleEstimator::SimpleEstimator()
   state.pose.pose.orientation.y = 0.0;
   state.pose.pose.orientation.z = 0.0;
 
-  ROS_INFO("Node initialized.");
+  ROS_INFO("Initialized.");
 }
 
 void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)

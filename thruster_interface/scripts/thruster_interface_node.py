@@ -37,7 +37,7 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
-        rospy.loginfo('Node initialized.')
+        rospy.loginfo('Initialized.')
 
     def output_to_zero(self):
         neutral_pulse_width = self.thrust_to_microsecs(0)

@@ -21,7 +21,7 @@ class Pca9685InterfaceNode(object):
         self.current_pwm = [0]*16
 
         self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=10)
-        rospy.loginfo("Ready for PWM messages")
+        rospy.loginfo('Initialized.')
 
     def callback(self, msg):
         if len(msg.pins) == len(msg.positive_width_us):

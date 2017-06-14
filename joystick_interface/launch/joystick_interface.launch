@@ -3,6 +3,7 @@
 
   <param name="joy/deadzone" value="0.2"/>
 
-  <node pkg="joy"                name="joy"                type="joy_node"               output="screen"/>
+  <node pkg="joy"                name="joy"                type="joy_node"              output="screen"/>
+  <node pkg="topic_tools"        name="joy_throttler"      type="throttle"              args="messages /joy 20 /joy_throttled" output="screen"/>
   <node pkg="joystick_interface" name="joystick_interface" type="joystick_interface.py" output="screen"/>
 </launch>

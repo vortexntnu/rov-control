@@ -1,6 +1,7 @@
 <launch>
   <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
   <rosparam command="load" file="$(find vortex)/config/robots/terrapin.yaml" />
+  <param name="stepper/default_speed_rpm" type="int" value="15" />
   <param name="computer" value="pc-debug" />
   <node name="manipulator_interface" pkg="manipulator_interface" type="manipulator_interface.py" output="screen"/>
 </launch>

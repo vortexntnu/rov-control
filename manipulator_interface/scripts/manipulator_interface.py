@@ -6,6 +6,8 @@ import rospy
 from vortex_msgs.msg import Manipulator, Pwm
 from stepper import Stepper
 
+COMPUTER = rospy.get_param('/computer')
+
 SERVO_PWM_PIN = rospy.get_param('/pwm/pins/claw_servo')
 LOOKUP_POSITION = rospy.get_param('/servo/lookup/position')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/servo/lookup/pulse_width')
@@ -36,15 +38,19 @@ class ManipulatorInterface(object):
         self.claw_speed = 0.5
 
         try:
-            self.valve_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_VALVE_PINS, STEPPER_VALVE_ENABLE_PIN)
-            self.valve_stepper.set_speed(STEPPER_RPM)
+            self.valve_stepper = Stepper(STEPPER_NUM_STEPS,
+                                         STEPPER_VALVE_PINS,
+                                         STEPPER_VALVE_ENABLE_PIN,
+                                         COMPUTER)
             self.valve_direction = 0
 
-            self.agar_stepper = Stepper(STEPPER_NUM_STEPS, STEPPER_AGAR_PINS, STEPPER_AGAR_ENABLE_PIN)
-            self.agar_stepper.set_speed(STEPPER_RPM)
+            self.agar_stepper = Stepper(STEPPER_NUM_STEPS,
+                                        STEPPER_AGAR_PINS,
+                                        STEPPER_AGAR_ENABLE_PIN,
+                                        COMPUTER)
             self.agar_direction = 0
         except NameError:
-            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly?'
+            rospy.logfatal('Could not initialize stepper.py. Is /computer parameter set correctly? '
                            'Shutting down node...')
             rospy.signal_shutdown('')
 
@@ -63,8 +69,8 @@ class ManipulatorInterface(object):
             # Saturate claw position to [-1, 1]
             self.claw_position = clip(self.claw_position, -1, 1)
 
-            self.valve_stepper.step(self.valve_direction)
-            self.agar_stepper.step(self.agar_direction)
+            self.valve_stepper.step_once(self.valve_direction)
+            self.agar_stepper.step_once(self.agar_direction)
 
             # Avoid too frequent PWM commands
             if (rospy.get_rostime() - prev_time) > min_pwm_interval:

@@ -213,7 +213,7 @@ void Controller::spin()
           * Eigen::AngleAxisd(euler_setpoint(EULER_ROLL),  Eigen::Vector3d::UnitX());
         Eigen::Quaterniond orientation_headinghold(R);
 
-        tau_headinghold = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, Eigen::VectorXd::Zero(6),
+        tau_headinghold = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
                                                   Eigen::Vector3d::Zero(), orientation_headinghold);
 
         // Turn off heading hold pitch and roll commands

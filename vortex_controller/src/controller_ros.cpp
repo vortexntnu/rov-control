@@ -181,11 +181,12 @@ void Controller::spin()
         if (abs(tau_openloop(WRENCH_HEAVE)) > FORCE_DEADZONE_LIMIT)
           position_setpoint(POSITION_HEAVE) = position_state(POSITION_HEAVE);
 
-        tau_depthhold = controller->getFeedback(position_state,
-                                                Eigen::Quaterniond::Identity(),
-                                                Eigen::VectorXd::Zero(6),
-                                                position_setpoint,
-                                                Eigen::Quaterniond::Identity());
+        tau_depthhold = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
+                                                position_setpoint, Eigen::Quaterniond::Identity());
+
+        // Turn off depth hold pitch and roll commands
+        tau_depthhold(WRENCH_PITCH) = 0;
+        tau_depthhold(WRENCH_ROLL)  = 0;
 
         tau_command = tau_openloop + tau_depthhold;
         break;

@@ -33,7 +33,7 @@ private:
   dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig> dr_srv;
 
   ControlMode control_mode;
-  int  frequency;
+  int frequency;
   const double FORCE_DEADZONE_LIMIT = 0.01;
 
   State                  *state;

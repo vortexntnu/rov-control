@@ -13,19 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 
-import rospy
-
-COMPUTER = rospy.get_param('/computer')
-if COMPUTER == 'raspberry':
-    import RPi.GPIO as GPIO
-    GPIO.setmode(GPIO.BCM)
-elif COMPUTER == 'beaglebone':
-    import Adafruit_BBIO.GPIO as GPIO
-elif COMPUTER == 'pc-debug':
-    print('stepper.py: Starting in PC debug mode, no stepper connected.')
-else:
-    print('stepper.py: Invalid COMPUTER!')
-
 MICROSEC_PER_SEC = 1000 * 1000
 STEPPER_PIN_VALUES = [[1, 0, 1, 0],
                       [0, 1, 1, 0],
@@ -38,12 +25,23 @@ def curr_time_in_microsec():
 
 
 class Stepper():
-    def __init__(self, number_of_steps, pins, disable_pin):
+    def __init__(self, number_of_steps, pins, disable_pin, computer):
         """"Initialize 4-pin stepper motor.
 
         number_of_steps -- number of steps per revolution
         pins -- list of pin IDs for the stepper pins used (e.g. "P9_01")
         """
+        self.computer = computer
+        if self.computer == 'raspberry':
+            import RPi.GPIO as GPIO
+            GPIO.setmode(GPIO.BCM)
+        elif self.computer == 'beaglebone':
+            import Adafruit_BBIO.GPIO as GPIO
+        elif self.computer == 'pc-debug':
+            print('stepper.py: Starting in PC debug mode, no stepper connected.')
+        else:
+            print('stepper.py: Invalid computer!')
+
         self.curr_step = 0
         self.direction = 0
         self.last_step_time = curr_time_in_microsec()
@@ -51,7 +49,7 @@ class Stepper():
 
         self.pins = pins
         self.disable_pin = disable_pin
-        if COMPUTER != 'pc-debug':
+        if self.computer != 'pc-debug':
             for pin in pins:
                 GPIO.setup(pin, GPIO.OUT)
             GPIO.setup(disable_pin, GPIO.OUT)
@@ -102,16 +100,18 @@ class Stepper():
                     GPIO.output(self.pins[i], GPIO.LOW)
                 else:
                     rospy.logwarn('Invalid output pin value.')
+        elif self.computer == 'pc-debug':
+            print('Stepping: {0}'.format(STEPPER_PIN_VALUES[self.curr_step % 4]))
 
     def enable(self):
-        if COMPUTER != 'pc-debug':
+        if self.computer != 'pc-debug':
             GPIO.output(self.disable_pin, GPIO.HIGH)
 
     def disable(self):
-        if COMPUTER != 'pc-debug':
+        if self.computer != 'pc-debug':
             GPIO.output(self.disable_pin, GPIO.LOW)
 
     def shutdown(self):
-        if COMPUTER != 'pc-debug':
+        if self.computer != 'pc-debug':
             print('stepper.py: Shutting down and cleaning GPIO pins.')
             GPIO.cleanup()

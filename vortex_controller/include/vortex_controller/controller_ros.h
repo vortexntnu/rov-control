@@ -36,6 +36,21 @@ private:
   int frequency;
   const double FORCE_DEADZONE_LIMIT = 0.01;
 
+  const uint8_t WRENCH_SURGE = 0;
+  const uint8_t WRENCH_SWAY  = 1;
+  const uint8_t WRENCH_HEAVE = 2;
+  const uint8_t WRENCH_ROLL  = 3;
+  const uint8_t WRENCH_PITCH = 4;
+  const uint8_t WRENCH_YAW   = 5;
+
+  const uint8_t POSITION_SURGE = 0;
+  const uint8_t POSITION_SWAY  = 1;
+  const uint8_t POSITION_HEAVE = 2;
+
+  const uint8_t EULER_YAW   = 0;
+  const uint8_t EULER_PITCH = 1;
+  const uint8_t EULER_ROLL  = 2;
+
   State                  *state;
   Setpoints              *setpoints;
   QuaternionPdController *controller;

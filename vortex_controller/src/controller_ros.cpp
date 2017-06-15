@@ -112,6 +112,7 @@ void Controller::spin()
   Eigen::Vector6d    tau_restoring        = Eigen::VectorXd::Zero(6);
   Eigen::Vector6d    tau_staylevel        = Eigen::VectorXd::Zero(6);
   Eigen::Vector6d    tau_depthhold        = Eigen::VectorXd::Zero(6);
+  Eigen::Vector6d    tau_headinghold      = Eigen::VectorXd::Zero(6);
 
   Eigen::Vector3d    position_state       = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_state    = Eigen::Quaterniond::Identity();
@@ -154,22 +155,22 @@ void Controller::spin()
         euler = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
 
         // Set pitch and roll setpoints to zero
-        euler(1) = 0;
-        euler(2) = 0;
+        euler(EULER_PITCH) = 0;
+        euler(EULER_ROLL)  = 0;
 
         // Convert euler setpoint back to quaternions
         Eigen::Matrix3d R;
-        R = Eigen::AngleAxisd(euler(0), Eigen::Vector3d::UnitZ())
-        * Eigen::AngleAxisd(euler(1), Eigen::Vector3d::UnitY())
-        * Eigen::AngleAxisd(euler(2), Eigen::Vector3d::UnitX());
+        R = Eigen::AngleAxisd(euler(EULER_YAW),   Eigen::Vector3d::UnitZ())
+          * Eigen::AngleAxisd(euler(EULER_PITCH), Eigen::Vector3d::UnitY())
+          * Eigen::AngleAxisd(euler(EULER_ROLL),  Eigen::Vector3d::UnitX());
         Eigen::Quaterniond orientation_staylevel(R);
 
         tau_staylevel = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
                                                 Eigen::Vector3d::Zero(), orientation_staylevel);
 
         // Turn off openloop roll and pitch commands
-        tau_openloop(3) = 0;
-        tau_openloop(4) = 0;
+        tau_openloop(WRENCH_ROLL)  = 0;
+        tau_openloop(WRENCH_PITCH) = 0;
 
         tau_command = tau_openloop + tau_staylevel;
         break;
@@ -177,9 +178,9 @@ void Controller::spin()
 
       case ControlModes::DEPTH_HOLD:
       {
-        // Reset depth setpoint if nonzero depth motion command
-        if (abs(tau_openloop(2)) > FORCE_DEADZONE_LIMIT)
-          position_setpoint(2) = position_state(2);
+        // Reset heave setpoint if nonzero heave motion command
+        if (abs(tau_openloop(WRENCH_HEAVE)) > FORCE_DEADZONE_LIMIT)
+          position_setpoint(POSITION_HEAVE) = position_state(POSITION_HEAVE);
 
         tau_depthhold = controller->getFeedback(position_state,
                                                 Eigen::Quaterniond::Identity(),
@@ -193,27 +194,32 @@ void Controller::spin()
 
       case ControlModes::HEADING_HOLD:
       {
+        // Reset orientation setpoint if nonzero yaw motion command
+        if (abs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT)
+          orientation_setpoint = orientation_state;
+
         // Convert quaternion setpoint to euler angles (ZYX convention)
         Eigen::Vector3d euler_state, euler_setpoint;
         euler_state = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
         euler_setpoint = orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
 
         // Copy pitch and roll state to setpoint
-        euler_setpoint(1) = euler_state(1);
-        euler_setpoint(2) = euler_state(2);
+        euler_setpoint(EULER_PITCH) = euler_state(EULER_PITCH);
+        euler_setpoint(EULER_ROLL)  = euler_state(EULER_ROLL);
 
         // Convert euler setpoint back to quaternions
         Eigen::Matrix3d R;
-        R = Eigen::AngleAxisd(euler_setpoint(0), Eigen::Vector3d::UnitZ())
-        * Eigen::AngleAxisd(euler_setpoint(1), Eigen::Vector3d::UnitY())
-        * Eigen::AngleAxisd(euler_setpoint(2), Eigen::Vector3d::UnitX());
+        R = Eigen::AngleAxisd(euler_setpoint(EULER_YAW),   Eigen::Vector3d::UnitZ())
+          * Eigen::AngleAxisd(euler_setpoint(EULER_PITCH), Eigen::Vector3d::UnitY())
+          * Eigen::AngleAxisd(euler_setpoint(EULER_ROLL),  Eigen::Vector3d::UnitX());
         Eigen::Quaterniond orientation_headinghold(R);
 
         tau_headinghold = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, Eigen::VectorXd::Zero(6),
                                                   Eigen::Vector3d::Zero(), orientation_headinghold);
 
-        // Turn off openloop heading command
-        tau_openloop(3) = 0;
+        // Turn off heading hold pitch and roll commands
+        tau_headinghold(WRENCH_ROLL)  = 0;
+        tau_headinghold(WRENCH_PITCH) = 0;
 
         tau_command = tau_openloop + tau_headinghold;
         break;

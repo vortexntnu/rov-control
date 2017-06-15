@@ -36,8 +36,6 @@ private:
   int  frequency;
   const double FORCE_DEADZONE_LIMIT = 0.01;
 
-  double heave_offset = 0;
-
   State                  *state;
   Setpoints              *setpoints;
   QuaternionPdController *controller;

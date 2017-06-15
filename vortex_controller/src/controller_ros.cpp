@@ -103,9 +103,6 @@ void Controller::configCallback(const vortex_controller::VortexControllerConfig 
   ROS_INFO_STREAM("Setting gains: [velocity = " << config.velocity_gain << ", position = " << config.position_gain
     << ", attitude = " << config.attitude_gain << "]");
   controller->setGains(config.velocity_gain, config.position_gain, config.attitude_gain);
-
-  ROS_INFO_STREAM("Setting heave_offset = " << config.heave_offset << " N.");
-  heave_offset = config.heave_offset;
 }
 
 void Controller::spin()
@@ -228,9 +225,6 @@ void Controller::spin()
         break;
       }
     }
-
-    // Add heave offset
-    tau_command(2) += heave_offset;
 
     geometry_msgs::Wrench msg;
     tf::wrenchEigenToMsg(tau_command, msg);

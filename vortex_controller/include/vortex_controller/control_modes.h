@@ -11,7 +11,8 @@ enum ControlMode
   OPEN_LOOP_RESTORING = 1,
   STAY_LEVEL          = 2,
   DEPTH_HOLD          = 3,
-  HEADING_HOLD        = 4
+  HEADING_HOLD        = 4,
+  DEPTH_HEADING_HOLD  = 5
 };
 }  // namespace ControlModes
 typedef ControlModes::ControlMode ControlMode;

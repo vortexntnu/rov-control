@@ -212,13 +212,13 @@ void Controller::spin()
         * Eigen::AngleAxisd(euler_setpoint(2), Eigen::Vector3d::UnitX());
         Eigen::Quaterniond orientation_headinghold(R);
 
-        tau_staylevel = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, Eigen::VectorXd::Zero(6),
-                                                Eigen::Vector3d::Zero(), orientation_headinghold);
+        tau_headinghold = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, Eigen::VectorXd::Zero(6),
+                                                  Eigen::Vector3d::Zero(), orientation_headinghold);
 
         // Turn off openloop heading command
         tau_openloop(3) = 0;
 
-        tau_command = tau_openloop + tau_staylevel;
+        tau_command = tau_openloop + tau_headinghold;
         break;
       }
 

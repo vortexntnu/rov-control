@@ -25,7 +25,9 @@ class Stepper():
         """"Initialize 4-pin stepper motor.
 
         number_of_steps -- number of steps per revolution
-        pins -- list of pin IDs for the stepper pins used (e.g. "P9_01")
+        pins -- list of pin IDs for the stepper pins used (e.g. 'P9_01')
+        disable_pin -- pin ID for stepper disable pin (disabled when low)
+        computer -- string identifier for computer type
         """
         self.computer = computer
         if self.computer == 'raspberry':

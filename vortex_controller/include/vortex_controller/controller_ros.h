@@ -35,6 +35,7 @@ private:
   ControlMode control_mode;
   int frequency;
   const double FORCE_DEADZONE_LIMIT = 0.01;
+  const double MAX_QUAT_NORM_DEVIATION = 0.1;
 
   const uint8_t WRENCH_SURGE = 0;
   const uint8_t WRENCH_SWAY  = 1;

@@ -87,7 +87,6 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
   tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
   tf::twistMsgToEigen(msg.twist.twist, velocity);
 
-  const double MAX_QUAT_NORM_DEVIATION = 0.1;
   bool orientation_invalid = (abs(orientation.norm() - 1) > MAX_QUAT_NORM_DEVIATION);
   if (isFucked(position) || isFucked(velocity) || orientation_invalid)
   {

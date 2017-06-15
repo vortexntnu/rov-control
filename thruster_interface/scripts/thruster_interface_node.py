@@ -43,7 +43,16 @@ class ThrusterInterface(object):
         if not self.healthy_message(msg):
             return
         thrust = list(msg.data)
-        self.set_pwm(thrust)
+
+        microsecs = [None] * NUM_THRUSTERS
+        pwm_msg = Pwm()
+
+        for i in range(NUM_THRUSTERS):
+            microsecs[i] = self.thrust_to_microsecs(thrust[i] + THRUST_OFFSET[i])
+            pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
+            pwm_msg.positive_width_us.append(microsecs[i])
+        if THRUSTERS_CONNECTED and self.thrusters_enabled:
+            self.pub_pwm.publish(pwm_msg)
 
     def handle_thrusters_enable(self, req):
         if req.thrusters_enable:
@@ -57,17 +66,6 @@ class ThrusterInterface(object):
 
     def thrust_to_microsecs(self, thrust):
         return interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
-
-    def set_pwm(self, thrust):
-        microsecs = [None] * NUM_THRUSTERS
-        pwm_msg = Pwm()
-
-        for i in range(NUM_THRUSTERS):
-            microsecs[i] = self.thrust_to_microsecs(thrust[i] + THRUST_OFFSET[i])
-            pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
-            pwm_msg.positive_width_us.append(microsecs[i])
-        if THRUSTERS_CONNECTED and self.thrusters_enabled:
-            self.pub_pwm.publish(pwm_msg)
 
     def healthy_message(self, msg):
         if (len(msg.data) != NUM_THRUSTERS):

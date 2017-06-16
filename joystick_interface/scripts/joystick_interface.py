@@ -55,11 +55,11 @@ class JoystickInterfaceNode(object):
 
         motion_msg.control_mode = [
             (buttons['A'] == 1),
-            (False),
-            (False),
-            (buttons['B'] == 1),
             (buttons['X'] == 1),
-            (buttons['Y'] == 1)
+            (buttons['B'] == 1),
+            (buttons['Y'] == 1),
+            (False),
+            (False)
         ]
 
         motion_msg.header.stamp = rospy.get_rostime()

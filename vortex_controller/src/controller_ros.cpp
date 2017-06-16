@@ -240,21 +240,27 @@ bool Controller::healthyMessage(const vortex_msgs::PropulsionCommand& msg)
   {
     if (msg.motion[i] > 1 || msg.motion[i] < -1)
     {
-      ROS_WARN("Motion command out of range.");
+      ROS_WARN("Motion command out of range, ignoring message...");
       return false;
     }
   }
 
-  // Check that exactly one control mode is requested
+  // Check correct length of control mode vector
+  if (msg.control_mode.size() != ControlModes::CONTROL_MODE_END)
+  {
+    ROS_WARN_STREAM_THROTTLE(1, "Control mode vector has " << msg.control_mode.size()
+      << " element(s), should have " << ControlModes::CONTROL_MODE_END);
+    return false;
+  }
+
+  // Check that exactly zero or one control mode is requested
   int num_requested_modes = 0;
   for (int i = 0; i < msg.control_mode.size(); ++i)
     if (msg.control_mode[i])
       num_requested_modes++;
-
   if (num_requested_modes > 1)
   {
-    ROS_WARN_STREAM("Invalid control mode. Attempt to set "
-                    << num_requested_modes << " control modes at once.");
+    ROS_WARN_STREAM("Attempt to set " << num_requested_modes << " control modes at once, ignoring message...");
     return false;
   }
 

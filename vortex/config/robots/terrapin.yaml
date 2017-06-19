@@ -70,7 +70,7 @@ pwm:
     claw_servo: 9
   frequency:
     set: 50.0
-    measured: 51.5
+    measured: 51.6
   counter:
     max: 4095
 

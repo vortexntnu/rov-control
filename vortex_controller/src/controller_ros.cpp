@@ -315,8 +315,12 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
   Eigen::Vector6d tau = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
                                                 position_setpoint_copy, Eigen::Quaterniond::Identity());
 
+  tau(WRENCH_SURGE) = 0;
+  tau(WRENCH_SWAY)  = 0;
+  // Allow HEAVE
   tau(WRENCH_ROLL)  = 0;
   tau(WRENCH_PITCH) = 0;
+  tau(WRENCH_YAW)   = 0;
 
   return tau;
 }
@@ -327,6 +331,7 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
                                         const Eigen::Quaterniond &orientation_setpoint)
 {
   Eigen::Quaterniond orientation_setpoint_copy = orientation_setpoint;
+
   // Reset orientation setpoint if nonzero yaw motion command
   if (abs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT)
     orientation_setpoint_copy = orientation_state;
@@ -350,8 +355,12 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   Eigen::Vector6d tau =  controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
                                                  Eigen::Vector3d::Zero(), orientation_headinghold);
 
+  tau(WRENCH_SURGE) = 0;
+  tau(WRENCH_SWAY)  = 0;
+  tau(WRENCH_HEAVE) = 0;
   tau(WRENCH_ROLL)  = 0;
   tau(WRENCH_PITCH) = 0;
+  // Allow YAW
 
   return tau;
 }

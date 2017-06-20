@@ -333,7 +333,8 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   Eigen::Quaterniond orientation_setpoint_copy = orientation_setpoint;
 
   // Reset orientation setpoint if nonzero yaw motion command
-  if (abs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT)
+  if (fabs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT)
+  {
     orientation_setpoint_copy = orientation_state;
 
   // Convert quaternion setpoint to euler angles (ZYX convention)

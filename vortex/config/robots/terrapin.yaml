@@ -55,10 +55,10 @@ stepper:
   default_speed_rpm: 15
   steps_per_rev: 200
   pins:
-    valve: ['P8_28', 'P8_30', 'P8_27', 'P8_29']
-    agar:  ['P8_32', 'P8_34', 'P8_31', 'P8_33']
-    valve_enable: 'P8_46'
-    agar_enable:  'P8_44'
+    agar:  ['P8_28', 'P8_30', 'P8_27', 'P8_29']
+    valve: ['P8_32', 'P8_34', 'P8_31', 'P8_33']
+    agar_enable:  'P8_46'
+    valve_enable: 'P8_44'
 
 computer: 'beaglebone'
 

@@ -129,14 +129,15 @@ class Bno055InterfaceNode(object):
             x, y, z, w = self.bno.read_quaternion()
             heading, roll, pitch = self.bno.read_euler()
             mag_x, mag_y, mag_z = self.bno.read_magnetometer()
-            temp = self.bno.read_temp()
+            temperature = self.bno.read_temp()
 
             imu_msg.header.stamp = rospy.get_rostime()
             imu_msg.orientation = Quaternion(x, y, z, w)
             imu_euler_msg.header.stamp = rospy.get_rostime()
             imu_euler_msg.vector = Vector3(heading, roll, pitch)
             imu_temp_msg.header.stamp = rospy.get_rostime()
-            imu_temp_msg.temperature = temp
+            imu_temp_msg.temperature = temperature
+
             imu_mag_msg.header.stamp = rospy.get_rostime()
             imu_mag_msg.magnetic_field = Vector3(mag_x, mag_y, mag_z)
             imu_diag_msg = self.get_diagnostic()

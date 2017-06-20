@@ -39,6 +39,7 @@ class Stepper():
             print('stepper.py: Starting in PC debug mode, no stepper connected.')
         else:
             print('stepper.py: Invalid computer!')
+        self.GPIO = GPIO
 
         self.curr_step = 0
         self.number_of_steps = number_of_steps
@@ -47,8 +48,8 @@ class Stepper():
         self.disable_pin = disable_pin
         if self.computer != 'pc-debug':
             for pin in pins:
-                GPIO.setup(pin, GPIO.OUT)
-            GPIO.setup(disable_pin, GPIO.OUT)
+                self.GPIO.setup(pin, self.GPIO.OUT)
+            self.GPIO.setup(disable_pin, self.GPIO.OUT)
 
     def step_once(self, direction):
         """"Step motor once in given direction."""
@@ -70,13 +71,13 @@ class Stepper():
 
     def enable(self):
         if self.computer != 'pc-debug':
-            GPIO.output(self.disable_pin, GPIO.HIGH)
+            self.GPIO.output(self.disable_pin, self.GPIO.LOW)
 
     def disable(self):
         if self.computer != 'pc-debug':
-            GPIO.output(self.disable_pin, GPIO.LOW)
+            self.GPIO.output(self.disable_pin, self.GPIO.HIGH)
 
     def shutdown(self):
         if self.computer != 'pc-debug':
             print('stepper.py: Shutting down and cleaning GPIO pins.')
-            GPIO.cleanup()
+            self.GPIO.cleanup()

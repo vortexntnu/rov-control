@@ -307,20 +307,25 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
                                       const Eigen::Vector6d &velocity_state,
                                       const Eigen::Vector3d &position_setpoint)
 {
-  Eigen::Vector3d position_setpoint_copy = position_setpoint;
-  // Reset heave setpoint if nonzero heave motion command
-  if (abs(tau_openloop(WRENCH_HEAVE)) > FORCE_DEADZONE_LIMIT)
-    position_setpoint_copy(POSITION_HEAVE) = position_state(POSITION_HEAVE);
+  Eigen::Vector6d tau;
 
-  Eigen::Vector6d tau = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
-                                                position_setpoint_copy, Eigen::Quaterniond::Identity());
+  bool activate_depthhold = fabs(tau_openloop(WRENCH_HEAVE)) > FORCE_DEADZONE_LIMIT;
+  if (activate_depthhold)
+  {
+    tau = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
+                                  position_setpoint, Eigen::Quaterniond::Identity());
 
-  tau(WRENCH_SURGE) = 0;
-  tau(WRENCH_SWAY)  = 0;
-  // Allow HEAVE
-  tau(WRENCH_ROLL)  = 0;
-  tau(WRENCH_PITCH) = 0;
-  tau(WRENCH_YAW)   = 0;
+    // Allow only heave feedback command
+    tau(WRENCH_SURGE) = 0;
+    tau(WRENCH_SWAY)  = 0;
+    tau(WRENCH_ROLL)  = 0;
+    tau(WRENCH_PITCH) = 0;
+    tau(WRENCH_YAW)   = 0;
+  }
+  else
+  {
+    tau.setZero();
+  }
 
   return tau;
 }
@@ -330,38 +335,25 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
                                         const Eigen::Vector6d &velocity_state,
                                         const Eigen::Quaterniond &orientation_setpoint)
 {
-  Eigen::Quaterniond orientation_setpoint_copy = orientation_setpoint;
+  Eigen::Vector6d tau;
 
-  // Reset orientation setpoint if nonzero yaw motion command
-  if (fabs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT)
+  bool activate_headinghold = fabs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT;
+  if (activate_headinghold)
   {
-    orientation_setpoint_copy = orientation_state;
+    tau = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
+                                  Eigen::Vector3d::Zero(), orientation_setpoint);
 
-  // Convert quaternion setpoint to euler angles (ZYX convention)
-  Eigen::Vector3d euler_state, euler_setpoint;
-  euler_state = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
-  euler_setpoint = orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
-
-  // Copy pitch and roll state to setpoint
-  euler_setpoint(EULER_PITCH) = euler_state(EULER_PITCH);
-  euler_setpoint(EULER_ROLL)  = euler_state(EULER_ROLL);
-
-  // Convert euler setpoint back to quaternions
-  Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(euler_setpoint(EULER_YAW),   Eigen::Vector3d::UnitZ())
-    * Eigen::AngleAxisd(euler_setpoint(EULER_PITCH), Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(euler_setpoint(EULER_ROLL),  Eigen::Vector3d::UnitX());
-  Eigen::Quaterniond orientation_headinghold(R);
-
-  Eigen::Vector6d tau =  controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
-                                                 Eigen::Vector3d::Zero(), orientation_headinghold);
-
-  tau(WRENCH_SURGE) = 0;
-  tau(WRENCH_SWAY)  = 0;
-  tau(WRENCH_HEAVE) = 0;
-  tau(WRENCH_ROLL)  = 0;
-  tau(WRENCH_PITCH) = 0;
-  // Allow YAW
+    // Allow only yaw feedback command
+    tau(WRENCH_SURGE) = 0;
+    tau(WRENCH_SWAY)  = 0;
+    tau(WRENCH_HEAVE) = 0;
+    tau(WRENCH_ROLL)  = 0;
+    tau(WRENCH_PITCH) = 0;
+  }
+  else
+  {
+    tau.setZero();
+  }
 
   return tau;
 }

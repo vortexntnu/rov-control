@@ -47,13 +47,12 @@ class ThrusterInterface(object):
         rospy.loginfo('Node initialized.')
         self.joystick_watchdog()
 
-    # Monitor heartbeat message from joystick node, set output to zero if heartbeat
-    # is absent for over one second
     def joystick_watchdog(self):
+        """ Monitor heartbeat from joystick node, zero output if heartbeat lost."""
         while not rospy.is_shutdown():
             if (rospy.get_rostime() - self.joystick_heartbeat).to_sec() > 1.0:
                 # Too long between heartbeats! Joystick node might be dead,
-                # or TCP connection to topside might be down
+                # or TCP connection to topside might be down.
                 rospy.logwarn('Joystick interface node not publishing heartbeat, '
                               'setting thrusters to zero. Restart joystick_interface')
                 self.output_to_zero()

@@ -124,6 +124,7 @@ class Bno055InterfaceNode(object):
         imu_temp_msg = Temperature()
         imu_mag_msg = MagneticField()
         imu_diag_msg = DiagnosticStatus()
+        imu_diag_msg_prev = DiagnosticStatus()
 
         while not rospy.is_shutdown():
             x, y, z, w = self.bno.read_quaternion()
@@ -148,13 +149,15 @@ class Bno055InterfaceNode(object):
             imu_mag_msg.header.stamp = rospy.get_rostime()
             imu_mag_msg.magnetic_field = Vector3(mag_x, mag_y, mag_z)
 
-            imu_diag_msg = self.get_diagnostic()
-
             self.pub_imu.publish(imu_msg)
             self.pub_euler.publish(imu_euler_msg)
             self.pub_imu_temp.publish(imu_temp_msg)
             self.pub_mag.publish(imu_mag_msg)
-            self.pub_diagnostics.publish(imu_diag_msg)
+
+            imu_diag_msg = self.get_diagnostic()
+            if imu_diag_msg.values != imu_diag_msg_prev.values:
+                imu_diag_msg_prev = imu_diag_msg
+                self.pub_diagnostics.publish(imu_diag_msg)
 
             rospy.Rate(10).sleep()
 

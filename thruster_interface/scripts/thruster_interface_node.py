@@ -31,9 +31,8 @@ class ThrusterInterface(object):
                                                        StampedHeartbeat,
                                                        self.heartbeat_callback)
 
-        self.prev_time = rospy.get_rostime()
-        self.joystick_heartbeat = self.prev_time
         self.is_initialized = False
+        self.joystick_heartbeat = rospy.get_rostime()
         self.joystick_isalive = False
 
         # The setpoint is the desired value (input)

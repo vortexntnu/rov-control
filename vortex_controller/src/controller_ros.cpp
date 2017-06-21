@@ -315,7 +315,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
 {
   Eigen::Vector6d tau;
 
-  bool activate_depthhold = fabs(tau_openloop(WRENCH_HEAVE)) < FORCE_DEADZONE_LIMIT;
+  bool activate_depthhold = fabs(tau_openloop(WRENCH_HEAVE)) < NORMALIZED_FORCE_DEADZONE;
   if (activate_depthhold)
   {
     tau = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
@@ -345,7 +345,7 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
 {
   Eigen::Vector6d tau;
 
-  bool activate_headinghold = fabs(tau_openloop(WRENCH_YAW)) < FORCE_DEADZONE_LIMIT;
+  bool activate_headinghold = fabs(tau_openloop(WRENCH_YAW)) < NORMALIZED_FORCE_DEADZONE;
   if (activate_headinghold)
   {
     tau = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,

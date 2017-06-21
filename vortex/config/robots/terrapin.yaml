@@ -53,7 +53,7 @@ servo:
     pulse_width: [950, 500]
 
 stepper:
-  default_speed_rpm: 15
+  default_speed_rpm: 30
   steps_per_rev: 200
   pins:
     agar:  ['P8_28', 'P8_30', 'P8_27', 'P8_29']

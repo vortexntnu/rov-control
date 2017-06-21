@@ -35,7 +35,7 @@ class ManipulatorInterface(object):
         rospy.on_shutdown(self.shutdown)
         self.claw_direction = 0.0
         self.claw_position = 0.0  # 1 = open, -1 = closed
-        self.claw_speed = 0.5
+        self.claw_speed = 1.0
 
         try:
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS,

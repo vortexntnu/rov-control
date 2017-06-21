@@ -50,7 +50,7 @@ servo:
   angle_range_deg: 35
   lookup:
     position: [-1, 1]
-    pulse_width: [1300, 500]
+    pulse_width: [950, 500]
 
 stepper:
   default_speed_rpm: 15

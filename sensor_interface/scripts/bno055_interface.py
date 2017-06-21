@@ -135,6 +135,9 @@ class Bno055InterfaceNode(object):
             imu_msg.header.stamp = rospy.get_rostime()
             imu_msg.orientation = Quaternion(x, y, z, w)
             imu_msg.angular_velocity = Vector3(gyro_x, gyro_y, gyro_z)
+            imu_msg.orientation_covariance[0] = -1
+            imu_msg.angular_velocity_covariance[0] = -1
+            imu_msg.linear_acceleration_covariance[0] = -1
 
             imu_euler_msg.header.stamp = rospy.get_rostime()
             imu_euler_msg.vector = Vector3(heading, roll, pitch)

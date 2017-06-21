@@ -31,7 +31,6 @@ class ThrusterInterface(object):
                                                        StampedHeartbeat,
                                                        self.heartbeat_callback)
 
-        self.is_initialized = False
         self.joystick_heartbeat = rospy.get_rostime()
         self.joystick_isalive = False
 

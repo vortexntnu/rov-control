@@ -42,9 +42,9 @@ propulsion:
 
 controller:
   frequency: 10
-  position_gain: 0.0
-  attitude_gain: 1.0
-  velocity_gain: 0.0
+  position_gain: 30.0
+  attitude_gain: 2.5
+  velocity_gain: 0.4
 
 servo:
   angle_range_deg: 35

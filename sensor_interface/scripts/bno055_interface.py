@@ -130,7 +130,7 @@ class Bno055InterfaceNode(object):
             heading, roll, pitch = self.bno.read_euler()
             mag_x, mag_y, mag_z = self.bno.read_magnetometer()
             temperature = self.bno.read_temp()
-            gyro_x, gyro_y, gyro_z = bno.read_gyroscope()
+            gyro_x, gyro_y, gyro_z = self.bno.read_gyroscope()
 
             imu_msg.header.stamp = rospy.get_rostime()
             imu_msg.orientation = Quaternion(x, y, z, w)

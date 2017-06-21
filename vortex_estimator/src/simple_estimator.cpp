@@ -45,6 +45,7 @@ void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
 
   // Convert to quaternion message and publish
   tf::quaternionEigenToMsg(quat_ned, state.pose.pose.orientation);
+  state.twist.twist.angular.z = -msg.angular_velocity.z;
   state_pub.publish(state);
 }
 

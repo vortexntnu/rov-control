@@ -64,9 +64,11 @@ private:
                             const Eigen::Vector6d &velocity_state);
   Eigen::Vector6d depthHold(const Eigen::Vector6d &tau_openloop,
                             const Eigen::Vector3d &position_state,
+                            const Eigen::Quaterniond &orientation_state,
                             const Eigen::Vector6d &velocity_state,
                             const Eigen::Vector3d &position_setpoint);
   Eigen::Vector6d headingHold(const Eigen::Vector6d &tau_openloop,
+                              const Eigen::Vector3d &position_state,
                               const Eigen::Quaterniond &orientation_state,
                               const Eigen::Vector6d &velocity_state,
                               const Eigen::Quaterniond &orientation_setpoint);

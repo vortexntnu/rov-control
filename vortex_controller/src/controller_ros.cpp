@@ -133,8 +133,8 @@ void Controller::spin()
     setpoints->get(&tau_openloop);
     tau_restoring = controller->getRestoring(orientation_state);
     tau_staylevel = stayLevel(orientation_state, velocity_state);
-    tau_depthhold = depthHold(tau_openloop, position_state, velocity_state, position_setpoint);
-    tau_headinghold = headingHold(tau_openloop, orientation_state, velocity_state, orientation_setpoint);
+    tau_depthhold = depthHold(tau_openloop, position_state, orientation_state, velocity_state, position_setpoint);
+    tau_headinghold = headingHold(tau_openloop, position_state, orientation_state, velocity_state, orientation_setpoint);
 
     switch (control_mode)
     {
@@ -304,6 +304,7 @@ Eigen::Vector6d Controller::stayLevel(const Eigen::Quaterniond &orientation_stat
 
 Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
                                       const Eigen::Vector3d &position_state,
+                                      const Eigen::Quaterniond &orientation_state,
                                       const Eigen::Vector6d &velocity_state,
                                       const Eigen::Vector3d &position_setpoint)
 {
@@ -324,6 +325,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
+    setpoints->set(position_state, orientation_state);
     tau.setZero();
   }
 
@@ -331,6 +333,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
 }
 
 Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
+                                        const Eigen::Vector3d &position_state,
                                         const Eigen::Quaterniond &orientation_state,
                                         const Eigen::Vector6d &velocity_state,
                                         const Eigen::Quaterniond &orientation_setpoint)
@@ -352,6 +355,7 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
+    setpoints->set(position_state, orientation_state);
     tau.setZero();
   }
 

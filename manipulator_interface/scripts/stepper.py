@@ -39,7 +39,9 @@ class Stepper():
             print('stepper.py: Starting in PC debug mode, no stepper connected.')
         else:
             print('stepper.py: Invalid computer!')
-        self.GPIO = GPIO
+
+        if self.computer != 'pc-debug':
+            self.GPIO = GPIO
 
         self.curr_step = 0
         self.number_of_steps = number_of_steps

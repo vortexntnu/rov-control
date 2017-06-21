@@ -135,8 +135,11 @@ void Controller::spin()
     setpoints->get(&tau_openloop);
     tau_restoring = controller->getRestoring(orientation_state);
     tau_staylevel = stayLevel(orientation_state, velocity_state);
-    tau_depthhold = depthHold(tau_openloop, position_state, orientation_state, velocity_state, position_setpoint);
-    tau_headinghold = headingHold(tau_openloop, position_state, orientation_state, velocity_state, orientation_setpoint);
+    tau_depthhold = depthHold(
+      tau_openloop, position_state, orientation_state, velocity_state, position_setpoint);
+    tau_headinghold = headingHold(
+      tau_openloop, position_state, orientation_state, velocity_state, orientation_setpoint);
+
     tau_command.setZero();
 
     switch (control_mode)

@@ -99,8 +99,8 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 
 void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
-  ROS_INFO_STREAM("Setting gains: [velocity = " << config.velocity_gain << ", position = " << config.position_gain
-    << ", attitude = " << config.attitude_gain << "]");
+  ROS_INFO_STREAM("Setting gains: [vel = " << config.velocity_gain << ", pos = " << config.position_gain
+    << ", rot = " << config.attitude_gain << "]");
   controller->setGains(config.velocity_gain, config.position_gain, config.attitude_gain);
 }
 

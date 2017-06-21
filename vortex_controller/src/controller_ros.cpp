@@ -120,6 +120,8 @@ void Controller::spin()
   Eigen::Vector3d    position_setpoint    = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
 
+  geometry_msgs::Wrench msg;
+
   ros::Rate rate(frequency);
   while (ros::ok())
   {
@@ -167,7 +169,6 @@ void Controller::spin()
       break;
     }
 
-    geometry_msgs::Wrench msg;
     tf::wrenchEigenToMsg(tau_command, msg);
     wrench_pub.publish(msg);
 

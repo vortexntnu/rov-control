@@ -88,14 +88,15 @@ class Bno055InterfaceNode(object):
         self.pub_imu = rospy.Publisher(
             'sensors/imu/data',
             Imu,
-        self.pub_mag = rospy.Publisher(
-            'sensors/imu/mag',
-            MagneticField,
-            queue_size=10)
-        self.pub_imu_temp = rospy.Publisher(
-            'sensors/imu/temperature',
-            Temperature,
             queue_size=1)
+        # self.pub_mag = rospy.Publisher(
+        #     'sensors/imu/mag',
+        #     MagneticField,
+        #     queue_size=1)
+        # self.pub_imu_temp = rospy.Publisher(
+        #     'sensors/imu/temperature',
+        #     Temperature,
+        #     queue_size=1)
         self.pub_diagnostics = rospy.Publisher(
             'sensors/imu/diagnostics',
             DiagnosticStatus,
@@ -120,8 +121,8 @@ class Bno055InterfaceNode(object):
     def talker(self):
         imu_msg = Imu()
         imu_euler_msg = Vector3Stamped()
-        imu_temp_msg = Temperature()
-        imu_mag_msg = MagneticField()
+        # imu_temp_msg = Temperature()
+        # imu_mag_msg = MagneticField()
         imu_diag_msg = DiagnosticStatus()
         imu_diag_msg_prev = DiagnosticStatus()
 
@@ -142,16 +143,16 @@ class Bno055InterfaceNode(object):
             imu_euler_msg.header.stamp = rospy.get_rostime()
             imu_euler_msg.vector = Vector3(heading, roll, pitch)
 
-            imu_temp_msg.header.stamp = rospy.get_rostime()
-            imu_temp_msg.temperature = temperature
+            # imu_temp_msg.header.stamp = rospy.get_rostime()
+            # imu_temp_msg.temperature = temperature
 
-            imu_mag_msg.header.stamp = rospy.get_rostime()
-            imu_mag_msg.magnetic_field = Vector3(mag_x, mag_y, mag_z)
+            # imu_mag_msg.header.stamp = rospy.get_rostime()
+            # imu_mag_msg.magnetic_field = Vector3(mag_x, mag_y, mag_z)
 
             self.pub_imu.publish(imu_msg)
             self.pub_euler.publish(imu_euler_msg)
-            self.pub_imu_temp.publish(imu_temp_msg)
-            self.pub_mag.publish(imu_mag_msg)
+            # self.pub_imu_temp.publish(imu_temp_msg)
+            # self.pub_mag.publish(imu_mag_msg)
 
             imu_diag_msg = self.get_diagnostic()
             if imu_diag_msg.values != imu_diag_msg_prev.values:

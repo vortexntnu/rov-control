@@ -57,6 +57,7 @@ private:
   QuaternionPdController *controller;
 
   void initSetpoints();
+  void resetSetpoints();
   void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
   void publishControlMode();

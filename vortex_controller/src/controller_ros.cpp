@@ -57,15 +57,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   if (new_control_mode != control_mode)
   {
     control_mode = new_control_mode;
-
-    Eigen::Vector3d    position;
-    Eigen::Quaterniond orientation;
-    Eigen::Vector6d    velocity;
-
-    // Reset setpoints to be equal to state
-    state->get(&position, &orientation, &velocity);
-    setpoints->set(position, orientation);
-
+    resetSetpoints();
     ROS_INFO_STREAM("Changing mode to " << controlModeString(control_mode) << ".");
   }
   publishControlMode();
@@ -202,6 +194,15 @@ void Controller::initSetpoints()
                             pose_command_rate);
 }
 
+void Controller::resetSetpoints()
+{
+  // Reset setpoints to be equal to state
+  Eigen::Vector3d position;
+  Eigen::Quaterniond orientation;
+  state->get(&position, &orientation);
+  setpoints->set(position, orientation);
+}
+
 void Controller::initPositionHoldController()
 {
   // Read controller gains from parameter server
@@ -330,7 +331,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    setpoints->set(position_state, orientation_state);
+    resetSetpoints();
     tau.setZero();
   }
 
@@ -360,7 +361,7 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    setpoints->set(position_state, orientation_state);
+    resetSetpoints();
     tau.setZero();
   }
 

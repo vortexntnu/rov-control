@@ -54,8 +54,8 @@ class Bno055InterfaceNode(object):
             raise rospy.ROSInitException('Failed to initialise BNO055! Is the sensor connected?')
 
         self.status, self.self_test, self.error = self.bno.get_system_status()
-        rospy.loginfo("System status: %s", self.status)
-        rospy.loginfo("Self test result (0x0F is normal): 0x%02X", self.self_test)
+        rospy.logdebug("System status: %s", self.status)
+        rospy.logdebug("Self test result (0x0F is normal): 0x%02X", self.self_test)
         if self.status == 0x01:
             rospy.logwarn("System status: 0x%02X\n (see datasheet section 4.3.59).", self.status)
 
@@ -65,7 +65,7 @@ class Bno055InterfaceNode(object):
             self.magnetometer_id, \
             self.gyro_id = self.bno.get_revision()
 
-        rospy.loginfo(("Software version: %s\n" "Bootloader version: %s\n"
+        rospy.logdebug(("Software version: %s\n" "Bootloader version: %s\n"
                        "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
                        "Gyroscope ID: 0x%02X\n"), self.sw_v,
                       self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)

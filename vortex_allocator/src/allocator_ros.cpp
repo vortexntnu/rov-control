@@ -10,7 +10,7 @@
 
 Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 {
-  sub = nh.subscribe("rov_forces", 10, &Allocator::callback, this);
+  sub = nh.subscribe("rov_forces", 1, &Allocator::callback, this);
   pub = nh.advertise<vortex_msgs::Float64ArrayStamped>("thruster_forces", 10);
 
   if (!nh.getParam("/propulsion/dofs/num", num_dof))

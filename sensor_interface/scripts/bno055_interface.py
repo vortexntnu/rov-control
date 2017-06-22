@@ -88,7 +88,6 @@ class Bno055InterfaceNode(object):
         self.pub_imu = rospy.Publisher(
             'sensors/imu/data',
             Imu,
-            queue_size=10)
         self.pub_mag = rospy.Publisher(
             'sensors/imu/mag',
             MagneticField,
@@ -96,15 +95,15 @@ class Bno055InterfaceNode(object):
         self.pub_imu_temp = rospy.Publisher(
             'sensors/imu/temperature',
             Temperature,
-            queue_size=10)
+            queue_size=1)
         self.pub_diagnostics = rospy.Publisher(
             'sensors/imu/diagnostics',
             DiagnosticStatus,
-            queue_size=10)
+            queue_size=1)
         self.pub_euler = rospy.Publisher(
             'sensors/imu/euler',
             Vector3Stamped,
-            queue_size=10)
+            queue_size=1)
 
     def get_diagnostic(self):
         diag_msg = DiagnosticStatus()

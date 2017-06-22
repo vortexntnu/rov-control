@@ -13,9 +13,9 @@
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
-  command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
-  state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
-  wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+  command_sub = nh.subscribe("propulsion_command", 1, &Controller::commandCallback, this);
+  state_sub   = nh.subscribe("state_estimate", 1, &Controller::stateCallback, this);
+  wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 1);
   mode_pub    = nh.advertise<std_msgs::String>("controller/mode", 10);
 
   control_mode = ControlModes::OPEN_LOOP;

@@ -5,9 +5,9 @@
 
 SimpleEstimator::SimpleEstimator()
 {
-  imu_sub      = nh.subscribe("/sensors/imu/data", 10, &SimpleEstimator::imuCallback, this);
-  pressure_sub = nh.subscribe("/sensors/pressure", 10, &SimpleEstimator::pressureCallback, this);
-  state_pub    = nh.advertise<nav_msgs::Odometry>("state_estimate", 10);
+  imu_sub      = nh.subscribe("/sensors/imu/data", 1, &SimpleEstimator::imuCallback, this);
+  pressure_sub = nh.subscribe("/sensors/pressure", 1, &SimpleEstimator::pressureCallback, this);
+  state_pub    = nh.advertise<nav_msgs::Odometry>("state_estimate", 1);
 
   if (!nh.getParam("atmosphere/pressure", atmospheric_pressure))
     ROS_ERROR("Could not read parameter atmospheric pressure.");

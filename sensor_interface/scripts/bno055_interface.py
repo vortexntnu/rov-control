@@ -66,9 +66,9 @@ class Bno055InterfaceNode(object):
             self.gyro_id = self.bno.get_revision()
 
         rospy.logdebug(("Software version: %s\n" "Bootloader version: %s\n"
-                       "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
-                       "Gyroscope ID: 0x%02X\n"), self.sw_v,
-                      self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
+                        "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
+                        "Gyroscope ID: 0x%02X\n"), self.sw_v,
+                       self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
 
         rospy.loginfo('Initialized in %s mode.', mode_name)
 

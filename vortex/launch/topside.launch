@@ -5,13 +5,9 @@
   <rosparam command="load" file="$(find vortex)/config/environments/trondheim_freshwater.yaml"/>
   <rosparam command="load" file="$(find thruster_interface)/config/thruster_terrapin.yaml"/>
 
-  <param name="joy/deadzone" value="0.2"/>
-
   <node pkg="vortex_controller" type="node" name="controller" output="screen"/>
   <node pkg="vortex_allocator"  type="node" name="allocator"  output="screen"/>
   <node pkg="vortex_estimator"  type="node" name="estimator"  output="screen"/>
 
-  <node pkg="joy"                name="joy"                type="joy_node"              output="screen"/>
-  <node pkg="topic_tools"        name="joy_throttler"      type="throttle"              args="messages /joy 20 /joy_throttled" output="screen"/>
-  <node pkg="joystick_interface" name="joystick_interface" type="joystick_interface.py" output="screen"/>
+  <include file="$(find joystick_interface)/launch/joystick_interface.launch" />
 </launch>

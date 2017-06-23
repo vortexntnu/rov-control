@@ -24,6 +24,7 @@ STEPPER_AGAR_ENABLE_PIN = rospy.get_param('/stepper/pins/agar_enable')
 
 class ManipulatorInterface(object):
     def __init__(self):
+        self.is_initialized = False
         rospy.init_node('manipulator_interface', anonymous=False)
         self.pub = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
@@ -55,6 +56,7 @@ class ManipulatorInterface(object):
             rospy.signal_shutdown('')
 
         rospy.loginfo('Initialized.')
+        self.is_initialized = True
         self.spin()
 
     def spin(self):
@@ -91,6 +93,10 @@ class ManipulatorInterface(object):
         self.valve_stepper.shutdown()
 
     def callback(self, msg):
+        if not self.is_initialized:
+            rospy.logwarn('Callback before node initialized, ignoring...')
+            return
+
         if not self.healthy_message(msg):
             return
 

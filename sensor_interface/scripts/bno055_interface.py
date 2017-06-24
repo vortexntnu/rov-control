@@ -80,7 +80,7 @@ class Bno055InterfaceNode(object):
             BNO055.AXIS_REMAP_POSITIVE,
             BNO055.AXIS_REMAP_POSITIVE
         )
-        rospy.loginfo('IMU axis config is {0}'.format(self.bno.get_axis_remap()))
+        rospy.logdebug('IMU axis config is {0}'.format(self.bno.get_axis_remap()))
 
         self.talker()
 

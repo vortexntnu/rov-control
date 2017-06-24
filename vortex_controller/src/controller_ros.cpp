@@ -35,7 +35,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   dr_cb = boost::bind(&Controller::configCallback, this, _1, _2);
   dr_srv.setCallback(dr_cb);
 
-  ROS_INFO("Initialized.");
+  ROS_INFO("Initialized at %i Hz.", frequency);
 }
 
 void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)

@@ -13,12 +13,12 @@ class Ms5837InterfaceNode(object):
         self.pub_pressure = rospy.Publisher(
             'sensors/pressure',
             FluidPressure,
-            queue_size=10)
+            queue_size=1)
 
         self.pub_temp = rospy.Publisher(
             'sensors/temperature',
             Temperature,
-            queue_size=10)
+            queue_size=1)
 
         self.ms5837 = ms5837.MS5837(model=ms5837.MODEL_30BA)
         if not self.ms5837.init():

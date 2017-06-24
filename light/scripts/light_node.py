@@ -13,8 +13,8 @@ PWM_SCALING = 100
 class LightNode(object):
     def __init__(self):
         rospy.init_node('light_node')
-        self.sub = rospy.Subscriber('toggle_light', LightInput, self.callback, queue_size=10)
-        self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
+        self.sub = rospy.Subscriber('toggle_light', LightInput, self.callback, queue_size=1)
+        self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=1)
         for light_name in GPIO_PIN_MAP:
             GPIO.setup(GPIO_PIN_MAP[light_name], GPIO.OUT)
 

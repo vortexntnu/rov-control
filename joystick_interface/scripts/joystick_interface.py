@@ -11,10 +11,10 @@ class JoystickInterfaceNode(object):
         self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=1)
         self.pub_motion = rospy.Publisher('propulsion_command',
                                           PropulsionCommand,
-                                          queue_size=10)
+                                          queue_size=1)
         self.pub_manipulator = rospy.Publisher('manipulator_command',
                                                Manipulator,
-                                               queue_size=10)
+                                               queue_size=1)
 
         # Name buttons and axes based on index from joy-node
         self.buttons_map = ['A', 'B', 'X', 'Y', 'LB', 'RB', 'back',

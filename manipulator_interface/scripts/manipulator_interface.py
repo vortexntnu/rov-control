@@ -93,8 +93,14 @@ class ManipulatorInterface(object):
         if self.is_initialized:
             rospy.loginfo("Setting servo position to zero")
 
+    def servo_disable(self):
+        msg = Pwm()
+        msg.pins.append(SERVO_PWM_PIN)
+        msg.positive_width_us.append(0)
+        self.pub.publish(msg)
+
     def shutdown(self):
-        self.servo_set_to_zero()
+        self.servo_disable()
         self.valve_stepper.shutdown()
 
     def callback(self, msg):

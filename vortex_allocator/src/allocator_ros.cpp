@@ -11,7 +11,7 @@
 Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 {
   sub = nh.subscribe("rov_forces", 1, &Allocator::callback, this);
-  pub = nh.advertise<vortex_msgs::Float64ArrayStamped>("thruster_forces", 10);
+  pub = nh.advertise<vortex_msgs::Float64ArrayStamped>("thruster_forces", 1);
 
   if (!nh.getParam("/propulsion/dofs/num", num_dof))
     ROS_FATAL("Failed to read parameter number of dofs.");

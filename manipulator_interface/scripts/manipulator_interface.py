@@ -26,7 +26,7 @@ class ManipulatorInterface(object):
     def __init__(self):
         self.is_initialized = False
         rospy.init_node('manipulator_interface', anonymous=False)
-        self.pub = rospy.Publisher('pwm', Pwm, queue_size=10)
+        self.pub = rospy.Publisher('pwm', Pwm, queue_size=1)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
 
         self.neutral_pulse_width = self.servo_position_to_microsecs(0)

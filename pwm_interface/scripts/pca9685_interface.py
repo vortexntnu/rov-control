@@ -20,7 +20,7 @@ class Pca9685InterfaceNode(object):
         self.pca9685.set_all_pwm(0, 0)
         self.current_pwm = [0]*16
 
-        self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=10)
+        self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=1)
         rospy.loginfo('Initialized for {0} Hz.'.format(FREQUENCY))
 
     def callback(self, msg):

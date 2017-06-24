@@ -8,7 +8,7 @@ class JoystickInterfaceNode(object):
     def __init__(self):
         rospy.init_node('joystick_node')
 
-        self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=10)
+        self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=1)
         self.pub_motion = rospy.Publisher('propulsion_command',
                                           PropulsionCommand,
                                           queue_size=10)

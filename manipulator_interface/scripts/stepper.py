@@ -84,6 +84,6 @@ class Stepper():
             print('Disabling stepper')
 
     def shutdown(self):
-        if self.computer != 'pc-debug':
+        if self.computer == 'raspberry':
             print('stepper.py: Shutting down and cleaning GPIO pins.')
             self.GPIO.cleanup()

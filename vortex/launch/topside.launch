@@ -5,6 +5,8 @@
   <rosparam command="load" file="$(find vortex)/config/environments/trondheim_freshwater.yaml"/>
   <rosparam command="load" file="$(find thruster_interface)/config/thruster_terrapin.yaml"/>
 
+  <node pkg="thruster_interface"    name="thruster_interface"    type="thruster_interface_node.py" output="screen"/>
+
   <node pkg="vortex_controller" type="node" name="controller" output="screen"/>
   <node pkg="vortex_allocator"  type="node" name="allocator"  output="screen"/>
   <node pkg="vortex_estimator"  type="node" name="estimator"  output="screen"/>

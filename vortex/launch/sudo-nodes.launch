@@ -11,7 +11,7 @@
   <node pkg="light"                 name="light"                 type="light_node.py"              output="screen"/>
   <node pkg="camera_selection"      name="camera_selection"      type="camera_selection.py"        output="screen"/>
   <node pkg="manipulator_interface" name="manipulator_interface" type="manipulator_interface.py"   output="screen"/>
-  <node pkg="thruster_interface"    name="thruster_interface"    type="thruster_interface_node.py" output="screen"/>
+  <!-- <node pkg="thruster_interface"    name="thruster_interface"    type="thruster_interface_node.py" output="screen"/> -->
 
   <node pkg="pwm_interface"    name="pwm_interface"    type="pca9685_interface.py" output="screen" respawn="true"/>
   <node pkg="sensor_interface" name="bno055_interface" type="bno055_interface.py"  output="screen" respawn="true"/>

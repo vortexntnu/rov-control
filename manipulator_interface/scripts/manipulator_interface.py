@@ -90,7 +90,8 @@ class ManipulatorInterface(object):
         msg.pins.append(SERVO_PWM_PIN)
         msg.positive_width_us.append(self.neutral_pulse_width)
         self.pub.publish(msg)
-        rospy.loginfo("Setting servo position to zero")
+        if self.is_initialized:
+            rospy.loginfo("Setting servo position to zero")
 
     def shutdown(self):
         self.servo_set_to_zero()

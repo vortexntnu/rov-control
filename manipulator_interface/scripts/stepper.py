@@ -68,7 +68,7 @@ class Stepper():
                     self.GPIO.output(self.pins[i], self.GPIO.LOW)
                 else:
                     rospy.logwarn('Invalid output pin value.')
-        elif self.computer == 'pc-debug':
+        else:
             print('Stepping: {0}'.format(STEPPER_PIN_VALUES[self.curr_step % 4]))
 
     def enable(self):

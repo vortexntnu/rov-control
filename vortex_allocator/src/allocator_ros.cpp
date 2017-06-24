@@ -50,6 +50,9 @@ Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 
   pseudoinverse_allocator = new PseudoinverseAllocator(thrust_configuration_pseudoinverse);
 
+  u_prev.resize(num_thrusters);
+  u_prev.setZero();
+
   ROS_INFO("Initialized.");
 }
 
@@ -75,10 +78,14 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
   if (!saturateVector(&u, min_thrust, max_thrust))
     ROS_WARN_THROTTLE(1, "Thrust vector u required saturation.");
 
-  vortex_msgs::Float64ArrayStamped u_msg;
-  arrayEigenToMsg(u, &u_msg);
-  u_msg.header.stamp = ros::Time::now();
-  pub.publish(u_msg);
+  if (u != u_prev)
+  {
+    u_prev = u;
+    vortex_msgs::Float64ArrayStamped u_msg;
+    arrayEigenToMsg(u, &u_msg);
+    u_msg.header.stamp = ros::Time::now();
+    pub.publish(u_msg);
+  }
 }
 
 Eigen::VectorXd Allocator::rovForcesMsgToEigen(const geometry_msgs::Wrench &msg)

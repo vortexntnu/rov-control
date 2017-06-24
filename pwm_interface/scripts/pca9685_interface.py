@@ -15,12 +15,15 @@ PWM_ON = 0  # Start of duty cycle
 class Pca9685InterfaceNode(object):
     def __init__(self):
         rospy.init_node('pwm_node')
+        self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=1)
+
         self.pca9685 = Adafruit_PCA9685.PCA9685()
         self.pca9685.set_pwm_freq(FREQUENCY)
         self.pca9685.set_all_pwm(0, 0)
         self.current_pwm = [0]*16
 
-        self.sub = rospy.Subscriber('pwm', Pwm, self.callback, queue_size=1)
+        rospy.on_shutdown(self.shutdown)
+
         rospy.loginfo('Initialized for {0} Hz.'.format(FREQUENCY))
 
     def callback(self, msg):
@@ -34,6 +37,8 @@ class Pca9685InterfaceNode(object):
         duty_cycle_normalized = microsecs / PERIOD_LENGTH_IN_MICROSECONDS
         return int(round(PWM_BITS_PER_PERIOD * duty_cycle_normalized))
 
+    def shutdown(self):
+        self.pca9685.set_all_pwm(0, 0)
 
 if __name__ == '__main__':
     try:

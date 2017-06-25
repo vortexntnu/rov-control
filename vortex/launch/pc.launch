@@ -8,6 +8,7 @@
   <param name="thruster_interface/thrusters_connected" type="bool" value="false" />
   <param name="thruster_interface/rate_limiting_enabled" type="bool" value="false" />
   <param name="computer" value="pc-debug" />
+  <param name="stepper/default_speed_rpm" value="1"/>
 
   <node name="manipulator_interface" pkg="manipulator_interface" type="manipulator_interface.py" output="screen" />
   <node name="thruster_interface" pkg="thruster_interface" type="thruster_interface_node.py" output="screen" />

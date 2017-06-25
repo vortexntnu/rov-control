@@ -27,6 +27,10 @@ class JoystickInterfaceNode(object):
                          'vertical_axis_right_stick', 'RT',
                          'dpad_horizontal', 'dpad_vertical']
 
+        self.agar_state = False
+        self.agar_msg_curr = False
+        self.agar_msg_prev = False
+
     def callback(self, msg):
         # Connect values to names in two dictionaries
         buttons = {}
@@ -41,7 +45,16 @@ class JoystickInterfaceNode(object):
         manipulator_msg = Manipulator()
         manipulator_msg.claw_direction = -axes['dpad_vertical']
         manipulator_msg.valve_direction = axes['dpad_horizontal']
-        manipulator_msg.agar_direction = buttons['start'] - buttons['back']
+
+        # Toggle agar direction
+        if buttons['start'] + buttons['back']:
+            self.agar_msg_curr = True
+        else:
+            self.agar_msg_curr = False
+        if self.agar_msg_curr and not self.agar_msg_prev:
+            self.agar_state = not self.agar_state
+        manipulator_msg.agar_direction = self.agar_state
+        self.agar_msg_prev = self.agar_msg_curr
 
         motion_msg = PropulsionCommand()
         motion_msg.motion = [

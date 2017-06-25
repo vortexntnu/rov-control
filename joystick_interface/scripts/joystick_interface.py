@@ -44,7 +44,7 @@ class JoystickInterfaceNode(object):
 
         manipulator_msg = Manipulator()
         manipulator_msg.claw_direction = -axes['dpad_vertical']
-        manipulator_msg.valve_direction = axes['dpad_horizontal']
+        manipulator_msg.valve_direction = buttons['RB'] - buttons['LB']
 
         # Toggle agar direction
         if buttons['start'] + buttons['back']:

@@ -55,6 +55,9 @@ class ManipulatorInterface(object):
                            'Shutting down node...')
             rospy.signal_shutdown('')
 
+        self.valve_stepper.disable()
+        self.agar_stepper.disable()
+
         rospy.loginfo('Initialized with {0} RPM steppers.'.format(STEPPER_RPM))
         self.is_initialized = True
         self.spin()

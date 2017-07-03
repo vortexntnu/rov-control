@@ -118,19 +118,9 @@ void Controller::spin()
   while (ros::ok())
   {
     // TODO(mortenfyhn): check value of bool return from getters
-
-    // Read state and setpoint
     state->get(&position_state, &orientation_state, &velocity_state);
     setpoints->get(&position_setpoint, &orientation_setpoint);
-
-    // Calculate terms of control vector
     setpoints->get(&tau_openloop);
-    tau_restoring = controller->getRestoring(orientation_state);
-    tau_staylevel = stayLevel(orientation_state, velocity_state);
-    tau_depthhold = depthHold(
-      tau_openloop, position_state, orientation_state, velocity_state, position_setpoint);
-    tau_headinghold = headingHold(
-      tau_openloop, position_state, orientation_state, velocity_state, orientation_setpoint);
 
     tau_command.setZero();
 
@@ -141,22 +131,44 @@ void Controller::spin()
       break;
 
       case ControlModes::OPEN_LOOP_RESTORING:
+      tau_restoring = controller->getRestoring(orientation_state);
       tau_command = tau_openloop + tau_restoring;
       break;
 
       case ControlModes::STAY_LEVEL:
+      tau_staylevel = stayLevel(orientation_state, velocity_state);
       tau_command = tau_openloop + tau_staylevel;
       break;
 
       case ControlModes::DEPTH_HOLD:
+      tau_depthhold = depthHold(tau_openloop,
+                                position_state,
+                                orientation_state,
+                                velocity_state,
+                                position_setpoint);
       tau_command = tau_openloop + tau_depthhold;
       break;
 
       case ControlModes::HEADING_HOLD:
+      tau_headinghold = headingHold(tau_openloop,
+                                    position_state,
+                                    orientation_state,
+                                    velocity_state,
+                                    orientation_setpoint);
       tau_command = tau_openloop + tau_headinghold;
       break;
 
       case ControlModes::DEPTH_HEADING_HOLD:
+      tau_depthhold = depthHold(tau_openloop,
+                                position_state,
+                                orientation_state,
+                                velocity_state,
+                                position_setpoint);
+      tau_headinghold = headingHold(tau_openloop,
+                                    position_state,
+                                    orientation_state,
+                                    velocity_state,
+                                    orientation_setpoint);
       tau_command = tau_openloop + tau_depthhold + tau_headinghold;
       break;
 

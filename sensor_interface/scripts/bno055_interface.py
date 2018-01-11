@@ -54,8 +54,8 @@ class Bno055InterfaceNode(object):
             raise rospy.ROSInitException('Failed to initialise BNO055! Is the sensor connected?')
 
         self.status, self.self_test, self.error = self.bno.get_system_status()
-        rospy.loginfo("System status: %s", self.status)
-        rospy.loginfo("Self test result (0x0F is normal): 0x%02X", self.self_test)
+        rospy.logdebug("System status: %s", self.status)
+        rospy.logdebug("Self test result (0x0F is normal): 0x%02X", self.self_test)
         if self.status == 0x01:
             rospy.logwarn("System status: 0x%02X\n (see datasheet section 4.3.59).", self.status)
 
@@ -65,10 +65,10 @@ class Bno055InterfaceNode(object):
             self.magnetometer_id, \
             self.gyro_id = self.bno.get_revision()
 
-        rospy.loginfo(("Software version: %s\n" "Bootloader version: %s\n"
-                       "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
-                       "Gyroscope ID: 0x%02X\n"), self.sw_v,
-                      self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
+        rospy.logdebug(("Software version: %s\n" "Bootloader version: %s\n"
+                        "Accelerometer ID: 0x%02X\n" "Magnetometer ID: 0x%02X\n"
+                        "Gyroscope ID: 0x%02X\n"), self.sw_v,
+                       self.bootloader_v, self.accelerometer_id, self.accelerometer_id, self.gyro_id)
 
         rospy.loginfo('Initialized in %s mode.', mode_name)
 
@@ -80,7 +80,7 @@ class Bno055InterfaceNode(object):
             BNO055.AXIS_REMAP_POSITIVE,
             BNO055.AXIS_REMAP_POSITIVE
         )
-        rospy.loginfo('IMU axis config is {0}'.format(self.bno.get_axis_remap()))
+        rospy.logdebug('IMU axis config is {0}'.format(self.bno.get_axis_remap()))
 
         self.talker()
 
@@ -88,23 +88,23 @@ class Bno055InterfaceNode(object):
         self.pub_imu = rospy.Publisher(
             'sensors/imu/data',
             Imu,
-            queue_size=10)
-        self.pub_mag = rospy.Publisher(
-            'sensors/imu/mag',
-            MagneticField,
-            queue_size=10)
-        self.pub_imu_temp = rospy.Publisher(
-            'sensors/imu/temperature',
-            Temperature,
-            queue_size=10)
+            queue_size=1)
+        # self.pub_mag = rospy.Publisher(
+        #     'sensors/imu/mag',
+        #     MagneticField,
+        #     queue_size=1)
+        # self.pub_imu_temp = rospy.Publisher(
+        #     'sensors/imu/temperature',
+        #     Temperature,
+        #     queue_size=1)
         self.pub_diagnostics = rospy.Publisher(
             'sensors/imu/diagnostics',
             DiagnosticStatus,
-            queue_size=10)
+            queue_size=1)
         self.pub_euler = rospy.Publisher(
             'sensors/imu/euler',
             Vector3Stamped,
-            queue_size=10)
+            queue_size=1)
 
     def get_diagnostic(self):
         diag_msg = DiagnosticStatus()
@@ -121,31 +121,43 @@ class Bno055InterfaceNode(object):
     def talker(self):
         imu_msg = Imu()
         imu_euler_msg = Vector3Stamped()
-        imu_temp_msg = Temperature()
-        imu_mag_msg = MagneticField()
+        # imu_temp_msg = Temperature()
+        # imu_mag_msg = MagneticField()
         imu_diag_msg = DiagnosticStatus()
+        imu_diag_msg_prev = DiagnosticStatus()
 
         while not rospy.is_shutdown():
             x, y, z, w = self.bno.read_quaternion()
-            heading, roll, pitch = self.bno.read_euler()
-            mag_x, mag_y, mag_z = self.bno.read_magnetometer()
-            temp = self.bno.read_temp()
+            # heading, roll, pitch = self.bno.read_euler()
+            # mag_x, mag_y, mag_z = self.bno.read_magnetometer()
+            # temperature = self.bno.read_temp()
+            gyro_x, gyro_y, gyro_z = self.bno.read_gyroscope()
 
             imu_msg.header.stamp = rospy.get_rostime()
             imu_msg.orientation = Quaternion(x, y, z, w)
-            imu_euler_msg.header.stamp = rospy.get_rostime()
-            imu_euler_msg.vector = Vector3(heading, roll, pitch)
-            imu_temp_msg.header.stamp = rospy.get_rostime()
-            imu_temp_msg.temperature = temp
-            imu_mag_msg.header.stamp = rospy.get_rostime()
-            imu_mag_msg.magnetic_field = Vector3(mag_x, mag_y, mag_z)
-            imu_diag_msg = self.get_diagnostic()
+            imu_msg.angular_velocity = Vector3(gyro_x, gyro_y, gyro_z)
+            imu_msg.orientation_covariance[0] = -1
+            imu_msg.angular_velocity_covariance[0] = -1
+            imu_msg.linear_acceleration_covariance[0] = -1
+
+            # imu_euler_msg.header.stamp = rospy.get_rostime()
+            # imu_euler_msg.vector = Vector3(heading, roll, pitch)
+
+            # imu_temp_msg.header.stamp = rospy.get_rostime()
+            # imu_temp_msg.temperature = temperature
+
+            # imu_mag_msg.header.stamp = rospy.get_rostime()
+            # imu_mag_msg.magnetic_field = Vector3(mag_x, mag_y, mag_z)
 
             self.pub_imu.publish(imu_msg)
-            self.pub_euler.publish(imu_euler_msg)
-            self.pub_imu_temp.publish(imu_temp_msg)
-            self.pub_mag.publish(imu_mag_msg)
-            self.pub_diagnostics.publish(imu_diag_msg)
+            # self.pub_euler.publish(imu_euler_msg)
+            # self.pub_imu_temp.publish(imu_temp_msg)
+            # self.pub_mag.publish(imu_mag_msg)
+
+            imu_diag_msg = self.get_diagnostic()
+            if imu_diag_msg.values != imu_diag_msg_prev.values:
+                imu_diag_msg_prev = imu_diag_msg
+                self.pub_diagnostics.publish(imu_diag_msg)
 
             rospy.Rate(10).sleep()
 

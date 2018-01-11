@@ -40,6 +40,9 @@ class Stepper():
         else:
             print('stepper.py: Invalid computer!')
 
+        if self.computer != 'pc-debug':
+            self.GPIO = GPIO
+
         self.curr_step = 0
         self.number_of_steps = number_of_steps
 
@@ -47,8 +50,8 @@ class Stepper():
         self.disable_pin = disable_pin
         if self.computer != 'pc-debug':
             for pin in pins:
-                GPIO.setup(pin, GPIO.OUT)
-            GPIO.setup(disable_pin, GPIO.OUT)
+                self.GPIO.setup(pin, self.GPIO.OUT)
+            self.GPIO.setup(disable_pin, self.GPIO.OUT)
 
     def step_once(self, direction):
         """"Step motor once in given direction."""
@@ -60,23 +63,27 @@ class Stepper():
             for i in range(len(self.pins)):
                 pin_value = STEPPER_PIN_VALUES[self.curr_step % 4][i]
                 if pin_value == 1:
-                    GPIO.output(self.pins[i], GPIO.HIGH)
+                    self.GPIO.output(self.pins[i], self.GPIO.HIGH)
                 elif pin_value == 0:
-                    GPIO.output(self.pins[i], GPIO.LOW)
+                    self.GPIO.output(self.pins[i], self.GPIO.LOW)
                 else:
                     rospy.logwarn('Invalid output pin value.')
-        elif self.computer == 'pc-debug':
+        else:
             print('Stepping: {0}'.format(STEPPER_PIN_VALUES[self.curr_step % 4]))
 
     def enable(self):
         if self.computer != 'pc-debug':
-            GPIO.output(self.disable_pin, GPIO.HIGH)
+            self.GPIO.output(self.disable_pin, self.GPIO.LOW)
+        else:
+            print('Enabling stepper')
 
     def disable(self):
         if self.computer != 'pc-debug':
-            GPIO.output(self.disable_pin, GPIO.LOW)
+            self.GPIO.output(self.disable_pin, self.GPIO.HIGH)
+        else:
+            print('Disabling stepper')
 
     def shutdown(self):
-        if self.computer != 'pc-debug':
+        if self.computer == 'raspberry':
             print('stepper.py: Shutting down and cleaning GPIO pins.')
-            GPIO.cleanup()
+            self.GPIO.cleanup()

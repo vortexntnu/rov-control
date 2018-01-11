@@ -24,8 +24,9 @@ STEPPER_AGAR_ENABLE_PIN = rospy.get_param('/stepper/pins/agar_enable')
 
 class ManipulatorInterface(object):
     def __init__(self):
+        self.is_initialized = False
         rospy.init_node('manipulator_interface', anonymous=False)
-        self.pub = rospy.Publisher('pwm', Pwm, queue_size=10)
+        self.pub = rospy.Publisher('pwm', Pwm, queue_size=1)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
 
         self.neutral_pulse_width = self.servo_position_to_microsecs(0)
@@ -35,7 +36,7 @@ class ManipulatorInterface(object):
         rospy.on_shutdown(self.shutdown)
         self.claw_direction = 0.0
         self.claw_position = 0.0  # 1 = open, -1 = closed
-        self.claw_speed = 0.5
+        self.claw_speed = 1.0
 
         try:
             self.valve_stepper = Stepper(STEPPER_NUM_STEPS,
@@ -54,7 +55,11 @@ class ManipulatorInterface(object):
                            'Shutting down node...')
             rospy.signal_shutdown('')
 
-        rospy.loginfo('Initialized.')
+        self.valve_stepper.disable()
+        self.agar_stepper.disable()
+
+        rospy.loginfo('Initialized with {0} RPM steppers.'.format(STEPPER_RPM))
+        self.is_initialized = True
         self.spin()
 
     def spin(self):
@@ -69,13 +74,17 @@ class ManipulatorInterface(object):
             # Saturate claw position to [-1, 1]
             self.claw_position = clip(self.claw_position, -1, 1)
 
-            self.valve_stepper.step_once(self.valve_direction)
-            self.agar_stepper.step_once(self.agar_direction)
+            # Step steppers if nonzero direction
+            if abs(self.valve_direction) == 1:
+                self.valve_stepper.step_once(self.valve_direction)
+            if abs(self.agar_direction) == 1:
+                self.agar_stepper.step_once(self.agar_direction)
 
-            # Avoid too frequent PWM commands
-            if (rospy.get_rostime() - prev_time) > min_pwm_interval:
-                self.set_claw_pwm(self.claw_position)
-                prev_time = rospy.get_rostime()
+            # Move servo if nonzero direction
+            if abs(self.claw_direction) == 1:
+                if (rospy.get_rostime() - prev_time) > min_pwm_interval:
+                    self.set_claw_pwm(self.claw_position)
+                    prev_time = rospy.get_rostime()
 
             rate.sleep()
 
@@ -84,29 +93,42 @@ class ManipulatorInterface(object):
         msg.pins.append(SERVO_PWM_PIN)
         msg.positive_width_us.append(self.neutral_pulse_width)
         self.pub.publish(msg)
-        rospy.loginfo("Setting servo position to zero")
+        if self.is_initialized:
+            rospy.loginfo("Setting servo position to zero")
+
+    def servo_disable(self):
+        msg = Pwm()
+        msg.pins.append(SERVO_PWM_PIN)
+        msg.positive_width_us.append(0)
+        self.pub.publish(msg)
 
     def shutdown(self):
-        self.servo_set_to_zero()
+        self.servo_disable()
         self.valve_stepper.shutdown()
 
     def callback(self, msg):
+        if not self.is_initialized:
+            rospy.logwarn('Callback before node initialized, ignoring...')
+            return
+
         if not self.healthy_message(msg):
             return
 
         self.claw_direction = msg.claw_direction
-        self.valve_direction = msg.valve_direction
-        self.agar_direction = msg.agar_direction
 
-        if self.valve_direction == 0:
-            self.valve_stepper.disable()
-        else:
-            self.valve_stepper.enable()
+        if msg.valve_direction != self.valve_direction:
+            self.valve_direction = msg.valve_direction
+            if self.valve_direction == 0:
+                self.valve_stepper.disable()
+            else:
+                self.valve_stepper.enable()
 
-        if self.agar_direction == 0:
-            self.agar_stepper.disable()
-        else:
-            self.agar_stepper.enable()
+        if msg.agar_direction != self.agar_direction:
+            self.agar_direction = msg.agar_direction
+            if self.agar_direction == 0:
+                self.agar_stepper.disable()
+            else:
+                self.agar_stepper.enable()
 
     def servo_position_to_microsecs(self, thrust):
         return interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)

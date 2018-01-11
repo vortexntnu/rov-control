@@ -34,7 +34,7 @@ private:
 
   ControlMode control_mode;
   int frequency;
-  const double FORCE_DEADZONE_LIMIT = 0.01;
+  const double NORMALIZED_FORCE_DEADZONE = 0.01;
   const double MAX_QUAT_NORM_DEVIATION = 0.1;
 
   const uint8_t WRENCH_SURGE = 0;
@@ -57,6 +57,7 @@ private:
   QuaternionPdController *controller;
 
   void initSetpoints();
+  void resetSetpoints();
   void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
   void publishControlMode();
@@ -64,9 +65,11 @@ private:
                             const Eigen::Vector6d &velocity_state);
   Eigen::Vector6d depthHold(const Eigen::Vector6d &tau_openloop,
                             const Eigen::Vector3d &position_state,
+                            const Eigen::Quaterniond &orientation_state,
                             const Eigen::Vector6d &velocity_state,
                             const Eigen::Vector3d &position_setpoint);
   Eigen::Vector6d headingHold(const Eigen::Vector6d &tau_openloop,
+                              const Eigen::Vector3d &position_state,
                               const Eigen::Quaterniond &orientation_state,
                               const Eigen::Vector6d &velocity_state,
                               const Eigen::Quaterniond &orientation_setpoint);

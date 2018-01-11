@@ -35,24 +35,24 @@ propulsion:
   command:
     wrench:
       max:     [33.9, 33.9, 48.0, 7.6, 3.2, 9.9]
-      scaling: [ 0.1,  0.1,  0.2, 0.3, 0.5, 0.05]
+      scaling: [ 0.4,  0.4,  0.4, 0.3, 0.5, 0.1]
     pose:
       rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
 
 controller:
   frequency: 10
-  position_gain: 0.0
-  attitude_gain: 0.0
-  velocity_gain: 0.0
+  position_gain: 30.0
+  attitude_gain: 2.5
+  velocity_gain: 0.4
 
 servo:
   angle_range_deg: 35
   lookup:
     position: [-1, 1]
-    pulse_width: [1300, 500]
+    pulse_width: [950, 500]
 
 stepper:
-  default_speed_rpm: 15
+  default_speed_rpm: 30
   steps_per_rev: 200
   pins:
     valve: ['P8_28', 'P8_30', 'P8_27', 'P8_29']
@@ -70,7 +70,7 @@ pwm:
     claw_servo: 9
   frequency:
     set: 50.0
-    measured: 51.5
+    measured: 51.6
   counter:
     max: 4095
 

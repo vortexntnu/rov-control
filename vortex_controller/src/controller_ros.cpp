@@ -13,9 +13,9 @@
 
 Controller::Controller(ros::NodeHandle nh) : nh(nh)
 {
-  command_sub = nh.subscribe("propulsion_command", 10, &Controller::commandCallback, this);
-  state_sub   = nh.subscribe("state_estimate", 10, &Controller::stateCallback, this);
-  wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 10);
+  command_sub = nh.subscribe("propulsion_command", 1, &Controller::commandCallback, this);
+  state_sub   = nh.subscribe("state_estimate", 1, &Controller::stateCallback, this);
+  wrench_pub  = nh.advertise<geometry_msgs::Wrench>("rov_forces", 1);
   mode_pub    = nh.advertise<std_msgs::String>("controller/mode", 10);
 
   control_mode = ControlModes::OPEN_LOOP;
@@ -35,7 +35,7 @@ Controller::Controller(ros::NodeHandle nh) : nh(nh)
   dr_cb = boost::bind(&Controller::configCallback, this, _1, _2);
   dr_srv.setCallback(dr_cb);
 
-  ROS_INFO("Initialized.");
+  ROS_INFO("Initialized at %i Hz.", frequency);
 }
 
 void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
@@ -57,15 +57,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   if (new_control_mode != control_mode)
   {
     control_mode = new_control_mode;
-
-    Eigen::Vector3d    position;
-    Eigen::Quaterniond orientation;
-    Eigen::Vector6d    velocity;
-
-    // Reset setpoints to be equal to state
-    state->get(&position, &orientation, &velocity);
-    setpoints->set(position, orientation);
-
+    resetSetpoints();
     ROS_INFO_STREAM("Changing mode to " << controlModeString(control_mode) << ".");
   }
   publishControlMode();
@@ -99,8 +91,8 @@ void Controller::stateCallback(const nav_msgs::Odometry &msg)
 
 void Controller::configCallback(const vortex_controller::VortexControllerConfig &config, uint32_t level)
 {
-  ROS_INFO_STREAM("Setting gains: [velocity = " << config.velocity_gain << ", position = " << config.position_gain
-    << ", attitude = " << config.attitude_gain << "]");
+  ROS_INFO_STREAM("Setting gains: [vel = " << config.velocity_gain << ", pos = " << config.position_gain
+    << ", rot = " << config.attitude_gain << "]");
   controller->setGains(config.velocity_gain, config.position_gain, config.attitude_gain);
 }
 
@@ -120,21 +112,17 @@ void Controller::spin()
   Eigen::Vector3d    position_setpoint    = Eigen::Vector3d::Zero();
   Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
 
+  geometry_msgs::Wrench msg;
+
   ros::Rate rate(frequency);
   while (ros::ok())
   {
     // TODO(mortenfyhn): check value of bool return from getters
-
-    // Read state and setpoint
     state->get(&position_state, &orientation_state, &velocity_state);
     setpoints->get(&position_setpoint, &orientation_setpoint);
-
-    // Calculate terms of control vector
     setpoints->get(&tau_openloop);
-    tau_restoring = controller->getRestoring(orientation_state);
-    tau_staylevel = stayLevel(orientation_state, velocity_state);
-    tau_depthhold = depthHold(tau_openloop, position_state, velocity_state, position_setpoint);
-    tau_headinghold = headingHold(tau_openloop, orientation_state, velocity_state, orientation_setpoint);
+
+    tau_command.setZero();
 
     switch (control_mode)
     {
@@ -143,22 +131,44 @@ void Controller::spin()
       break;
 
       case ControlModes::OPEN_LOOP_RESTORING:
+      tau_restoring = controller->getRestoring(orientation_state);
       tau_command = tau_openloop + tau_restoring;
       break;
 
       case ControlModes::STAY_LEVEL:
+      tau_staylevel = stayLevel(orientation_state, velocity_state);
       tau_command = tau_openloop + tau_staylevel;
       break;
 
       case ControlModes::DEPTH_HOLD:
+      tau_depthhold = depthHold(tau_openloop,
+                                position_state,
+                                orientation_state,
+                                velocity_state,
+                                position_setpoint);
       tau_command = tau_openloop + tau_depthhold;
       break;
 
       case ControlModes::HEADING_HOLD:
+      tau_headinghold = headingHold(tau_openloop,
+                                    position_state,
+                                    orientation_state,
+                                    velocity_state,
+                                    orientation_setpoint);
       tau_command = tau_openloop + tau_headinghold;
       break;
 
       case ControlModes::DEPTH_HEADING_HOLD:
+      tau_depthhold = depthHold(tau_openloop,
+                                position_state,
+                                orientation_state,
+                                velocity_state,
+                                position_setpoint);
+      tau_headinghold = headingHold(tau_openloop,
+                                    position_state,
+                                    orientation_state,
+                                    velocity_state,
+                                    orientation_setpoint);
       tau_command = tau_openloop + tau_depthhold + tau_headinghold;
       break;
 
@@ -167,7 +177,6 @@ void Controller::spin()
       break;
     }
 
-    geometry_msgs::Wrench msg;
     tf::wrenchEigenToMsg(tau_command, msg);
     wrench_pub.publish(msg);
 
@@ -195,6 +204,15 @@ void Controller::initSetpoints()
   setpoints = new Setpoints(wrench_command_scaling,
                             wrench_command_max,
                             pose_command_rate);
+}
+
+void Controller::resetSetpoints()
+{
+  // Reset setpoints to be equal to state
+  Eigen::Vector3d position;
+  Eigen::Quaterniond orientation;
+  state->get(&position, &orientation);
+  setpoints->set(position, orientation);
 }
 
 void Controller::initPositionHoldController()
@@ -304,63 +322,60 @@ Eigen::Vector6d Controller::stayLevel(const Eigen::Quaterniond &orientation_stat
 
 Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
                                       const Eigen::Vector3d &position_state,
+                                      const Eigen::Quaterniond &orientation_state,
                                       const Eigen::Vector6d &velocity_state,
                                       const Eigen::Vector3d &position_setpoint)
 {
-  Eigen::Vector3d position_setpoint_copy = position_setpoint;
-  // Reset heave setpoint if nonzero heave motion command
-  if (abs(tau_openloop(WRENCH_HEAVE)) > FORCE_DEADZONE_LIMIT)
-    position_setpoint_copy(POSITION_HEAVE) = position_state(POSITION_HEAVE);
+  Eigen::Vector6d tau;
 
-  Eigen::Vector6d tau = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
-                                                position_setpoint_copy, Eigen::Quaterniond::Identity());
+  bool activate_depthhold = fabs(tau_openloop(WRENCH_HEAVE)) < NORMALIZED_FORCE_DEADZONE;
+  if (activate_depthhold)
+  {
+    tau = controller->getFeedback(position_state, Eigen::Quaterniond::Identity(), velocity_state,
+                                  position_setpoint, Eigen::Quaterniond::Identity());
 
-  tau(WRENCH_SURGE) = 0;
-  tau(WRENCH_SWAY)  = 0;
-  // Allow HEAVE
-  tau(WRENCH_ROLL)  = 0;
-  tau(WRENCH_PITCH) = 0;
-  tau(WRENCH_YAW)   = 0;
+    // Allow only heave feedback command
+    tau(WRENCH_SURGE) = 0;
+    tau(WRENCH_SWAY)  = 0;
+    tau(WRENCH_ROLL)  = 0;
+    tau(WRENCH_PITCH) = 0;
+    tau(WRENCH_YAW)   = 0;
+  }
+  else
+  {
+    resetSetpoints();
+    tau.setZero();
+  }
 
   return tau;
 }
 
 Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
+                                        const Eigen::Vector3d &position_state,
                                         const Eigen::Quaterniond &orientation_state,
                                         const Eigen::Vector6d &velocity_state,
                                         const Eigen::Quaterniond &orientation_setpoint)
 {
-  Eigen::Quaterniond orientation_setpoint_copy = orientation_setpoint;
+  Eigen::Vector6d tau;
 
-  // Reset orientation setpoint if nonzero yaw motion command
-  if (abs(tau_openloop(WRENCH_YAW)) > FORCE_DEADZONE_LIMIT)
-    orientation_setpoint_copy = orientation_state;
+  bool activate_headinghold = fabs(tau_openloop(WRENCH_YAW)) < NORMALIZED_FORCE_DEADZONE;
+  if (activate_headinghold)
+  {
+    tau = controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
+                                  Eigen::Vector3d::Zero(), orientation_setpoint);
 
-  // Convert quaternion setpoint to euler angles (ZYX convention)
-  Eigen::Vector3d euler_state, euler_setpoint;
-  euler_state = orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
-  euler_setpoint = orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
-
-  // Copy pitch and roll state to setpoint
-  euler_setpoint(EULER_PITCH) = euler_state(EULER_PITCH);
-  euler_setpoint(EULER_ROLL)  = euler_state(EULER_ROLL);
-
-  // Convert euler setpoint back to quaternions
-  Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(euler_setpoint(EULER_YAW),   Eigen::Vector3d::UnitZ())
-    * Eigen::AngleAxisd(euler_setpoint(EULER_PITCH), Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(euler_setpoint(EULER_ROLL),  Eigen::Vector3d::UnitX());
-  Eigen::Quaterniond orientation_headinghold(R);
-
-  Eigen::Vector6d tau =  controller->getFeedback(Eigen::Vector3d::Zero(), orientation_state, velocity_state,
-                                                 Eigen::Vector3d::Zero(), orientation_headinghold);
-
-  tau(WRENCH_SURGE) = 0;
-  tau(WRENCH_SWAY)  = 0;
-  tau(WRENCH_HEAVE) = 0;
-  tau(WRENCH_ROLL)  = 0;
-  tau(WRENCH_PITCH) = 0;
-  // Allow YAW
+    // Allow only yaw feedback command
+    tau(WRENCH_SURGE) = 0;
+    tau(WRENCH_SWAY)  = 0;
+    tau(WRENCH_HEAVE) = 0;
+    tau(WRENCH_ROLL)  = 0;
+    tau(WRENCH_PITCH) = 0;
+  }
+  else
+  {
+    resetSetpoints();
+    tau.setZero();
+  }
 
   return tau;
 }

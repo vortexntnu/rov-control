@@ -13,6 +13,7 @@ class Hc05InterfaceNode(object):
         self.port = "/dev/ttyO4"
         self.init_serial()
         self.init_publisher()
+        rospy.loginfo('Initialized Bluetooth.')
         self.read_bluetooth_data()
 
     def init_serial(self):
@@ -59,3 +60,5 @@ if __name__ == '__main__':
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
+    except:
+        rospy.logerr('Unexpected error, shutting down.')

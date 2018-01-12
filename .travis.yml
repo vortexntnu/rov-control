@@ -1,14 +1,18 @@
 dist: trusty
 sudo: required
 language:
-  - generic
+- generic
 cache:
-  - apt
+- apt
 services:
-  - docker
-
+- docker
 install:
-  - docker pull vortexntnu/rov-control
-
+- docker pull vortexntnu/rov-control
 script:
-  - docker run -v $(pwd):/root/clone vortexntnu/rov-control bash -c "source /opt/ros/kinetic/setup.bash && mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src && catkin_init_workspace && ln -s /root/clone . && cd ~/catkin_ws && catkin_make && catkin_make tests && source devel/setup.bash && catkin_make run_tests && catkin_make roslint"
+- docker run -v $(pwd):/root/clone vortexntnu/rov-control bash -c "source /opt/ros/kinetic/setup.bash
+  && mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src && catkin_init_workspace && ln
+  -s /root/clone . && cd ~/catkin_ws && catkin_make && catkin_make tests && source
+  devel/setup.bash && catkin_make run_tests && catkin_make roslint"
+notifications:
+  slack:
+    secure: kBD7n6ydVeDanA3Uk5hvuTRgP3gl3+RwIw+2T4ZjFWlse1FiWpRwDyrO/8qBMSdjzIIUkd2vj25gQxGKebOt5bLvlbFtAyZRR/XJTmOYBtZNXvqL1Qm0vJ3KN6NuaChy3rUmJx9kLW1I/rDu/Ws7M883yiGvrYVwrYj66JlP63wJ6XXwNgn1WlVwCsDnn7exZq7kXTJAzSQbxYOIy0p2DTEqfX0IuGHH4j9Fl7EumTqAWayFuNgg8ggPShYZzzovkbFFSYd3RoVRnz8OJS/XmFajEhrMu34/FykkHtDoq5D1if6vr4vC64o163BUgmcrXVWZ32VFa23arQfDOAgBZ0fzHEmjodDOfi6MnJnwe+Ush0PCwv4fk1ck5Jst7f6edxwqjCKPB1UX+C6JsdM8RvR5YYDJ9uHhmdPs1B63opGbZWUqufTz8AS9JmOg547EpL9kzWfYsg8BEZQ9Asxz/7eLcq7dBF7clKZwbNxbBC7yv2WtLT2Gn4SaoyWcPHbJig2p9ChZMv1u1mx1iceotPA4b2wCWbewrPjxPTmGMe4vS5OhpyH1k9MReNb8vhZSr0QZlnYl5Cwa9l484GkVHtMcrk0P0yQSE020FJrsBweLysPPPqBQEGgNLEEjfHW4AM18RmBg9goMIFhAU/7g26+mNi5eTWgB3VApcmTcT38=

@@ -19,6 +19,7 @@ add_message_files(
   ContainerID.msg
   Manipulator.msg
   CameraFeedSelection.msg
+  StampedHeartbeat.msg
 )
 
 generate_messages(

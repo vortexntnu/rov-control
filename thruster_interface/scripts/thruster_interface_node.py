@@ -4,7 +4,7 @@ from math import isnan, isinf
 from numpy import interp
 import rospy
 
-from vortex_msgs.msg import Float64ArrayStamped, Pwm
+from vortex_msgs.msg import Float64ArrayStamped, Pwm, StampedHeartbeat
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 THRUST_RANGE_LIMIT = 100
@@ -21,14 +21,46 @@ class ThrusterInterface(object):
     def __init__(self):
         rospy.init_node('thruster_interface', anonymous=False)
         self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
-        self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
-        self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
+        self.sub = rospy.Subscriber('thruster_forces',
+                                    Float64ArrayStamped,
+                                    self.callback)
+        self.srv = rospy.Service('/thruster_interface/thrusters_enable',
+                                 ThrustersEnable,
+                                 self.handle_thrusters_enable)
+        self.joystick_heartbeat_sub = rospy.Subscriber('joystick_heartbeat',
+                                                       StampedHeartbeat,
+                                                       self.heartbeat_callback)
+
+        self.joystick_heartbeat = rospy.get_rostime()
+        self.joystick_isalive = False
+
+        # The setpoint is the desired value (input)
+        self.thrust_setpoint = [0] * NUM_THRUSTERS
+        # The reference is the output value (rate limited)
+        self.thrust_reference = [0] * NUM_THRUSTERS
 
         self.thrusters_enabled = True
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
         rospy.loginfo('Initialized with offset:\n\t{0}.'.format(THRUST_OFFSET))
+        rospy.loginfo('Node initialized.')
+        self.joystick_watchdog()
+
+    def joystick_watchdog(self):
+        """ Monitor heartbeat from joystick node, zero output if heartbeat lost."""
+        while not rospy.is_shutdown():
+            if (rospy.get_rostime() - self.joystick_heartbeat).to_sec() > 1.0:
+                # Too long between heartbeats! Joystick node might be dead,
+                # or TCP connection to topside might be down.
+                rospy.logwarn('Joystick interface node not publishing heartbeat, '
+                              'setting thrusters to zero. Restart joystick_interface')
+                self.output_to_zero()
+                self.joystick_isalive = False
+                return
+            elif not self.joystick_isalive:
+                self.joystick_isalive = True
+            rospy.Rate(2).sleep()
 
     def output_to_zero(self):
         neutral_pulse_width = self.thrust_to_microsecs(0)
@@ -39,7 +71,13 @@ class ThrusterInterface(object):
                 pwm_msg.positive_width_us.append(neutral_pulse_width)
             self.pub_pwm.publish(pwm_msg)
 
+    def heartbeat_callback(self, msg):
+        self.joystick_heartbeat = msg.stamp
+
     def callback(self, msg):
+        if not self.joystick_isalive:
+            return
+
         if not self.healthy_message(msg):
             return
         thrust = list(msg.data)

@@ -35,7 +35,7 @@ propulsion:
   command:
     wrench:
       max:     [33.9, 33.9, 48.0, 7.6, 3.2, 9.9]
-      scaling: [ 0.4,  0.4,  0.4, 0.3, 0.5, 0.1]
+      scaling: [ 0.4,  0.4,  0.6, 0.3, 0.7, 0.2]
     pose:
       rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
 
@@ -65,7 +65,7 @@ computer: 'beaglebone'
 pwm:
   pins:
     # Map from thruster number (list index) to pwm pin (list value)
-    thrusters: [4, 5, 6, 7, 0, 1, 2, 3]
+    thrusters: [0, 1, 2, 3, 4, 5, 6, 7]
     headlights: 8
     claw_servo: 9
   frequency:

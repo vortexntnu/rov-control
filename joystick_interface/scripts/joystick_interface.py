@@ -14,7 +14,6 @@ class JoystickInterfaceNode(object):
                                           queue_size=1)
         self.pub_manipulator = rospy.Publisher('manipulator_command',
                                                Manipulator,
-                                               queue_size=1)
                                                queue_size=10)
         self.pub_heartbeat = rospy.Publisher('joystick_heartbeat',
                                              StampedHeartbeat,

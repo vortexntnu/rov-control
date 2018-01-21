@@ -16,7 +16,19 @@ from Adafruit_BNO055 import BNO055
 class Bno055InterfaceNode(object):
     def __init__(self):
         rospy.init_node('imu_node')
-        self.init_publishers()
+
+        self.pub_euler = rospy.Publisher(
+            'sensors/imu/euler',
+            Vector3Stamped,
+            queue_size=1)
+        self.pub_diagnostics = rospy.Publisher(
+            'sensors/imu/diagnostics',
+            DiagnosticStatus,
+            queue_size=1)
+        self.pub_imu = rospy.Publisher(
+            'sensors/imu/data',
+            Imu,
+            queue_size=1)
 
         self.srv_save_calibration = rospy.Service(
             'sensors/imu/save_calibration',
@@ -84,28 +96,6 @@ class Bno055InterfaceNode(object):
 
         self.talker()
 
-    def init_publishers(self):
-        self.pub_imu = rospy.Publisher(
-            'sensors/imu/data',
-            Imu,
-            queue_size=1)
-        # self.pub_mag = rospy.Publisher(
-        #     'sensors/imu/mag',
-        #     MagneticField,
-        #     queue_size=1)
-        # self.pub_imu_temp = rospy.Publisher(
-        #     'sensors/imu/temperature',
-        #     Temperature,
-        #     queue_size=1)
-        self.pub_diagnostics = rospy.Publisher(
-            'sensors/imu/diagnostics',
-            DiagnosticStatus,
-            queue_size=1)
-        self.pub_euler = rospy.Publisher(
-            'sensors/imu/euler',
-            Vector3Stamped,
-            queue_size=1)
-
     def get_diagnostic(self):
         diag_msg = DiagnosticStatus()
 
@@ -120,10 +110,10 @@ class Bno055InterfaceNode(object):
 
     def talker(self):
         imu_msg = Imu()
-        imu_euler_msg = Vector3Stamped()
+        # imu_euler_msg = Vector3Stamped()
         # imu_temp_msg = Temperature()
         # imu_mag_msg = MagneticField()
-        imu_diag_msg = DiagnosticStatus()
+        # imu_diag_msg = DiagnosticStatus()
         imu_diag_msg_prev = DiagnosticStatus()
 
         while not rospy.is_shutdown():

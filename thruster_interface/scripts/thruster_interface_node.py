@@ -17,6 +17,22 @@ THRUSTERS_CONNECTED = rospy.get_param('/thruster_interface/thrusters_connected')
 THRUSTER_PWM_PINS = rospy.get_param('/pwm/pins/thrusters')
 
 
+def thrust_to_microsecs(thrust):
+    return interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
+
+
+def healthy_message(msg):
+    if len(msg.data) != NUM_THRUSTERS:
+        rospy.logwarn_throttle(10, 'Wrong number of thrusters, ignoring...')
+        return False
+
+    for t in msg.data:
+        if isnan(t) or isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
+            rospy.logwarn_throttle(10, 'Message out of range, ignoring...')
+            return False
+    return True
+
+
 class ThrusterInterface(object):
     def __init__(self):
         rospy.init_node('thruster_interface', anonymous=False)
@@ -31,7 +47,7 @@ class ThrusterInterface(object):
         rospy.loginfo('Initialized with offset:\n\t{0}.'.format(THRUST_OFFSET))
 
     def output_to_zero(self):
-        neutral_pulse_width = self.thrust_to_microsecs(0)
+        neutral_pulse_width = thrust_to_microsecs(0)
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
             pwm_msg = Pwm()
             for i in range(NUM_THRUSTERS):
@@ -40,7 +56,7 @@ class ThrusterInterface(object):
             self.pub_pwm.publish(pwm_msg)
 
     def callback(self, msg):
-        if not self.healthy_message(msg):
+        if not healthy_message(msg):
             return
         thrust = list(msg.data)
 
@@ -48,7 +64,7 @@ class ThrusterInterface(object):
         pwm_msg = Pwm()
 
         for i in range(NUM_THRUSTERS):
-            microsecs[i] = self.thrust_to_microsecs(thrust[i] + THRUST_OFFSET[i])
+            microsecs[i] = thrust_to_microsecs(thrust[i] + THRUST_OFFSET[i])
             pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
             pwm_msg.positive_width_us.append(microsecs[i])
         if THRUSTERS_CONNECTED and self.thrusters_enabled:
@@ -63,20 +79,6 @@ class ThrusterInterface(object):
             self.output_to_zero()
             self.thrusters_enabled = False
         return ThrustersEnableResponse()
-
-    def thrust_to_microsecs(self, thrust):
-        return interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
-
-    def healthy_message(self, msg):
-        if (len(msg.data) != NUM_THRUSTERS):
-            rospy.logwarn_throttle(10, 'Wrong number of thrusters, ignoring...')
-            return False
-
-        for t in msg.data:
-            if isnan(t) or isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
-                rospy.logwarn_throttle(10, 'Message out of range, ignoring...')
-                return False
-        return True
 
 
 if __name__ == '__main__':

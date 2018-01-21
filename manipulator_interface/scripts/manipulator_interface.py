@@ -22,6 +22,26 @@ STEPPER_AGAR_PINS = rospy.get_param('/stepper/pins/agar')
 STEPPER_AGAR_ENABLE_PIN = rospy.get_param('/stepper/pins/agar_enable')
 
 
+def servo_position_to_microsecs(thrust):
+    return interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
+
+
+def healthy_message(msg):
+    if abs(msg.claw_direction) > 1:
+        rospy.logwarn_throttle(1, 'Claw position out of range. Ignoring message...')
+        return False
+
+    if abs(msg.valve_direction) > 1:
+        rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
+        return False
+
+    if abs(msg.agar_direction) > 1:
+        rospy.logwarn_throttle(1, 'Agar screwer command out of range. Ignoring message...')
+        return False
+
+    return True
+
+
 class ManipulatorInterface(object):
     def __init__(self):
         self.is_initialized = False
@@ -29,7 +49,7 @@ class ManipulatorInterface(object):
         self.pub = rospy.Publisher('pwm', Pwm, queue_size=1)
         self.sub = rospy.Subscriber('manipulator_command', Manipulator, self.callback)
 
-        self.neutral_pulse_width = self.servo_position_to_microsecs(0)
+        self.neutral_pulse_width = servo_position_to_microsecs(0)
 
         rospy.sleep(0.1)  # Initial set to zero seems to disappear without a short sleep here
         self.servo_set_to_zero()
@@ -111,7 +131,7 @@ class ManipulatorInterface(object):
             rospy.logwarn('Callback before node initialized, ignoring...')
             return
 
-        if not self.healthy_message(msg):
+        if not healthy_message(msg):
             return
 
         self.claw_direction = msg.claw_direction
@@ -130,32 +150,14 @@ class ManipulatorInterface(object):
             else:
                 self.agar_stepper.enable()
 
-    def servo_position_to_microsecs(self, thrust):
-        return interp(thrust, LOOKUP_POSITION, LOOKUP_PULSE_WIDTH)
-
     def set_claw_pwm(self, position):
-        microsecs = self.servo_position_to_microsecs(position)
+        microsecs = servo_position_to_microsecs(position)
 
         msg = Pwm()
         msg.pins.append(SERVO_PWM_PIN)
         msg.positive_width_us.append(microsecs)
 
         self.pub.publish(msg)
-
-    def healthy_message(self, msg):
-        if abs(msg.claw_direction) > 1:
-            rospy.logwarn_throttle(1, 'Claw position out of range. Ignoring message...')
-            return False
-
-        if abs(msg.valve_direction) > 1:
-            rospy.logwarn_throttle(1, 'Valve spinner command out of range. Ignoring message...')
-            return False
-
-        if abs(msg.agar_direction) > 1:
-            rospy.logwarn_throttle(1, 'Agar screwer command out of range. Ignoring message...')
-            return False
-
-        return True
 
 
 if __name__ == '__main__':

@@ -20,7 +20,7 @@ STEPPER_PIN_VALUES = [[1, 0, 1, 0],
                       [1, 0, 0, 1]]
 
 
-class Stepper():
+class Stepper:
     def __init__(self, number_of_steps, pins, disable_pin, computer):
         """"Initialize 4-pin stepper motor.
 

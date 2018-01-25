@@ -2,13 +2,15 @@
 import rospy
 from vortex_msgs.msg import PropulsionCommand, Manipulator
 from sensor_msgs.msg import Joy
+from geometry_msgs.msg import Twist
 
 
 class JoystickInterfaceNode(object):
     def __init__(self):
         rospy.init_node('joystick_node')
 
-        self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=1)
+        # self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=1)
+        self.sub = rospy.Subscriber('spacenav/twist', Twist, self.spacenav_callback, queue_size=1)
         self.pub_motion = rospy.Publisher('propulsion_command',
                                           PropulsionCommand,
                                           queue_size=1)
@@ -30,6 +32,31 @@ class JoystickInterfaceNode(object):
         self.agar_state = False
         self.agar_msg_curr = False
         self.agar_msg_prev = False
+
+
+    def spacenav_callback(self, msg):
+        motion_msg = PropulsionCommand()
+        motion_msg.motion = [
+            msg.linear.x / 0.68359375,   # Surge
+            msg.linear.y / -0.68359375,  # Sway
+            msg.linear.z / 0.68359375,   # Heave
+            msg.angular.x / 0.68359375,  # Roll
+            msg.angular.y / 0.68359375,  # Pitch
+            msg.angular.z / -0.68359375, # Yaw
+        ]
+
+        motion_msg.control_mode = [
+            (False),
+            (False),
+            (False),
+            (False),
+            (False),
+            (False)
+        ]
+
+        motion_msg.header.stamp = rospy.get_rostime()
+
+        self.pub_motion.publish(motion_msg)
 
     def callback(self, msg):
         # Connect values to names in two dictionaries

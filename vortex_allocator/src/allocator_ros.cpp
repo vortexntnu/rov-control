@@ -58,7 +58,7 @@ void Allocator::callback(const geometry_msgs::Wrench &msg_in) const
 
   if (!healthyWrench(rov_forces))
   {
-    ROS_ERROR("Rov forces vector invalid, ignoring.");
+    ROS_ERROR("ROV forces vector invalid, ignoring.");
     return;
   }
 

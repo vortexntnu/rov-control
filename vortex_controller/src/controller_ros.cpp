@@ -61,8 +61,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
 
 ControlMode Controller::getControlMode(const vortex_msgs::PropulsionCommand& msg) const
 {
-  ControlMode new_control_mode;
-  new_control_mode = control_mode;
+  ControlMode new_control_mode = this->control_mode;
   for (unsigned i = 0; i < msg.control_mode.size(); ++i)
   {
     if (msg.control_mode[i])

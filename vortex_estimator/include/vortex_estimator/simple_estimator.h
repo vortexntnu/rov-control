@@ -19,18 +19,18 @@ class SimpleEstimator
     void pressureCallback(const sensor_msgs::FluidPressure &msg);
     void publish();
   private:
-    ros::NodeHandle nh;
-    ros::Subscriber imu_sub;
-    ros::Subscriber pressure_sub;
-    ros::Publisher  state_pub;
+    ros::NodeHandle m_nh;
+    ros::Subscriber m_imu_sub;
+    ros::Subscriber m_pressure_sub;
+    ros::Publisher  m_state_pub;
 
-    double atmospheric_pressure;
-    double water_density;
-    double gravitational_acceleration;
+    double m_atmospheric_pressure;
+    double m_water_density;
+    double m_gravitational_acceleration;
 
-    const double PI = 3.141592653589793;
+    const double c_pi = 3.141592653589793;
 
-    vortex_msgs::RovState state;
+    vortex_msgs::RovState m_state;
 };
 
 #endif  // VORTEX_ESTIMATOR_SIMPLE_ESTIMATOR_H

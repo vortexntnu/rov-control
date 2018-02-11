@@ -2,20 +2,20 @@
 
 State::State()
 {
-  position_.setZero();
-  orientation_.setIdentity();
-  velocity_.setZero();
-  is_initialized_ = false;
+  m_position.setZero();
+  m_orientation.setIdentity();
+  m_velocity.setZero();
+  m_is_initialized = false;
 }
 
 bool State::get(Eigen::Vector3d    *position,
                 Eigen::Quaterniond *orientation)
 {
-  if (!is_initialized_)
+  if (!m_is_initialized)
     return false;
 
-  *position    = position_;
-  *orientation = orientation_;
+  *position    = m_position;
+  *orientation = m_orientation;
   return true;
 }
 
@@ -23,12 +23,12 @@ bool State::get(Eigen::Vector3d    *position,
                 Eigen::Quaterniond *orientation,
                 Eigen::Vector6d    *velocity)
 {
-  if (!is_initialized_)
+  if (!m_is_initialized)
     return false;
 
-  *position    = position_;
-  *orientation = orientation_;
-  *velocity    = velocity_;
+  *position    = m_position;
+  *orientation = m_orientation;
+  *velocity    = m_velocity;
   return true;
 }
 
@@ -36,9 +36,9 @@ void State::set(const Eigen::Vector3d    &position,
                 const Eigen::Quaterniond &orientation,
                 const Eigen::Vector6d    &velocity)
 {
-  position_    = position;
-  orientation_ = orientation;
-  velocity_    = velocity;
+  m_position    = position;
+  m_orientation = orientation;
+  m_velocity    = velocity;
 
-  is_initialized_ = true;
+  m_is_initialized = true;
 }

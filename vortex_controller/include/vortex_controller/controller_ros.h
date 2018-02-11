@@ -25,36 +25,24 @@ public:
   void configCallback(const vortex_controller::VortexControllerConfig& config, uint32_t level);
   void spin();
 private:
-  ros::NodeHandle nh;
-  ros::Subscriber command_sub;
-  ros::Subscriber state_sub;
-  ros::Publisher  wrench_pub;
-  ros::Publisher  mode_pub;
-  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig> dr_srv;
+  ros::NodeHandle m_nh;
+  ros::Subscriber m_command_sub;
+  ros::Subscriber m_state_sub;
+  ros::Publisher  m_wrench_pub;
+  ros::Publisher  m_mode_pub;
+  dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig> m_dr_srv;
 
-  ControlMode control_mode;
-  int frequency;
-  const double NORMALIZED_FORCE_DEADZONE = 0.01;
-  const double MAX_QUAT_NORM_DEVIATION = 0.1;
+  ControlMode m_control_mode;
+  int m_frequency;
+  const double c_normalized_force_deadzone = 0.01;
+  const double c_max_quat_norm_deviation = 0.1;
 
-  const uint8_t WRENCH_SURGE = 0;
-  const uint8_t WRENCH_SWAY  = 1;
-  const uint8_t WRENCH_HEAVE = 2;
-  const uint8_t WRENCH_ROLL  = 3;
-  const uint8_t WRENCH_PITCH = 4;
-  const uint8_t WRENCH_YAW   = 5;
+  enum PoseIndex { SURGE = 0, SWAY = 1, HEAVE = 2, ROLL = 3, PITCH = 4, YAW = 5 };
+  enum EulerIndex { EULER_YAW = 0, EULER_PITCH = 1, EULER_ROLL = 2 };
 
-  const uint8_t POSITION_SURGE = 0;
-  const uint8_t POSITION_SWAY  = 1;
-  const uint8_t POSITION_HEAVE = 2;
-
-  const uint8_t EULER_YAW   = 0;
-  const uint8_t EULER_PITCH = 1;
-  const uint8_t EULER_ROLL  = 2;
-
-  State                  *state;
-  Setpoints              *setpoints;
-  QuaternionPdController *controller;
+  std::unique_ptr<State>                  m_state;
+  std::unique_ptr<Setpoints>              m_setpoints;
+  std::unique_ptr<QuaternionPdController> m_controller;
 
   ControlMode getControlMode(const vortex_msgs::PropulsionCommand &msg) const;
   void initSetpoints();

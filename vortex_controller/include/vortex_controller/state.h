@@ -18,11 +18,11 @@ public:
            const Eigen::Vector6d    &velocity);
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 private:
-  Eigen::Vector3d    position_;
-  Eigen::Quaterniond orientation_;
-  Eigen::Vector6d    velocity_;
+  Eigen::Vector3d    m_position;
+  Eigen::Quaterniond m_orientation;
+  Eigen::Vector6d    m_velocity;
 
-  bool is_initialized_;
+  bool m_is_initialized;
 };
 
 #endif  // VORTEX_CONTROLLER_STATE_H

@@ -4,7 +4,7 @@ from math import isnan, isinf
 from numpy import interp
 import rospy
 
-from vortex_msgs.msg import Float64ArrayStamped, Pwm
+from vortex_msgs.msg import ThrusterForces, Pwm
 from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 THRUST_RANGE_LIMIT = 100
@@ -37,7 +37,7 @@ class ThrusterInterface(object):
     def __init__(self):
         rospy.init_node('thruster_interface', anonymous=False)
         self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
-        self.sub = rospy.Subscriber('thruster_forces', Float64ArrayStamped, self.callback)
+        self.sub = rospy.Subscriber('thruster_forces', ThrusterForces, self.callback)
         self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
 
         self.thrusters_enabled = True
@@ -58,7 +58,7 @@ class ThrusterInterface(object):
     def callback(self, msg):
         if not healthy_message(msg):
             return
-        thrust = list(msg.data)
+        thrust = list(msg.thrust)
 
         microsecs = [None] * NUM_THRUSTERS
         pwm_msg = Pwm()

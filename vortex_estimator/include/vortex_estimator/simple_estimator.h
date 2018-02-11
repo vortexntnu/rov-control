@@ -7,9 +7,9 @@
 #define VORTEX_ESTIMATOR_SIMPLE_ESTIMATOR_H
 
 #include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/FluidPressure.h"
+#include "vortex_msgs/RovState.h"
 
 class SimpleEstimator
 {
@@ -30,7 +30,7 @@ class SimpleEstimator
 
     const double PI = 3.141592653589793;
 
-    nav_msgs::Odometry state;
+    vortex_msgs::RovState state;
 };
 
 #endif  // VORTEX_ESTIMATOR_SIMPLE_ESTIMATOR_H

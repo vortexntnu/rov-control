@@ -16,6 +16,7 @@ add_message_files(
   EulerOrientations.msg
   Debug.msg
   Pwm.msg
+  RovState.msg
   ContainerID.msg
   Manipulator.msg
   CameraFeedSelection.msg

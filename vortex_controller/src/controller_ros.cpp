@@ -74,15 +74,15 @@ ControlMode Controller::getControlMode(const vortex_msgs::PropulsionCommand& msg
   return new_control_mode;
 }
 
-void Controller::stateCallback(const nav_msgs::Odometry &msg)
+void Controller::stateCallback(const vortex_msgs::RovState &msg)
 {
   Eigen::Vector3d    position;
   Eigen::Quaterniond orientation;
   Eigen::Vector6d    velocity;
 
-  tf::pointMsgToEigen(msg.pose.pose.position, position);
-  tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
-  tf::twistMsgToEigen(msg.twist.twist, velocity);
+  tf::pointMsgToEigen(msg.pose.position, position);
+  tf::quaternionMsgToEigen(msg.pose.orientation, orientation);
+  tf::twistMsgToEigen(msg.twist, velocity);
 
   bool orientation_invalid = (abs(orientation.norm() - 1) > MAX_QUAT_NORM_DEVIATION);
   if (isFucked(position) || isFucked(velocity) || orientation_invalid)

@@ -43,17 +43,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   if (!healthyMessage(msg))
     return;
 
-  ControlMode new_control_mode;
-  new_control_mode = control_mode;
-  for (int i = 0; i < msg.control_mode.size(); ++i)
-  {
-    if (msg.control_mode[i])
-    {
-      new_control_mode = static_cast<ControlMode>(i);
-      break;
-    }
-  }
-
+  ControlMode new_control_mode = getControlMode(msg);
   if (new_control_mode != control_mode)
   {
     control_mode = new_control_mode;
@@ -67,6 +57,21 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   for (int i = 0; i < 6; ++i)
     command(i) = msg.motion[i];
   setpoints->update(time, command);
+}
+
+ControlMode Controller::getControlMode(const vortex_msgs::PropulsionCommand& msg) const
+{
+  ControlMode new_control_mode;
+  new_control_mode = control_mode;
+  for (unsigned i = 0; i < msg.control_mode.size(); ++i)
+  {
+    if (msg.control_mode[i])
+    {
+      new_control_mode = static_cast<ControlMode>(i);
+      break;
+    }
+  }
+  return new_control_mode;
 }
 
 void Controller::stateCallback(const nav_msgs::Odometry &msg)

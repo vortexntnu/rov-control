@@ -56,6 +56,7 @@ private:
   Setpoints              *setpoints;
   QuaternionPdController *controller;
 
+  ControlMode getControlMode(const vortex_msgs::PropulsionCommand &msg) const;
   void initSetpoints();
   void resetSetpoints();
   void initPositionHoldController();

@@ -7,7 +7,7 @@ SimpleEstimator::SimpleEstimator()
 {
   imu_sub      = nh.subscribe("/sensors/imu/data", 1, &SimpleEstimator::imuCallback, this);
   pressure_sub = nh.subscribe("/sensors/pressure", 1, &SimpleEstimator::pressureCallback, this);
-  state_pub    = nh.advertise<nav_msgs::Odometry>("state_estimate", 1);
+  state_pub    = nh.advertise<vortex_msgs::RovState>("state_estimate", 1);
 
   if (!nh.getParam("atmosphere/pressure", atmospheric_pressure))
     ROS_ERROR("Could not read parameter atmospheric pressure.");
@@ -18,10 +18,10 @@ SimpleEstimator::SimpleEstimator()
   if (!nh.getParam("/gravity/acceleration", gravitational_acceleration))
     ROS_ERROR("Could not read parameter gravititional acceleration.");
 
-  state.pose.pose.orientation.w = 1.0;
-  state.pose.pose.orientation.x = 0.0;
-  state.pose.pose.orientation.y = 0.0;
-  state.pose.pose.orientation.z = 0.0;
+  state.pose.orientation.w = 1.0;
+  state.pose.orientation.x = 0.0;
+  state.pose.orientation.y = 0.0;
+  state.pose.orientation.z = 0.0;
 
   ROS_INFO("Initialized.");
 }
@@ -44,13 +44,13 @@ void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
   Eigen::Quaterniond quat_ned;
 
   // Convert to quaternion message and publish
-  tf::quaternionEigenToMsg(quat_ned, state.pose.pose.orientation);
-  state.twist.twist.angular.z = -msg.angular_velocity.z;
+  tf::quaternionEigenToMsg(quat_ned, state.pose.orientation);
+  state.twist.angular.z = -msg.angular_velocity.z;
   state_pub.publish(state);
 }
 
 void SimpleEstimator::pressureCallback(const sensor_msgs::FluidPressure &msg)
 {
-  state.pose.pose.position.z = (msg.fluid_pressure - atmospheric_pressure)/(water_density * gravitational_acceleration);
+  state.pose.position.z = (msg.fluid_pressure - atmospheric_pressure)/(water_density * gravitational_acceleration);
   state_pub.publish(state);
 }

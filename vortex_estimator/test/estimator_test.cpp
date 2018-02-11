@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/FluidPressure.h"
-#include "nav_msgs/Odometry.h"
+#include "vortex_msgs/RovState.h"
 
 // Pub imu/pressure and imu/data
 // Sub state_estimate
@@ -75,13 +75,13 @@ public:
   ros::Subscriber sub;
   bool message_received;
 
-  void Callback(const nav_msgs::Odometry& msg)
+  void Callback(const vortex_msgs::RovState& msg)
   {
-    q_w   = msg.pose.pose.orientation.w;
-    q_x   = msg.pose.pose.orientation.x;
-    q_y   = msg.pose.pose.orientation.y;
-    q_z   = msg.pose.pose.orientation.z;
-    depth = msg.pose.pose.position.z;
+    q_w   = msg.pose.orientation.w;
+    q_x   = msg.pose.orientation.x;
+    q_y   = msg.pose.orientation.y;
+    q_z   = msg.pose.orientation.z;
+    depth = msg.pose.position.z;
     message_received = true;
   }
 

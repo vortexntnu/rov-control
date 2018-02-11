@@ -3,7 +3,7 @@
 #include "boost/array.hpp"
 
 #include "vortex_msgs/PropulsionCommand.h"
-#include "vortex_msgs/Float64ArrayStamped.h"
+#include "vortex_msgs/ThrusterForces.h"
 
 #include <vector>
 
@@ -75,9 +75,9 @@ public:
   ros::Subscriber sub;
   bool message_received;
 
-  void Callback(const vortex_msgs::Float64ArrayStamped& msg)
+  void Callback(const vortex_msgs::ThrusterForces& msg)
   {
-    thrust = msg.data;
+    thrust = msg.thrust;
     message_received = true;
   }
 

@@ -43,17 +43,7 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   if (!healthyMessage(msg))
     return;
 
-  ControlMode new_control_mode;
-  new_control_mode = control_mode;
-  for (int i = 0; i < msg.control_mode.size(); ++i)
-  {
-    if (msg.control_mode[i])
-    {
-      new_control_mode = static_cast<ControlMode>(i);
-      break;
-    }
-  }
-
+  ControlMode new_control_mode = getControlMode(msg);
   if (new_control_mode != control_mode)
   {
     control_mode = new_control_mode;
@@ -69,15 +59,29 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   setpoints->update(time, command);
 }
 
-void Controller::stateCallback(const nav_msgs::Odometry &msg)
+ControlMode Controller::getControlMode(const vortex_msgs::PropulsionCommand& msg) const
+{
+  ControlMode new_control_mode = this->control_mode;
+  for (unsigned i = 0; i < msg.control_mode.size(); ++i)
+  {
+    if (msg.control_mode[i])
+    {
+      new_control_mode = static_cast<ControlMode>(i);
+      break;
+    }
+  }
+  return new_control_mode;
+}
+
+void Controller::stateCallback(const vortex_msgs::RovState &msg)
 {
   Eigen::Vector3d    position;
   Eigen::Quaterniond orientation;
   Eigen::Vector6d    velocity;
 
-  tf::pointMsgToEigen(msg.pose.pose.position, position);
-  tf::quaternionMsgToEigen(msg.pose.pose.orientation, orientation);
-  tf::twistMsgToEigen(msg.twist.twist, velocity);
+  tf::pointMsgToEigen(msg.pose.position, position);
+  tf::quaternionMsgToEigen(msg.pose.orientation, orientation);
+  tf::twistMsgToEigen(msg.twist, velocity);
 
   bool orientation_invalid = (abs(orientation.norm() - 1) > MAX_QUAT_NORM_DEVIATION);
   if (isFucked(position) || isFucked(velocity) || orientation_invalid)

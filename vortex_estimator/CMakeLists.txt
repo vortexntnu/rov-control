@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   eigen_conversions
   roscpp
   roslint
+  vortex_msgs
 )
 
 find_package(Eigen3 REQUIRED)

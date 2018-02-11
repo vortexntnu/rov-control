@@ -10,12 +10,13 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
-  Float64ArrayStamped.msg
+  ThrusterForces.msg
   LightInput.msg
   PropulsionCommand.msg
   EulerOrientations.msg
   Debug.msg
   Pwm.msg
+  RovState.msg
   ContainerID.msg
   Manipulator.msg
   CameraFeedSelection.msg

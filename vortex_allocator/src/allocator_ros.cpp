@@ -4,14 +4,14 @@
 #include <limits>
 
 #include <eigen_conversions/eigen_msg.h>
-#include "vortex_msgs/Float64ArrayStamped.h"
+#include "vortex_msgs/ThrusterForces.h"
 #include "vortex/eigen_typedefs.h"
 #include "vortex/eigen_helper.h"
 
 Allocator::Allocator(ros::NodeHandle nh) : nh(nh)
 {
   sub = nh.subscribe("rov_forces", 1, &Allocator::callback, this);
-  pub = nh.advertise<vortex_msgs::Float64ArrayStamped>("thruster_forces", 1);
+  pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 1);
 
   if (!nh.getParam("/propulsion/dofs/num", num_dof))
     ROS_FATAL("Failed to read parameter number of dofs.");
@@ -81,7 +81,7 @@ void Allocator::callback(const geometry_msgs::Wrench &msg)
   if (u != u_prev)
   {
     u_prev = u;
-    vortex_msgs::Float64ArrayStamped u_msg;
+    vortex_msgs::ThrusterForces u_msg;
     arrayEigenToMsg(u, &u_msg);
     u_msg.header.stamp = ros::Time::now();
     pub.publish(u_msg);

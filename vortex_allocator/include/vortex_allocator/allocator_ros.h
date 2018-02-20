@@ -12,7 +12,7 @@
 class Allocator
 {
 public:
-  Allocator(ros::NodeHandle nh);
+  explicit Allocator(ros::NodeHandle nh);
   void callback(const geometry_msgs::Wrench &msg) const;
 private:
   ros::NodeHandle nh;

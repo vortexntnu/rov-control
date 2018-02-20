@@ -9,11 +9,10 @@
 #include "vortex/eigen_typedefs.h"
 #include "vortex/eigen_helper.h"
 
-Allocator::Allocator(ros::NodeHandle nh)
- :
-nh(nh),
-min_thrust(-std::numeric_limits<double>::infinity()),
-max_thrust(std::numeric_limits<double>::infinity())
+Allocator::Allocator(ros::NodeHandle nh) :
+  nh(nh),
+  min_thrust(-std::numeric_limits<double>::infinity()),
+  max_thrust(std::numeric_limits<double>::infinity())
 {
   sub = nh.subscribe("rov_forces", 1, &Allocator::callback, this);
   pub = nh.advertise<vortex_msgs::ThrusterForces>("thruster_forces", 1);

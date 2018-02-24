@@ -29,9 +29,8 @@ Allocator::Allocator(ros::NodeHandle nh)
   std::vector<double> thrust;
   if (!m_nh.getParam("/thrusters/characteristics/thrust", thrust))
   {
-    m_min_thrust = -std::numeric_limits<double>::infinity();
-    m_max_thrust =  std::numeric_limits<double>::infinity();
-    ROS_WARN_STREAM("Failed to read params min/max thrust. Defaulting to " << m_min_thrust << "/" << m_max_thrust << ".");
+    ROS_WARN("Failed to read params min/max thrust. Using (%.2f) to (%.2f).",
+      m_min_thrust, m_max_thrust);
   }
 
   // Read thrust config matrix

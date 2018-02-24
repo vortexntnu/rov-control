@@ -23,6 +23,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
     m_wrench(i) = m_wrench_scaling(i) * m_wrench_max(i) * command(i);
   m_wrench_is_valid = true;
 
+#if 0
   // Check difference and validity of timestamp
   if (!m_time_is_valid)
   {
@@ -56,6 +57,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   m_orientation = q;
 
   m_pose_is_valid = true;
+#endif
   return true;
 }
 

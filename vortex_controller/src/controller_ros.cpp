@@ -40,6 +40,22 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   if (!healthyMessage(msg))
     return;
 
+
+  // if prev call had nonzero joystick command and this call has zero joystick command
+  // then reset setpoints
+  static bool joystick_active_prev = false;
+
+  bool joystick_active_curr = false;
+  const auto joystick_is_zero = [&] () {
+    for (const auto& m : msg.motion)
+      if (std::abs(m) > c_normalized_force_deadzone)
+        joystick_active_curr = true;
+  };
+
+  if (joystick_active_prev && !joystick_active_curr)
+    resetSetpoints();
+
+
   ControlMode new_control_mode = getControlMode(msg);
   if (new_control_mode != m_control_mode)
   {

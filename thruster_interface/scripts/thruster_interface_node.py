@@ -22,11 +22,11 @@ def thrust_to_microsecs(thrust):
 
 
 def healthy_message(msg):
-    if len(msg.data) != NUM_THRUSTERS:
+    if len(msg.thrust) != NUM_THRUSTERS:
         rospy.logwarn_throttle(10, 'Wrong number of thrusters, ignoring...')
         return False
 
-    for t in msg.data:
+    for t in msg.thrust:
         if isnan(t) or isinf(t) or (abs(t) > THRUST_RANGE_LIMIT):
             rospy.logwarn_throttle(10, 'Message out of range, ignoring...')
             return False

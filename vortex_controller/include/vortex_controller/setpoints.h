@@ -18,18 +18,18 @@ public:
            const Eigen::Quaterniond &orientation);
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 private:
-  Eigen::Vector6d    wrench_;
-  Eigen::Vector3d    position_;
-  Eigen::Quaterniond orientation_;
+  Eigen::Vector6d    m_wrench;
+  Eigen::Vector3d    m_position;
+  Eigen::Quaterniond m_orientation;
 
-  Eigen::Vector6d wrench_scaling_;
-  Eigen::Vector6d wrench_max_;
-  Eigen::Vector6d pose_rate_;
+  Eigen::Vector6d m_wrench_scaling;
+  Eigen::Vector6d m_wrench_max;
+  Eigen::Vector6d m_pose_rate;
 
-  double time_;
-  bool   time_valid_;
-  bool   wrench_valid_;
-  bool   pose_valid_;
+  double m_time;
+  bool   m_time_is_valid;
+  bool   m_wrench_is_valid;
+  bool   m_pose_is_valid;
 };
 
 #endif  // VORTEX_CONTROLLER_SETPOINTS_H

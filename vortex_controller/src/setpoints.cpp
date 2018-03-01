@@ -3,49 +3,49 @@
 Setpoints::Setpoints(const Eigen::Vector6d &wrench_scaling,
                      const Eigen::Vector6d &wrench_max,
                      const Eigen::Vector6d &pose_rate)
-: wrench_scaling_(wrench_scaling),
-  wrench_max_(wrench_max),
-  pose_rate_(pose_rate)
+: m_wrench_scaling(wrench_scaling),
+  m_wrench_max(wrench_max),
+  m_pose_rate(pose_rate)
 {
-  wrench_.setZero();
-  position_.setZero();
-  orientation_.setIdentity();
+  m_wrench.setZero();
+  m_position.setZero();
+  m_orientation.setIdentity();
 
-  time_valid_   = false;
-  wrench_valid_ = false;
-  pose_valid_   = false;
+  m_time_is_valid   = false;
+  m_wrench_is_valid = false;
+  m_pose_is_valid   = false;
 }
 
 bool Setpoints::update(const double time, const Eigen::Vector6d &command)
 {
   // Update wrench setpoint (independent of timestamp)
   for (int i = 0; i < 6; ++i)
-    wrench_(i) = wrench_scaling_(i) * wrench_max_(i) * command(i);
-  wrench_valid_ = true;
+    m_wrench(i) = m_wrench_scaling(i) * m_wrench_max(i) * command(i);
+  m_wrench_is_valid = true;
 
   // Check difference and validity of timestamp
-  if (!time_valid_)
+  if (!m_time_is_valid)
   {
-    time_ = time;
-    time_valid_ = true;
+    m_time = time;
+    m_time_is_valid = true;
     return false;
   }
-  double dt = time - time_;
-  time_ = time;
+  double dt = time - m_time;
+  m_time = time;
   if (dt == 0)
     return false;
 
   // Increment position setpoint
   for (int i = 0; i < 3; ++i)
-    position_(i) += pose_rate_(i) * dt * command(i);
+    m_position(i) += m_pose_rate(i) * dt * command(i);
 
   // Convert quaternion setpoint to euler angles (ZYX convention)
   Eigen::Vector3d euler;
-  euler = orientation_.toRotationMatrix().eulerAngles(2, 1, 0);
+  euler = m_orientation.toRotationMatrix().eulerAngles(2, 1, 0);
 
   // Increment euler setpoint
   for (int i = 0; i < 3; ++i)
-    euler(i) += pose_rate_(i) * dt * command(3+i);
+    euler(i) += m_pose_rate(i) * dt * command(3+i);
 
   // Convert euler setpoint back to quaternions
   Eigen::Matrix3d R;
@@ -53,38 +53,38 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
     * Eigen::AngleAxisd(euler(1), Eigen::Vector3d::UnitY())
     * Eigen::AngleAxisd(euler(2), Eigen::Vector3d::UnitX());
   Eigen::Quaterniond q(R);
-  orientation_ = q;
+  m_orientation = q;
 
-  pose_valid_ = true;
+  m_pose_is_valid = true;
   return true;
 }
 
 bool Setpoints::get(Eigen::Vector6d *wrench)
 {
-  if (!wrench_valid_)
+  if (!m_wrench_is_valid)
     return false;
 
-  *wrench = wrench_;
+  *wrench = m_wrench;
   return true;
 }
 
 bool Setpoints::get(Eigen::Vector3d    *position,
                     Eigen::Quaterniond *orientation)
 {
-  if (!pose_valid_)
+  if (!m_pose_is_valid)
     return false;
 
-  *position    = position_;
-  *orientation = orientation_;
+  *position    = m_position;
+  *orientation = m_orientation;
   return true;
 }
 
 void Setpoints::set(const Eigen::Vector3d    &position,
                     const Eigen::Quaterniond &orientation)
 {
-  position_    = position;
-  orientation_ = orientation;
+  m_position    = position;
+  m_orientation = orientation;
 
-  time_valid_ = false;
-  pose_valid_ = true;
+  m_time_is_valid = false;
+  m_pose_is_valid = true;
 }

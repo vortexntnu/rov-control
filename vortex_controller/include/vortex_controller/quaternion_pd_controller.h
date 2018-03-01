@@ -12,13 +12,8 @@
 class QuaternionPdController
 {
 public:
-  QuaternionPdController(double a,
-                         double b,
-                         double c,
-                         double W,
-                         double B,
-                         const Eigen::Vector3d &r_G,
-                         const Eigen::Vector3d &r_B);
+  QuaternionPdController(double a, double b, double c, double W, double B,
+                         const Eigen::Vector3d &r_G, const Eigen::Vector3d &r_B);
   void setGains(double a, double b, double c);
 
   // Return restoring forces vector
@@ -47,14 +42,14 @@ private:
   Eigen::Vector6d restoringForceVector(const Eigen::Matrix3d &R);
   int             sgn(double x);
 
-  double c;             // Orientation gain
-  Eigen::Matrix6d K_d;  // Derivative gain matrix
-  Eigen::Matrix3d K_x;  // Position error gain matrix
+  double m_c;             // Orientation gain
+  Eigen::Matrix6d m_K_d;  // Derivative gain matrix
+  Eigen::Matrix3d m_K_x;  // Position error gain matrix
 
-  Eigen::Vector3d r_G;  // Center of gravity, expressed in body frame
-  Eigen::Vector3d r_B;  // Center of buoyancy, expressed in body frame
-  double W;             // [N] Weight of ROV
-  double B;             // [N] Buoyancy of ROV
+  Eigen::Vector3d m_r_G;  // Center of gravity, expressed in body frame
+  Eigen::Vector3d m_r_B;  // Center of buoyancy, expressed in body frame
+  double m_W;             // [N] Weight of ROV
+  double m_B;             // [N] Buoyancy of ROV
 };
 
 #endif  // VORTEX_CONTROLLER_QUATERNION_PD_CONTROLLER_H

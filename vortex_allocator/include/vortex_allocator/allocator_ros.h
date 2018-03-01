@@ -15,18 +15,18 @@ public:
   explicit Allocator(ros::NodeHandle nh);
   void callback(const geometry_msgs::Wrench &msg) const;
 private:
-  ros::NodeHandle nh;
-  ros::Subscriber sub;
-  ros::Publisher  pub;
+  ros::NodeHandle m_nh;
+  ros::Subscriber m_sub;
+  ros::Publisher  m_pub;
 
-  int num_degrees_of_freedom;
-  int num_thrusters;
-  std::map<std::string, bool> active_degrees_of_freedom;
-  double min_thrust;
-  double max_thrust;
-  const double FORCE_RANGE_LIMIT = 100;
+  int m_num_degrees_of_freedom;
+  int m_num_thrusters;
+  std::map<std::string, bool> m_active_degrees_of_freedom;
+  double m_min_thrust;
+  double m_max_thrust;
+  const double c_force_range_limit = 100;
 
-  std::unique_ptr<PseudoinverseAllocator> pseudoinverse_allocator;
+  std::unique_ptr<PseudoinverseAllocator> m_pseudoinverse_allocator;
 
   Eigen::VectorXd rovForcesMsgToEigen(const geometry_msgs::Wrench &msg) const;
   bool healthyWrench(const Eigen::VectorXd &v) const;

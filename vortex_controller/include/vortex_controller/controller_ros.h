@@ -11,6 +11,8 @@
 #include "vortex_controller/control_modes.h"
 #include "vortex_msgs/PropulsionCommand.h"
 #include "vortex_msgs/RovState.h"
+#include "vortex_msgs/Debug.h"
+
 
 #include "vortex_controller/state.h"
 #include "vortex_controller/setpoints.h"
@@ -51,6 +53,11 @@ private:
   void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
   void publishControlMode();
+  void publishDebugMsg(const Eigen::Vector3d    &position_state,
+                       const Eigen::Quaterniond &orientation_state,
+                       const Eigen::Vector6d    &velocity_state,
+                       const Eigen::Vector3d    &position_setpoint,
+                       const Eigen::Quaterniond &orientation_setpoint);
   Eigen::Vector6d stayLevel(const Eigen::Quaterniond &orientation_state,
                             const Eigen::Vector6d &velocity_state);
   Eigen::Vector6d depthHold(const Eigen::Vector6d &tau_openloop,

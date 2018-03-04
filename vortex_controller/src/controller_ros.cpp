@@ -5,7 +5,7 @@
 #include <eigen_conversions/eigen_msg.h>
 
 #include "std_msgs/String.h"
-#include "vortex_msgs/Debug.h"
+
 
 #include <math.h>
 #include <map>
@@ -127,28 +127,8 @@ void Controller::spin()
     m_setpoints->get(&position_setpoint, &orientation_setpoint);
     m_setpoints->get(&tau_openloop);
 
-    dbg_msg.state_position.x = position_state[0];
-    dbg_msg.state_position.y = position_state[1];
-    dbg_msg.state_position.z = position_state[2];
-
-    dbg_msg.setpoint_position.x = position_setpoint[0];
-    dbg_msg.setpoint_position.y = position_setpoint[1];
-    dbg_msg.setpoint_position.z = position_setpoint[2];
-
-    Eigen::Vector3d dbg_state_orientation =
-        orientation_state.toRotationMatrix().eulerAngles(2,1,0);
-    Eigen::Vector3d dbg_setpoint_orientation =
-        orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
-
-    dbg_msg.state_roll = euler_state[0];
-    dbg_msg.state_pitch = euler_state[1];
-    dbg_msg.state_yaw = euler_state[2];
-
-    dbg_msg.setpoint_roll = euler_setpoint[0];
-    dbg_msg.setpoint_pitch = euler_setpoint[1];
-    dbg_msg.setpoint_yaw = euler_setpoint[2];
-
-    m_debug_pub.publish(dbg_msg);
+    publishDebugMsg(position_state, orientation_state, velocity_state,
+                    position_setpoint, orientation_setpoint);
 
     tau_command.setZero();
 
@@ -317,6 +297,38 @@ void Controller::publishControlMode()
   std_msgs::String msg;
   msg.data = s;
   m_mode_pub.publish(msg);
+}
+
+void Controller::publishDebugMsg(const Eigen::Vector3d    &position_state,
+                                 const Eigen::Quaterniond &orientation_state,
+                                 const Eigen::Vector6d    &velocity_state,
+                                 const Eigen::Vector3d    &position_setpoint,
+                                 const Eigen::Quaterniond &orientation_setpoint)
+{
+  vortex_msgs::Debug dbg_msg;
+
+  dbg_msg.state_position.x = position_state[0];
+  dbg_msg.state_position.y = position_state[1];
+  dbg_msg.state_position.z = position_state[2];
+
+  dbg_msg.setpoint_position.x = position_setpoint[0];
+  dbg_msg.setpoint_position.y = position_setpoint[1];
+  dbg_msg.setpoint_position.z = position_setpoint[2];
+
+  Eigen::Vector3d dbg_state_orientation =
+      orientation_state.toRotationMatrix().eulerAngles(2,1,0);
+  Eigen::Vector3d dbg_setpoint_orientation =
+      orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+
+  dbg_msg.state_roll = dbg_state_orientation[0];
+  dbg_msg.state_pitch = dbg_state_orientation[1];
+  dbg_msg.state_yaw = dbg_state_orientation[2];
+
+  dbg_msg.setpoint_roll = dbg_setpoint_orientation[0];
+  dbg_msg.setpoint_pitch = dbg_setpoint_orientation[1];
+  dbg_msg.setpoint_yaw = dbg_setpoint_orientation[2];
+
+  m_debug_pub.publish(dbg_msg);
 }
 
 Eigen::Vector6d Controller::stayLevel(const Eigen::Quaterniond &orientation_state,

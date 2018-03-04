@@ -30,6 +30,7 @@ private:
   ros::Subscriber m_state_sub;
   ros::Publisher  m_wrench_pub;
   ros::Publisher  m_mode_pub;
+  ros::Publisher  m_debug_pub;
   dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig> m_dr_srv;
 
   ControlMode m_control_mode;

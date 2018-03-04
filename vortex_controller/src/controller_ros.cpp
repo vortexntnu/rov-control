@@ -5,6 +5,7 @@
 #include <eigen_conversions/eigen_msg.h>
 
 #include "std_msgs/String.h"
+#include "vortex_msgs/Debug.h"
 
 #include <math.h>
 #include <map>
@@ -17,6 +18,7 @@ Controller::Controller(ros::NodeHandle nh) : m_nh(nh), m_frequency(10)
   m_state_sub   = m_nh.subscribe("state_estimate", 1, &Controller::stateCallback, this);
   m_wrench_pub  = m_nh.advertise<geometry_msgs::Wrench>("rov_forces", 1);
   m_mode_pub    = m_nh.advertise<std_msgs::String>("controller/mode", 10);
+  m_debug_pub   = m_nh.advertise<vortex_msgs::Debug>("debug/controlstates", 10);
 
   m_control_mode = ControlModes::OPEN_LOOP;
 
@@ -114,6 +116,8 @@ void Controller::spin()
   Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
 
   geometry_msgs::Wrench msg;
+  vortex_msgs::Debug    dbg_msg;
+
 
   ros::Rate rate(m_frequency);
   while (ros::ok())
@@ -122,6 +126,29 @@ void Controller::spin()
     m_state->get(&position_state, &orientation_state, &velocity_state);
     m_setpoints->get(&position_setpoint, &orientation_setpoint);
     m_setpoints->get(&tau_openloop);
+
+    dbg_msg.state_position.x = position_state[0];
+    dbg_msg.state_position.y = position_state[1];
+    dbg_msg.state_position.z = position_state[2];
+
+    dbg_msg.setpoint_position.x = position_setpoint[0];
+    dbg_msg.setpoint_position.y = position_setpoint[1];
+    dbg_msg.setpoint_position.z = position_setpoint[2];
+
+    Eigen::Vector3d dbg_state_orientation =
+        orientation_state.toRotationMatrix().eulerAngles(2,1,0);
+    Eigen::Vector3d dbg_setpoint_orientation =
+        orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+
+    dbg_msg.state_roll = euler_state[0];
+    dbg_msg.state_pitch = euler_state[1];
+    dbg_msg.state_yaw = euler_state[2];
+
+    dbg_msg.setpoint_roll = euler_setpoint[0];
+    dbg_msg.setpoint_pitch = euler_setpoint[1];
+    dbg_msg.setpoint_yaw = euler_setpoint[2];
+
+    m_debug_pub.publish(dbg_msg);
 
     tau_command.setZero();
 

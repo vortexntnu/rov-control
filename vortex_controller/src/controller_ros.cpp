@@ -214,6 +214,41 @@ void Controller::resetSetpoints()
   m_setpoints->set(position, orientation);
 }
 
+void Controller::updatePositionSetpoint(PoseIndex axis)
+{
+  Eigen::Vector3d position_state;
+  Eigen::Vector3d position_setpoint;
+
+  m_state->get(&position_state);
+  m_setpoints->get(&position_setpoint);
+
+  position_setpoint[axis] = position_state[axis];
+
+  m_setpoints->set(position_setpoint);
+}
+
+void Controller::updateOrientationSetpoint(EulerIndex axis)
+{
+  Eigen::Quaterniond orientation_state;
+  Eigen::Quaterniond orientation_setpoint;
+
+  m_state->get(&orientation_state);
+  m_setpoints->get(&orientation_setpoint);
+
+  Eigen::Vector3d euler_state =
+    orientation_state.toRotationMatrix().eulerAngles(2,1,0);
+  Eigen::Vector3d euler_setpoint =
+    orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+
+  euler_setpoint[axis] = euler_state[axis];
+  Eigen::Matrix3d R;
+  R = Eigen::AngleAxisd(euler_setpoint(0), Eigen::Vector3d::UnitZ())
+    * Eigen::AngleAxisd(euler_setpoint(1), Eigen::Vector3d::UnitY())
+    * Eigen::AngleAxisd(euler_setpoint(2), Eigen::Vector3d::UnitX());
+  Eigen::Quaterniond quaternion_setpoint(R);
+  m_setpoints->set(quaternion_setpoint);
+}
+
 void Controller::initPositionHoldController()
 {
   // Read controller gains from parameter server
@@ -342,7 +377,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    resetSetpoints();
+    updatePositionSetpoint(HEAVE);
     tau.setZero();
   }
 
@@ -372,9 +407,10 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    resetSetpoints();
+    updateOrientationSetpoint(EULER_YAW);
     tau.setZero();
   }
 
   return tau;
 }
+

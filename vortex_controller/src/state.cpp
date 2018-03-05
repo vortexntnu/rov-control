@@ -32,6 +32,22 @@ bool State::get(Eigen::Vector3d    *position,
   return true;
 }
 
+bool State::get(Eigen::Vector3d *position)
+{
+  if (!m_is_initialized)
+    return false;
+
+  *position = m_position;
+}
+
+bool State::get(Eigen::Quaterniond *orientation)
+{
+  if (!m_is_initialized)
+    return false;
+
+  *orientation = m_orientation;
+}
+
 void State::set(const Eigen::Vector3d    &position,
                 const Eigen::Quaterniond &orientation,
                 const Eigen::Vector6d    &velocity)

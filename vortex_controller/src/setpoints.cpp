@@ -34,7 +34,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
   m_time = time;
   if (dt == 0)
     return false;
-
+/*
   // Increment position setpoint
   for (int i = 0; i < 3; ++i)
     m_position(i) += m_pose_rate(i) * dt * command(i);
@@ -54,7 +54,7 @@ bool Setpoints::update(const double time, const Eigen::Vector6d &command)
     * Eigen::AngleAxisd(euler(2), Eigen::Vector3d::UnitX());
   Eigen::Quaterniond q(R);
   m_orientation = q;
-
+*/
   m_pose_is_valid = true;
   return true;
 }
@@ -79,6 +79,22 @@ bool Setpoints::get(Eigen::Vector3d    *position,
   return true;
 }
 
+bool Setpoints::get(Eigen::Vector3d *position)
+{
+  if (!m_pose_is_valid)
+    return false;
+
+  *position    = m_position;
+}
+
+bool Setpoints::get(Eigen::Quaterniond *orientation)
+{
+  if (!m_pose_is_valid)
+    return false;
+
+  *orientation = m_orientation;
+}
+
 void Setpoints::set(const Eigen::Vector3d    &position,
                     const Eigen::Quaterniond &orientation)
 {
@@ -87,4 +103,18 @@ void Setpoints::set(const Eigen::Vector3d    &position,
 
   m_time_is_valid = false;
   m_pose_is_valid = true;
+}
+
+void Setpoints::set(const Eigen::Vector3d &position)
+{
+  m_position   = position;
+
+  // SET TIME AND POSITION VALID HERE?
+}
+
+void Setpoints::set(const Eigen::Quaterniond &orientation)
+{
+  m_orientation = orientation;
+
+  // SET TIME AND POSITION VALID HERE?
 }

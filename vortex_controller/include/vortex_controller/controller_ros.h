@@ -47,6 +47,8 @@ private:
   ControlMode getControlMode(const vortex_msgs::PropulsionCommand &msg) const;
   void initSetpoints();
   void resetSetpoints();
+  void updatePositionSetpoint(PoseIndex axis);
+  void updateOrientationSetpoint(EulerIndex axis);
   void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
   void publishControlMode();

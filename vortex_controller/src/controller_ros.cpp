@@ -316,9 +316,9 @@ void Controller::publishDebugMsg(const Eigen::Vector3d    &position_state,
   dbg_msg.setpoint_position.z = position_setpoint[2];
 
   Eigen::Vector3d dbg_state_orientation =
-      orientation_state.toRotationMatrix().eulerAngles(2,1,0);
+      orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
   Eigen::Vector3d dbg_setpoint_orientation =
-      orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+      orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
 
   dbg_msg.state_roll = dbg_state_orientation[0];
   dbg_msg.state_pitch = dbg_state_orientation[1];

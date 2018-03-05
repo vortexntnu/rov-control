@@ -236,9 +236,9 @@ void Controller::updateOrientationSetpoint(EulerIndex axis)
   m_setpoints->get(&orientation_setpoint);
 
   Eigen::Vector3d euler_state =
-    orientation_state.toRotationMatrix().eulerAngles(2,1,0);
+    orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
   Eigen::Vector3d euler_setpoint =
-    orientation_setpoint.toRotationMatrix().eulerAngles(2,1,0);
+    orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
 
   euler_setpoint[axis] = euler_state[axis];
   Eigen::Matrix3d R;

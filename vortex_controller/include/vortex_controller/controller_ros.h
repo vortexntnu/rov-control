@@ -13,7 +13,6 @@
 #include "vortex_msgs/RovState.h"
 #include "vortex_msgs/Debug.h"
 
-
 #include "vortex_controller/state.h"
 #include "vortex_controller/setpoints.h"
 #include "vortex_controller/quaternion_pd_controller.h"

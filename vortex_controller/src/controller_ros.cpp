@@ -17,11 +17,20 @@ Controller::Controller(ros::NodeHandle nh) : m_nh(nh), m_frequency(10)
   m_state_sub   = m_nh.subscribe("state_estimate", 1, &Controller::stateCallback, this);
   m_wrench_pub  = m_nh.advertise<geometry_msgs::Wrench>("rov_forces", 1);
   m_mode_pub    = m_nh.advertise<std_msgs::String>("controller/mode", 10);
+  m_debug_pub   = m_nh.advertise<vortex_msgs::Debug>("debug/controlstates", 10);
 
   m_control_mode = ControlModes::OPEN_LOOP;
 
   if (!m_nh.getParam("/controller/frequency", m_frequency))
     ROS_WARN("Failed to read parameter controller frequency, defaulting to %i Hz.", m_frequency);
+  std::string s;
+  if (!m_nh.getParam("/computer", s))
+  {
+    s = "pc-debug";
+    ROS_WARN("Failed to read parameter computer");
+  }
+  if (s == "pc-debug")
+    m_debug_mode = true;
 
   m_state.reset(new State());
   initSetpoints();
@@ -114,6 +123,7 @@ void Controller::spin()
   Eigen::Quaterniond orientation_setpoint = Eigen::Quaterniond::Identity();
 
   geometry_msgs::Wrench msg;
+  vortex_msgs::Debug    dbg_msg;
 
   ros::Rate rate(m_frequency);
   while (ros::ok())
@@ -122,6 +132,10 @@ void Controller::spin()
     m_state->get(&position_state, &orientation_state, &velocity_state);
     m_setpoints->get(&position_setpoint, &orientation_setpoint);
     m_setpoints->get(&tau_openloop);
+
+    if (m_debug_mode)
+    publishDebugMsg(position_state, orientation_state, velocity_state,
+                    position_setpoint, orientation_setpoint);
 
     tau_command.setZero();
 
@@ -325,6 +339,38 @@ void Controller::publishControlMode()
   std_msgs::String msg;
   msg.data = s;
   m_mode_pub.publish(msg);
+}
+
+void Controller::publishDebugMsg(const Eigen::Vector3d    &position_state,
+                                 const Eigen::Quaterniond &orientation_state,
+                                 const Eigen::Vector6d    &velocity_state,
+                                 const Eigen::Vector3d    &position_setpoint,
+                                 const Eigen::Quaterniond &orientation_setpoint)
+{
+  vortex_msgs::Debug dbg_msg;
+
+  dbg_msg.state_position.x = position_state[0];
+  dbg_msg.state_position.y = position_state[1];
+  dbg_msg.state_position.z = position_state[2];
+
+  dbg_msg.setpoint_position.x = position_setpoint[0];
+  dbg_msg.setpoint_position.y = position_setpoint[1];
+  dbg_msg.setpoint_position.z = position_setpoint[2];
+
+  Eigen::Vector3d dbg_state_orientation =
+      orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
+  Eigen::Vector3d dbg_setpoint_orientation =
+      orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
+
+  dbg_msg.state_roll = dbg_state_orientation[0];
+  dbg_msg.state_pitch = dbg_state_orientation[1];
+  dbg_msg.state_yaw = dbg_state_orientation[2];
+
+  dbg_msg.setpoint_roll = dbg_setpoint_orientation[0];
+  dbg_msg.setpoint_pitch = dbg_setpoint_orientation[1];
+  dbg_msg.setpoint_yaw = dbg_setpoint_orientation[2];
+
+  m_debug_pub.publish(dbg_msg);
 }
 
 Eigen::Vector6d Controller::stayLevel(const Eigen::Quaterniond &orientation_state,

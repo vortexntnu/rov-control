@@ -11,6 +11,7 @@
 #include "vortex_controller/control_modes.h"
 #include "vortex_msgs/PropulsionCommand.h"
 #include "vortex_msgs/RovState.h"
+#include "vortex_msgs/Debug.h"
 
 #include "vortex_controller/state.h"
 #include "vortex_controller/setpoints.h"
@@ -30,10 +31,12 @@ private:
   ros::Subscriber m_state_sub;
   ros::Publisher  m_wrench_pub;
   ros::Publisher  m_mode_pub;
+  ros::Publisher  m_debug_pub;
   dynamic_reconfigure::Server<vortex_controller::VortexControllerConfig> m_dr_srv;
 
   ControlMode m_control_mode;
   int m_frequency;
+  bool m_debug_mode = false;
   const double c_normalized_force_deadzone = 0.01;
   const double c_max_quat_norm_deviation = 0.1;
 
@@ -50,6 +53,11 @@ private:
   void initPositionHoldController();
   bool healthyMessage(const vortex_msgs::PropulsionCommand &msg);
   void publishControlMode();
+  void publishDebugMsg(const Eigen::Vector3d    &position_state,
+                       const Eigen::Quaterniond &orientation_state,
+                       const Eigen::Vector6d    &velocity_state,
+                       const Eigen::Vector3d    &position_setpoint,
+                       const Eigen::Quaterniond &orientation_setpoint);
   Eigen::Vector6d stayLevel(const Eigen::Quaterniond &orientation_state,
                             const Eigen::Vector6d &velocity_state);
   Eigen::Vector6d depthHold(const Eigen::Vector6d &tau_openloop,

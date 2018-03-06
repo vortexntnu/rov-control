@@ -24,6 +24,14 @@ Controller::Controller(ros::NodeHandle nh) : m_nh(nh), m_frequency(10)
 
   if (!m_nh.getParam("/controller/frequency", m_frequency))
     ROS_WARN("Failed to read parameter controller frequency, defaulting to %i Hz.", m_frequency);
+  std::string s;
+  if(!m_nh.getParam("/computer", s))
+  {
+    s = "pc-debug";
+    ROS_WARN("Failed to read parameter computer");
+  }
+  if(s == "pc-debug")
+    m_debug_mode = true;
 
   m_state.reset(new State());
   initSetpoints();
@@ -127,6 +135,7 @@ void Controller::spin()
     m_setpoints->get(&position_setpoint, &orientation_setpoint);
     m_setpoints->get(&tau_openloop);
 
+    if(m_debug_mode)
     publishDebugMsg(position_state, orientation_state, velocity_state,
                     position_setpoint, orientation_setpoint);
 

@@ -37,6 +37,7 @@ private:
 
   ControlMode m_control_mode;
   int m_frequency;
+  bool m_debug_mode = false;
   const double c_normalized_force_deadzone = 0.01;
   const double c_max_quat_norm_deviation = 0.1;
 

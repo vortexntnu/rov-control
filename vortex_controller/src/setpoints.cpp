@@ -95,6 +95,25 @@ bool Setpoints::get(Eigen::Quaterniond *orientation)
   *orientation = m_orientation;
 }
 
+bool Setpoints::getEuler(Eigen::Vector3d *orientation)
+{
+  if (!m_pose_is_valid)
+    return false;
+
+  const double w = m_orientation.w();
+  const double x = m_orientation.x();
+  const double y = m_orientation.y();
+  const double z = m_orientation.z();
+
+  Eigen::Vector3d euler_orientation;
+
+  euler_orientation[2] = std::atan2(2*(w*x + y*z), 1 - 2*(x*x + y*y)); // ROLL
+  euler_orientation[1] = std::asin( 2*(w*y - x*z));                    // PITCH
+  euler_orientation[0] = std::atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z)); // YAW
+
+  *orientation = euler_orientation;
+}
+
 void Setpoints::set(const Eigen::Vector3d    &position,
                     const Eigen::Quaterniond &orientation)
 {
@@ -115,6 +134,5 @@ void Setpoints::set(const Eigen::Vector3d &position)
 void Setpoints::set(const Eigen::Quaterniond &orientation)
 {
   m_orientation = orientation;
-
-  // SET TIME AND POSITION VALID HERE?
 }
+

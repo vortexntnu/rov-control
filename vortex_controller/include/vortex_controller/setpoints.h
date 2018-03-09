@@ -16,6 +16,7 @@ public:
            Eigen::Quaterniond *orientation);
   bool get(Eigen::Vector3d *position);
   bool get(Eigen::Quaterniond *orientation);
+  bool getEuler(Eigen::Vector3d *orientation);
   void set(const Eigen::Vector3d    &position,
            const Eigen::Quaterniond &orientation);
   void set(const Eigen::Vector3d    &position);

@@ -243,16 +243,11 @@ void Controller::updatePositionSetpoint(PoseIndex axis)
 
 void Controller::updateOrientationSetpoint(EulerIndex axis)
 {
-  Eigen::Quaterniond orientation_state;
-  Eigen::Quaterniond orientation_setpoint;
+  Eigen::Vector3d euler_state;
+  Eigen::Vector3d euler_setpoint;
 
-  m_state->get(&orientation_state);
-  m_setpoints->get(&orientation_setpoint);
-
-  Eigen::Vector3d euler_state =
-    orientation_state.toRotationMatrix().eulerAngles(2, 1, 0);
-  Eigen::Vector3d euler_setpoint =
-    orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
+  m_state->getEuler(&euler_state);
+  m_setpoints->getEuler(&euler_setpoint);
 
   euler_setpoint[axis] = euler_state[axis];
   Eigen::Matrix3d R;
@@ -260,6 +255,7 @@ void Controller::updateOrientationSetpoint(EulerIndex axis)
     * Eigen::AngleAxisd(euler_setpoint(1), Eigen::Vector3d::UnitY())
     * Eigen::AngleAxisd(euler_setpoint(2), Eigen::Vector3d::UnitX());
   Eigen::Quaterniond quaternion_setpoint(R);
+
   m_setpoints->set(quaternion_setpoint);
 }
 
@@ -362,13 +358,13 @@ void Controller::publishDebugMsg(const Eigen::Vector3d    &position_state,
   Eigen::Vector3d dbg_setpoint_orientation =
       orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
 
-  dbg_msg.state_roll = dbg_state_orientation[0];
+  dbg_msg.state_yaw = dbg_state_orientation[0];
   dbg_msg.state_pitch = dbg_state_orientation[1];
-  dbg_msg.state_yaw = dbg_state_orientation[2];
+  dbg_msg.state_roll = dbg_state_orientation[2];
 
-  dbg_msg.setpoint_roll = dbg_setpoint_orientation[0];
+  dbg_msg.setpoint_yaw = dbg_setpoint_orientation[0];
   dbg_msg.setpoint_pitch = dbg_setpoint_orientation[1];
-  dbg_msg.setpoint_yaw = dbg_setpoint_orientation[2];
+  dbg_msg.setpoint_roll = dbg_setpoint_orientation[2];
 
   m_debug_pub.publish(dbg_msg);
 }
@@ -459,4 +455,3 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
 
   return tau;
 }
-

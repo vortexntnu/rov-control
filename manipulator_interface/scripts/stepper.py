@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# This is a BeagleBone / ROS port of:
+# This is a nanopi neo 2+ / ROS port of:
 # Stepper.cpp - Stepper library for Wiring/Arduino - Version 1.1.0
 #
 # This library is free software; you can redistribute it and/or
@@ -13,7 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 
-MICROSEC_PER_SEC = 1000 * 1000
 STEPPER_PIN_VALUES = [[1, 0, 1, 0],
                       [0, 1, 1, 0],
                       [0, 1, 0, 1],
@@ -21,20 +20,18 @@ STEPPER_PIN_VALUES = [[1, 0, 1, 0],
 
 
 class Stepper:
-    def __init__(self, number_of_steps, pins, disable_pin, computer):
+    def __init__(self, number_of_steps, pins, pwm_pins, computer):
         """"Initialize 4-pin stepper motor.
 
         number_of_steps -- number of steps per revolution
         pins -- list of pin IDs for the stepper pins used (e.g. 'P9_01')
-        disable_pin -- pin ID for stepper disable pin (disabled when low)
+        pwm_pins -- pin IDs for stepper PWM pins used to enable or disable
         computer -- string identifier for computer type
         """
         self.computer = computer
-        if self.computer == 'raspberry':
+        if self.computer == 'nanopi':
             import RPi.GPIO as GPIO
-            GPIO.setmode(GPIO.BCM)
-        elif self.computer == 'beaglebone':
-            import Adafruit_BBIO.GPIO as GPIO
+            print('stepper.py: Starting in nanopi mode')
         elif self.computer == 'pc-debug':
             print('stepper.py: Starting in PC debug mode, no stepper connected.')
         else:
@@ -47,11 +44,13 @@ class Stepper:
         self.number_of_steps = number_of_steps
 
         self.pins = pins
-        self.disable_pin = disable_pin
+        self.pwm_pins = pwm_pins
         if self.computer != 'pc-debug':
-            for pin in pins:
+            self.GPIO.setmode(GPIO.BOARD)
+            for pin in self.pins:
                 self.GPIO.setup(pin, self.GPIO.OUT)
-            self.GPIO.setup(disable_pin, self.GPIO.OUT)
+            for pwm_pin in self.pwm_pins:
+                self.GPIO.setup(pwm_pin, self.GPIO.OUT)
 
     def step_once(self, direction):
         """"Step motor once in given direction."""
@@ -73,17 +72,19 @@ class Stepper:
 
     def enable(self):
         if self.computer != 'pc-debug':
-            self.GPIO.output(self.disable_pin, self.GPIO.LOW)
+            for pin in self.pwm_pins:
+                self.GPIO.output(pin, self.GPIO.HIGH)
         else:
             print('Enabling stepper')
 
     def disable(self):
         if self.computer != 'pc-debug':
-            self.GPIO.output(self.disable_pin, self.GPIO.HIGH)
+            for pin in self.pwm_pins:
+                self.GPIO.output(pin, self.GPIO.LOW)
         else:
             print('Disabling stepper')
 
     def shutdown(self):
-        if self.computer == 'raspberry':
+        if self.computer == 'nanopi':
             print('stepper.py: Shutting down and cleaning GPIO pins.')
             self.GPIO.cleanup()

@@ -1,0 +1,8 @@
+stepper:
+  default_speed_rpm: 30
+  steps_per_rev: 200
+  pins:
+    claw: [19, 21, 23, 24]
+    claw_pwm: [8, 10]
+
+computer: 'nanopi'

@@ -1,5 +1,0 @@
-<launch>
-  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
-  <rosparam command="load" file="$(find vortex)/config/robots/terrapin.yaml" />
-  <node name="manipulator_interface" pkg="manipulator_interface" type="manipulator_interface.py" output="screen" />
-</launch>

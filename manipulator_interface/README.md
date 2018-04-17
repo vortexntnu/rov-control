@@ -1,8 +1,9 @@
 # manipulator_interface
 
 ## Usage
-`roslaunch manipulator_interface terrapin.launch`
+`roslaunch manipulator_interface nanopi.launch`
 
 ## Dependencies
 
-Adafruit's BeagleBone IO library: `sudo pip install Adafruit_BBIO`
+RPi.GPIO GPIO library for NanoPi. The library is integrated in the UbuntuCore
+images for the NanoPi NEO/NEO2+.

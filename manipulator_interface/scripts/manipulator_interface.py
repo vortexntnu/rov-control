@@ -59,7 +59,6 @@ class ManipulatorInterface(object):
             rate.sleep()
 
     def shutdown(self):
-
         self.claw_stepper.shutdown()
 
     def callback(self, msg):

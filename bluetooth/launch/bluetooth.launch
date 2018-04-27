@@ -1,4 +1,0 @@
-<launch>
-  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}" />
-  <node name="bluetooth" pkg="bluetooth" type="hc-05_interface.py" output="screen"/>
-</launch>

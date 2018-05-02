@@ -3,7 +3,7 @@
 SerialCom::SerialCom()
 {
 	// Open File Descriptor 
-	const char device[] = "/dev/ttyUSB1";
+	const char device[] = "/dev/ttyUSB0";
 
 	m_dev = open(device, O_RDWR| O_NONBLOCK);
 
@@ -158,6 +158,29 @@ void SerialCom::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 
 	// Error Handling 
 	if (serial_write(&m_heartbeat_cmd[0], MSG_HEARTBEAT_SIZE) < 0)
+	{
+	    std::cout << "Error writing: " 
+	              << strerror(errno) 
+	              << std::endl;
+	}
+}
+
+void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
+{
+
+	ROS_INFO("I heard: [%s]", msg->data.c_str());
+
+
+	m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM; 
+
+	std::cout << "Command: "
+		  << m_arming_cmd[MAGIC_START_BYTE_INDEX] 
+	 	  << m_arming_cmd[MSG_TYPE_INDEX]
+		  << m_arming_cmd[MSG_ARMING_SIZE-1] << std::endl;
+
+
+	// Error Handling 
+	if (serial_write(&m_arming_cmd[0], MSG_ARMING_SIZE) < 0)
 	{
 	    std::cout << "Error writing: " 
 	              << strerror(errno) 

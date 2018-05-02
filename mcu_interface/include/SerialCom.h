@@ -37,6 +37,7 @@ typedef enum msg_type
 #define MAX_MSG_SIZE 21
 
 #define MSG_HEARTBEAT_SIZE 3
+#define MSG_ARMING_SIZE 3
 
 #define MAGIC_START_BYTE_INDEX  0
 #define MSG_TYPE_INDEX          1
@@ -56,6 +57,7 @@ class SerialCom
         public:
                 void thruster_pwm_callback(const vortex_msgs::Pwm& msg);
                 void heartbeat_callback(const std_msgs::String::ConstPtr& msg);
+                void arming_callback(const std_msgs::String::ConstPtr& msg);
                 int serial_write(char* cmd, int cmd_size);
                 uint16_t crc_checksum(char* input, uint8_t num);
                 int serial_read();

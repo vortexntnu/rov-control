@@ -122,6 +122,62 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 
 	std::cout << "uint16_ t CRC_CHECKSUM = : " << checksum << std::endl;
 
+	char alternative_thruster_cmd[MAX_MSG_SIZE];
+
+	for (i = 0; i < MAX_MSG_SIZE; i++)
+	{
+		alternative_thruster_cmd[i] = m_thruster_cmd[i];
+	}
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 0] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 12];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 1] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 13];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 4] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 8];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 5] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 9];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 6] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 10];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 7] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 11];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 8] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 4];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 9] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 5];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 10] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 6];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 11] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 7];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 12] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 0];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 13] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 1];
+
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3];
+
+	alternative_thruster_cmd[MSG_CRC_BYTE_INDEX] 	  = (uint8_t)(checksum  >> 8);
+	alternative_thruster_cmd[MSG_CRC_BYTE_INDEX + 1] = (uint8_t)(checksum  & 0xFF);
+
+
+	std::cout << "Alternative command: "
+			  << alternative_thruster_cmd[MAGIC_START_BYTE_INDEX] 
+		 	  << alternative_thruster_cmd[MSG_TYPE_INDEX];
+
+	for (i = 0; i < MAX_MSG_SIZE; i++)
+	{
+		printf(" %d ", alternative_thruster_cmd[i]);
+	}
+
+		// Error Handling 
+	if (serial_write(&alternative_thruster_cmd[0], MAX_MSG_SIZE) < 0)
+	{
+	    std::cout << "Error writing: " 
+	              << strerror(errno) 
+	              << std::endl;
+	}
+
+
+
+
+	/*
 	// Error Handling 
 	if (serial_write(&m_thruster_cmd[0], MAX_MSG_SIZE) < 0)
 	{
@@ -129,6 +185,7 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 	              << strerror(errno) 
 	              << std::endl;
 	}
+	*/
 
 	if (serial_read() < 0)
 	{
@@ -141,6 +198,8 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 		std::cout << "Received over UART: " << m_read_buffer << std::endl;
 		clear_read_buffer();
 	}
+
+	clear_read_buffer();
 
 }
 

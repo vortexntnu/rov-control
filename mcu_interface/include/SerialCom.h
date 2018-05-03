@@ -53,6 +53,7 @@ class SerialCom
                 char m_read_buffer[MAX_MSG_SIZE];
                 char m_thruster_cmd[MAX_MSG_SIZE] = {0};
                 char m_heartbeat_cmd[MSG_HEARTBEAT_SIZE] = {5};
+		char m_arming_cmd[MSG_ARMING_SIZE] = {10};
 
         public:
                 void thruster_pwm_callback(const vortex_msgs::Pwm& msg);

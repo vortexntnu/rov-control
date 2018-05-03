@@ -3,7 +3,7 @@
 SerialCom::SerialCom()
 {
 	// Open File Descriptor 
-	const char device[] = "/dev/ttyUSB0";
+	const char device[] = "/dev/ttySAC0";
 
 	m_dev = open(device, O_RDWR| O_NONBLOCK);
 
@@ -31,8 +31,8 @@ SerialCom::SerialCom()
 	}
 
 	// Set Baud Rate 
-	cfsetospeed (&tty, B115200);
-	cfsetispeed (&tty, B115200);
+	cfsetospeed (&tty, B38400);
+	cfsetispeed (&tty, B38400);
 
 	// Set port settings
 	tty.c_cflag     &=  ~CSTOPB;	//
@@ -68,6 +68,11 @@ SerialCom::SerialCom()
 	m_heartbeat_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
 	m_heartbeat_cmd[MSG_HEARTBEAT_SIZE-1] = MAGIC_STOP_BYTE;
 	m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_HEARTBEAT;
+
+	m_arming_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
+        m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
+        m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
+
 }
 
 
@@ -170,8 +175,10 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 
 	ROS_INFO("I heard: [%s]", msg->data.c_str());
 
-
-	m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM; 
+	if(msg->data == "ARM")
+		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
+	else
+		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_DISARM; 
 
 	std::cout << "Command: "
 		  << m_arming_cmd[MAGIC_START_BYTE_INDEX] 

@@ -153,6 +153,8 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2];
 	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3];
 
+	checksum = crc_checksum(&alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX], (MSG_PAYLOAD_STOP_INDEX - MSG_PAYLOAD_START_INDEX + 1));
+
 	alternative_thruster_cmd[MSG_CRC_BYTE_INDEX] 	  = (uint8_t)(checksum  >> 8);
 	alternative_thruster_cmd[MSG_CRC_BYTE_INDEX + 1] = (uint8_t)(checksum  & 0xFF);
 
@@ -161,10 +163,21 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 			  << alternative_thruster_cmd[MAGIC_START_BYTE_INDEX] 
 		 	  << alternative_thruster_cmd[MSG_TYPE_INDEX];
 
-	for (i = 0; i < MAX_MSG_SIZE; i++)
+	for (i = 0; i < 8; i++)
 	{
 		printf(" %d ", alternative_thruster_cmd[i]);
+                printf(" %d ", alternative_thruster_cmd[i+1]);
 	}
+	
+	checksum = crc_checksum(&alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX], 
+                                                                        (MSG_PAYLOAD_STOP_INDEX - MSG_PAYLOAD_START_INDEX + 1));
+
+	printf("%d %d", 
+			alternative_thruster_cmd[MSG_CRC_BYTE_INDEX], 
+			alternative_thruster_cmd[MSG_CRC_BYTE_INDEX+1]);
+
+
+	std::cout << alternative_thruster_cmd[MAGIC_STOP_BYTE_INDEX] << std::endl;
 
 		// Error Handling 
 	if (serial_write(&alternative_thruster_cmd[0], MAX_MSG_SIZE) < 0)

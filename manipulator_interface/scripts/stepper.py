@@ -68,7 +68,8 @@ class Stepper:
                 else:
                     rospy.logwarn('Invalid output pin value.')
         else:
-            print('Stepping: {0}'.format(STEPPER_PIN_VALUES[self.curr_step % 4]))
+            print('Stepping: {0}'.format(
+                STEPPER_PIN_VALUES[self.curr_step % 4]))
 
     def enable(self):
         if self.computer != 'pc-debug':

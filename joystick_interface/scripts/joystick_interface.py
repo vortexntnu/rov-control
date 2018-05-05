@@ -40,7 +40,7 @@ class JoystickInterfaceNode(object):
 
         manipulator_msg = Manipulator()
         manipulator_msg.claw_direction = buttons['RB'] - buttons['LB']
-
+        manipulator_msg.valve_direction = axes['dpad_vertical']
         motion_msg = PropulsionCommand()
         motion_msg.motion = [
             axes['vertical_axis_left_stick'],     # Surge

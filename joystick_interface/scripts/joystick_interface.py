@@ -8,7 +8,8 @@ class JoystickInterfaceNode(object):
     def __init__(self):
         rospy.init_node('joystick_node')
 
-        self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=1)
+        self.sub = rospy.Subscriber(
+            'joy_throttle', Joy, self.callback, queue_size=1)
         self.pub_motion = rospy.Publisher('propulsion_command',
                                           PropulsionCommand,
                                           queue_size=1)
@@ -41,6 +42,7 @@ class JoystickInterfaceNode(object):
         manipulator_msg = Manipulator()
         manipulator_msg.claw_direction = buttons['RB'] - buttons['LB']
         manipulator_msg.valve_direction = axes['dpad_vertical']
+
         motion_msg = PropulsionCommand()
         motion_msg.motion = [
             axes['vertical_axis_left_stick'],     # Surge

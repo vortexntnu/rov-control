@@ -73,6 +73,10 @@ SerialCom::SerialCom()
     m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
     m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
 
+    m_light_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
+    m_light_cmd[MSG_LIGHT_SIZE-1] = MAGIC_STOP_BYTE;
+    m_light_cmd[MSG_TYPE_INDEX] = MSG_TYPE_LIGHT;
+
 }
 
 
@@ -177,7 +181,7 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 
 	ROS_INFO("I heard: [%s]", msg->data.c_str());
 
-	if(strcmp(msg->data, "ARM") == 0)
+	if(msg->data == "ARM")
 		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
 	else
 		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_DISARM; 
@@ -195,6 +199,41 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 	              << strerror(errno) 
 	              << std::endl;
 	}
+}
+
+void SerialCom::light_pwm_callback(const std_msgs::Int32::ConstPtr& msg)
+{
+	ROS_INFO("I heard: [%d]", msg->data);
+
+	m_light_cmd[MSG_TYPE_INDEX] = MSG_TYPE_LIGHT;
+
+
+	std::cout << "Command: "
+		  << m_light_cmd[MAGIC_START_BYTE_INDEX] 
+	 	  << m_light_cmd[MSG_TYPE_INDEX];
+
+	m_light_cmd[MSG_PAYLOAD_START_INDEX] = (uint8_t)(msg->data  >> 8);
+	m_light_cmd[MSG_PAYLOAD_START_INDEX + 1] = (uint8_t)(msg->data & 0xFF);
+
+	printf(" %d %d ", m_light_cmd[MSG_PAYLOAD_START_INDEX], m_light_cmd[MSG_PAYLOAD_START_INDEX + 1]);
+
+	int16_t checksum = crc_checksum(&m_light_cmd[MSG_PAYLOAD_START_INDEX], 2);
+
+	m_light_cmd[4] = (uint8_t)(checksum  >> 8);
+	m_light_cmd[5] = (uint8_t)(checksum  & 0xFF);
+
+	printf("%d %d", m_light_cmd[4], m_light_cmd[5]);
+
+	std::cout << m_light_cmd[MAGIC_STOP_BYTE_INDEX] << std::endl;
+
+	// Error Handling 
+	if (serial_write(&m_light_cmd[0], MSG_LIGHT_SIZE) < 0)
+	{
+	    std::cout << "Error writing: " 
+	              << strerror(errno) 
+	              << std::endl;
+	}
+
 }
 
 uint16_t SerialCom::crc_checksum(char *input, uint8_t num)

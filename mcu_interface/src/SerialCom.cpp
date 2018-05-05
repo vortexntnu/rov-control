@@ -201,7 +201,7 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 	}
 }
 
-void SerialCom::light_pwm_callback(const std_msgs::Int32::ConstPtr& msg)
+void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 {
 	ROS_INFO("I heard: [%d]", msg->data);
 
@@ -224,7 +224,7 @@ void SerialCom::light_pwm_callback(const std_msgs::Int32::ConstPtr& msg)
 
 	printf("%d %d", m_light_cmd[4], m_light_cmd[5]);
 
-	std::cout << m_light_cmd[MAGIC_STOP_BYTE_INDEX] << std::endl;
+	std::cout << m_light_cmd[6] << std::endl;
 
 	// Error Handling 
 	if (serial_write(&m_light_cmd[0], MSG_LIGHT_SIZE) < 0)

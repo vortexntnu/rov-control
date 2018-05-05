@@ -4,7 +4,7 @@
 #include "ros/ros.h"
 #include "vortex_msgs/Pwm.h"
 #include "std_msgs/String.h"
-#include "std_msgs/Int32.h"
+#include "std_msgs/Int16.h"
 
 #include <stdio.h>
 #include <stdlib.h> 
@@ -62,7 +62,7 @@ class SerialCom
                 void thruster_pwm_callback(const vortex_msgs::Pwm& msg);
                 void heartbeat_callback(const std_msgs::String::ConstPtr& msg);
                 void arming_callback(const std_msgs::String::ConstPtr& msg);
-                void light_pwm_callback(const std_msgs::Int32::ConstPtr& msg);
+                void light_pwm_callback(const std_msgs::Int16::ConstPtr& msg);
                 int serial_write(char* cmd, int cmd_size);
                 uint16_t crc_checksum(char* input, uint8_t num);
                 int serial_read();

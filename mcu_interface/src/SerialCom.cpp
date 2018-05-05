@@ -129,29 +129,29 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 		alternative_thruster_cmd[i] = m_thruster_cmd[i];
 	}
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 0] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 12];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 1] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 13];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 0] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 10];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 1] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 11];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 8];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 9];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 4] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 8];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 5] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 9];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 4] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 12];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 5] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 13];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 6] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 10];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 7] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 11];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 6] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 7] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 8] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 4];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 9] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 5];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 8] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 9] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 10] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 6];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 11] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 7];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 10] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 0];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 11] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 1];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 12] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 0];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 13] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 1];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 12] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 4];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 13] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 5];
 
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 2];
-	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 3];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 14] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 6];
+	alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX + 15] = m_thruster_cmd[MSG_PAYLOAD_START_INDEX + 7];
 
 	checksum = crc_checksum(&alternative_thruster_cmd[MSG_PAYLOAD_START_INDEX], (MSG_PAYLOAD_STOP_INDEX - MSG_PAYLOAD_START_INDEX + 1));
 

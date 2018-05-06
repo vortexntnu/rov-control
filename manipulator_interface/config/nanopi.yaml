@@ -4,5 +4,7 @@ stepper:
   pins:
     claw: [19, 21, 23, 24]
     claw_pwm: [8, 10]
+    vertical: [7, 11, 13, 15]
+    vertical_pwm: [16, 18]
 
 computer: 'nanopi'

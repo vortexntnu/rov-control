@@ -71,7 +71,8 @@ class ManipulatorInterface(object):
             if abs(self.claw_direction) == 1:
                 self.claw_stepper.step_once(self.claw_direction)
             if abs(self.vertical_stepper_direction) == 1:
-                self.vertical_stepper.step_once(self.vertical_direction)
+                self.vertical_stepper.step_once(
+                    self.vertical_stepper_direction)
 
             rate.sleep()
 

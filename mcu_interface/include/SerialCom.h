@@ -31,6 +31,8 @@ typedef enum msg_type
     MSG_TYPE_DISARM     = 0x47,
 }msg_type;
 
+#define READ_BUFFERSIZE    50
+
 #define MAGIC_START_BYTE    0x24
 #define MAGIC_STOP_BYTE     0x40
 
@@ -52,7 +54,7 @@ class SerialCom
 {
         private:
                 int m_dev = 0;
-                char m_read_buffer[MAX_MSG_SIZE];
+                char m_read_buffer[READ_BUFFERSIZE];
                 char m_thruster_cmd[MAX_MSG_SIZE] = {0};
                 char m_heartbeat_cmd[MSG_HEARTBEAT_SIZE] = {5};
                 char m_arming_cmd[MSG_ARMING_SIZE] = {10};

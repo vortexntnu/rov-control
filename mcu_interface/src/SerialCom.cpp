@@ -70,8 +70,8 @@ SerialCom::SerialCom()
 	m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_HEARTBEAT;
 
 	m_arming_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
-    m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
-    m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
+        m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
+        m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
 
     m_light_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
     m_light_cmd[MSG_LIGHT_SIZE-1] = MAGIC_STOP_BYTE;
@@ -146,8 +146,6 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 		clear_read_buffer();
 	}
 
-	clear_read_buffer();
-
 }
 
 
@@ -174,6 +172,19 @@ void SerialCom::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 	              << strerror(errno) 
 	              << std::endl;
 	}
+
+	if (serial_read() < 0)
+        {
+            std::cout << "Error reading: "
+                      << strerror(errno)
+                      << std::endl;
+        }
+        else
+        {
+                std::cout << "Received over UART: " << m_read_buffer << std::endl;
+                clear_read_buffer();
+        }
+
 }
 
 void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
@@ -233,6 +244,18 @@ void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 	              << strerror(errno) 
 	              << std::endl;
 	}
+	
+	if (serial_read() < 0)
+        {
+            std::cout << "Error reading: "
+                      << strerror(errno)
+                      << std::endl;
+        }
+        else
+        {
+                std::cout << "Received over UART: " << m_read_buffer << std::endl;
+                clear_read_buffer();
+        }
 
 }
 
@@ -243,10 +266,8 @@ uint16_t SerialCom::crc_checksum(char *input, uint8_t num)
 
 void SerialCom::clear_read_buffer()
 {
-	for (int i = 0; i < sizeof(m_read_buffer); i++)
-	{
-		m_read_buffer[i] = 0;
-	}
+	std::fill(std::begin(m_read_buffer), std::end(m_read_buffer), 0);
+	tcflush(m_dev, TCIFLUSH );
 }
 
 SerialCom::~SerialCom()

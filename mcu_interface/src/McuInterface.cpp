@@ -139,10 +139,7 @@ void McuInterface::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 
 	ROS_INFO("I heard: [%s]", msg->data.c_str());
 
-	if(msg->data.c_str() == "F")
-		m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
-	else
-		m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_HEARTBEAT; 
+	m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_HEARTBEAT; 
 
 	std::cout << "Command: "
 		  << m_heartbeat_cmd[MAGIC_START_BYTE_INDEX] 
@@ -157,7 +154,16 @@ void McuInterface::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 		<< strerror(errno) 
 		<< std::endl;
 	}
-	
+
+	if (serial_read() < 0)
+        {
+                std::cout << "Error reading: "
+                << strerror(errno)
+                << std::endl;
+        }
+
+	clear_read_buffer();
+
 }
 
 
@@ -183,14 +189,6 @@ void McuInterface::arming_callback(const std_msgs::String::ConstPtr& msg)
 	    std::cout << "Error writing: " 
 	              << strerror(errno) 
 	              << std::endl;
-	}
-
-	// Error Handling 
-	if (serial_write(&m_light_cmd[0], MSG_LIGHT_SIZE) < 0)
-	{
-		std::cout << "Error writing: " 
-		<< strerror(errno) 
-		<< std::endl;
 	}
 }
 

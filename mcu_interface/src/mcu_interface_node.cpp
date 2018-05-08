@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	ros::Subscriber arming_sub = nh_mcu.subscribe("/mcu_arm", 1000, &McuInterface::arming_callback, &mcu_interface);
 	ros::Subscriber light_pwm_sub = nh_mcu.subscribe("/mcu_light", 1000, &McuInterface::light_pwm_callback, &mcu_interface);
 
-	ros::Publisher is_leak_pub = nh_mcu.advertise<std_msgs::UInt8>("/mcu_read_leak_sensor", 1000);
+	ros::Publisher read_leak_sensor_pub = nh_mcu.advertise<std_msgs::UInt8>("/mcu_read_leak_sensor", 1000);
 
 	ros::Rate loop_rate(1);
 
@@ -36,15 +36,13 @@ int main(int argc, char **argv)
 			msg.data = 0;
 		}
 
-		is_leak_pub.publish(msg);
+		read_leak_sensor_pub.publish(msg);
 			
 
 		ros::spinOnce();
 
 		loop_rate.sleep();
 	}
-
-	//ros::spin();
 
 	return 0;
 }

@@ -132,7 +132,7 @@ void McuInterface::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 
 	if (serial_read() < 0)
         {
-            ROS_ERROR("ERROR READING: [ %s ]", strerror(errno));
+            ROS_DEBUG("ERROR READING: [ %s ]", strerror(errno));
         }
 
 	clear_read_buffer();
@@ -184,11 +184,11 @@ uint8_t McuInterface::read_leak_sensor()
 
 	if (serial_read() < 0)
 	{
-		ROS_ERROR("ERROR READING: [ %s ]", strerror(errno));
+		ROS_DEBUG("ERROR READING: [ %s ]", strerror(errno));
 	}
 	else
 	{
-		ROS_DEBUG("MCU: [ %s ]", m_read_buffer);
+		ROS_INFO("MCU: [ %s ]", m_read_buffer);
 
 		int i = 0;
 		bool match = false;

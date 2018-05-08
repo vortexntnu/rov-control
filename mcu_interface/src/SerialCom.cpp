@@ -70,8 +70,8 @@ SerialCom::SerialCom()
 	m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_HEARTBEAT;
 
 	m_arming_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
-        m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
-        m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
+	m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
+	m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
 
     m_light_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
     m_light_cmd[MSG_LIGHT_SIZE-1] = MAGIC_STOP_BYTE;
@@ -168,22 +168,22 @@ void SerialCom::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 	// Error Handling 
 	if (serial_write(&m_heartbeat_cmd[0], MSG_HEARTBEAT_SIZE) < 0)
 	{
-	    std::cout << "Error writing: " 
-	              << strerror(errno) 
-	              << std::endl;
+		std::cout << "Error writing: " 
+		<< strerror(errno) 
+		<< std::endl;
 	}
 
 	if (serial_read() < 0)
-        {
-            std::cout << "Error reading: "
-                      << strerror(errno)
-                      << std::endl;
-        }
-        else
-        {
-                std::cout << "Received over UART: " << m_read_buffer << std::endl;
-                clear_read_buffer();
-        }
+	{
+		std::cout << "Error reading: "
+					<< strerror(errno)
+					<< std::endl;
+	}
+	else
+	{
+		std::cout << "Received over UART: " << m_read_buffer << std::endl;
+		clear_read_buffer();
+	}
 
 }
 
@@ -198,9 +198,9 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_DISARM; 
 
 	std::cout << "Command: "
-		  << m_arming_cmd[MAGIC_START_BYTE_INDEX] 
-	 	  << m_arming_cmd[MSG_TYPE_INDEX]
-		  << m_arming_cmd[MSG_ARMING_SIZE-1] << std::endl;
+			  << m_arming_cmd[MAGIC_START_BYTE_INDEX] 
+	 		  << m_arming_cmd[MSG_TYPE_INDEX]
+			  << m_arming_cmd[MSG_ARMING_SIZE-1] << std::endl;
 
 
 	// Error Handling 
@@ -209,6 +209,26 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 	    std::cout << "Error writing: " 
 	              << strerror(errno) 
 	              << std::endl;
+	}
+
+	// Error Handling 
+	if (serial_write(&m_light_cmd[0], MSG_LIGHT_SIZE) < 0)
+	{
+		std::cout << "Error writing: " 
+		<< strerror(errno) 
+		<< std::endl;
+	}
+
+	if (serial_read() < 0)
+	{
+		std::cout << "Error reading: "
+		<< strerror(errno)
+		<< std::endl;
+	}
+	else
+	{
+		std::cout << "Received over UART: " << m_read_buffer << std::endl;
+		clear_read_buffer();
 	}
 }
 
@@ -240,23 +260,27 @@ void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 	// Error Handling 
 	if (serial_write(&m_light_cmd[0], MSG_LIGHT_SIZE) < 0)
 	{
-	    std::cout << "Error writing: " 
-	              << strerror(errno) 
-	              << std::endl;
+		std::cout << "Error writing: " 
+		<< strerror(errno) 
+		<< std::endl;
 	}
-	
-	if (serial_read() < 0)
-        {
-            std::cout << "Error reading: "
-                      << strerror(errno)
-                      << std::endl;
-        }
-        else
-        {
-                std::cout << "Received over UART: " << m_read_buffer << std::endl;
-                clear_read_buffer();
-        }
 
+	if (serial_read() < 0)
+	{
+		std::cout << "Error reading: "
+		<< strerror(errno)
+		<< std::endl;
+	}
+	else
+	{
+		std::cout << "Received over UART: " << m_read_buffer << std::endl;
+		clear_read_buffer();
+	}
+}
+
+uint8_t SerialCom::is_leak()
+{
+	return 1;
 }
 
 uint16_t SerialCom::crc_checksum(char *input, uint8_t num)

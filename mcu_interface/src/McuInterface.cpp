@@ -8,7 +8,7 @@ McuInterface::McuInterface(const char device[])
 	while (m_dev < 0)
 	{
 		
-		ROS_INFO("Error %d opening %s: %s. Could not connect to MCU, retrying...", 
+		ROS_INFO("Error %d opening %s: %s. Could not connect to MCU, retrying", 
 				 errno, device, strerror(errno));
 
 		usleep(2000*1000); 
@@ -23,9 +23,7 @@ McuInterface::McuInterface(const char device[])
 
 	if (tcgetattr (m_dev, &tty) != 0 )
 	{
-		std::cout << "Error " << errno 
-				  << " from tcgetattr: " 
-				  << strerror(errno) << std::endl;
+		ROS_INFO("Error %d from tcgetattr:  %s", errno, strerror(errno));
 	}
 
 	// Set Baud Rate 
@@ -93,14 +91,9 @@ int McuInterface::serial_read()
 void McuInterface::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 {
 	int i;
-	ROS_INFO("I heard: ");
+	ROS_DEBUG("I heard: ");
 
-	for(i = 0; i < 8; i++) ROS_INFO("%d ", msg.positive_width_us[i]);
-
-	std::cout << "Command: "
-			  << m_thruster_cmd[MAGIC_START_BYTE_INDEX] 
-		 	  << m_thruster_cmd[MSG_TYPE_INDEX];
-
+	for(i = 0; i < 8; i++) ROS_DEBUG("%d ", msg.positive_width_us[i]);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -116,20 +109,10 @@ void McuInterface::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 	m_thruster_cmd[MSG_CRC_BYTE_INDEX] 	  = (uint8_t)(checksum  >> 8);
 	m_thruster_cmd[MSG_CRC_BYTE_INDEX + 1] = (uint8_t)(checksum  & 0xFF);
 
-	printf("%d %d", 
-			m_thruster_cmd[MSG_CRC_BYTE_INDEX], 
-			m_thruster_cmd[MSG_CRC_BYTE_INDEX+1]);
-
-	std::cout << m_thruster_cmd[MAGIC_STOP_BYTE_INDEX] << std::endl;
-
-	std::cout << "uint16_ t CRC_CHECKSUM = : " << checksum << std::endl;
-
 	// Error Handling 
 	if (serial_write(&m_thruster_cmd[0], MAX_MSG_SIZE) < 0)
 	{
-	    std::cout << "Error writing: " 
-	              << strerror(errno) 
-	              << std::endl;
+		ROS_ERROR("ERROR WRITING: [ %s ]", strerror(errno));
 	}
 }
 
@@ -137,29 +120,19 @@ void McuInterface::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 void McuInterface::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 {
 
-	ROS_INFO("I heard: [%s]", msg->data.c_str());
+	ROS_DEBUG("I heard: [%s]", msg->data.c_str());
 
 	m_heartbeat_cmd[MSG_TYPE_INDEX] = MSG_TYPE_HEARTBEAT; 
-
-	std::cout << "Command: "
-		  << m_heartbeat_cmd[MAGIC_START_BYTE_INDEX] 
-	 	  << m_heartbeat_cmd[MSG_TYPE_INDEX]
-		  << m_heartbeat_cmd[MSG_HEARTBEAT_SIZE-1] << std::endl;
-
 
 	// Error Handling 
 	if (serial_write(&m_heartbeat_cmd[0], MSG_HEARTBEAT_SIZE) < 0)
 	{
-		std::cout << "Error writing: " 
-		<< strerror(errno) 
-		<< std::endl;
+		ROS_ERROR("ERROR WRITING: [ %s ]", strerror(errno));
 	}
 
 	if (serial_read() < 0)
         {
-                std::cout << "Error reading: "
-                << strerror(errno)
-                << std::endl;
+            ROS_ERROR("ERROR READING: [ %s ]", strerror(errno));
         }
 
 	clear_read_buffer();
@@ -170,59 +143,38 @@ void McuInterface::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 void McuInterface::arming_callback(const std_msgs::String::ConstPtr& msg)
 {
 
-	ROS_INFO("I heard: [%s]", msg->data.c_str());
+	ROS_DEBUG("I heard: [%s]", msg->data.c_str());
 
-	if(msg->data == "ARM")
+	if(msg->data == "ARM" || msg->data =="arm")
 		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
 	else
 		m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_DISARM; 
 
-	std::cout << "Command: "
-			  << m_arming_cmd[MAGIC_START_BYTE_INDEX] 
-	 		  << m_arming_cmd[MSG_TYPE_INDEX]
-			  << m_arming_cmd[MSG_ARMING_SIZE-1] << std::endl;
-
-
+	
 	// Error Handling 
 	if (serial_write(&m_arming_cmd[0], MSG_ARMING_SIZE) < 0)
 	{
-	    std::cout << "Error writing: " 
-	              << strerror(errno) 
-	              << std::endl;
+	    ROS_ERROR("ERROR WRITING: [ %s ]", strerror(errno));
 	}
 }
 
 void McuInterface::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 {
-	ROS_INFO("I heard: [%d]", msg->data);
-
 	m_light_cmd[MSG_TYPE_INDEX] = MSG_TYPE_LIGHT;
-
-
-	std::cout << "Command: "
-		  << m_light_cmd[MAGIC_START_BYTE_INDEX] 
-	 	  << m_light_cmd[MSG_TYPE_INDEX];
 
 	m_light_cmd[MSG_PAYLOAD_START_INDEX] = (uint8_t)(msg->data  >> 8);
 	m_light_cmd[MSG_PAYLOAD_START_INDEX + 1] = (uint8_t)(msg->data & 0xFF);
 
-	printf(" %d %d ", m_light_cmd[MSG_PAYLOAD_START_INDEX], m_light_cmd[MSG_PAYLOAD_START_INDEX + 1]);
 
 	int16_t checksum = crc_checksum(&m_light_cmd[MSG_PAYLOAD_START_INDEX], 2);
 
 	m_light_cmd[4] = (uint8_t)(checksum  >> 8);
 	m_light_cmd[5] = (uint8_t)(checksum  & 0xFF);
 
-	printf("%d %d", m_light_cmd[4], m_light_cmd[5]);
-
-	std::cout << m_light_cmd[6] << std::endl;
-
 	// Error Handling 
 	if (serial_write(&m_light_cmd[0], MSG_LIGHT_SIZE) < 0)
 	{
-		std::cout << "Error writing: " 
-		<< strerror(errno) 
-		<< std::endl;
+		ROS_ERROR("ERROR WRITING: [ %s ]", strerror(errno));
 	}
 }
 
@@ -232,13 +184,11 @@ uint8_t McuInterface::read_leak_sensor()
 
 	if (serial_read() < 0)
 	{
-		std::cout << "Error reading: "
-		<< strerror(errno)
-		<< std::endl;
+		ROS_ERROR("ERROR READING: [ %s ]", strerror(errno));
 	}
 	else
 	{
-		ROS_INFO("MCU: [ %s ]", m_read_buffer);
+		ROS_DEBUG("MCU: [ %s ]", m_read_buffer);
 
 		int i = 0;
 		bool match = false;

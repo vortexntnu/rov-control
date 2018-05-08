@@ -280,7 +280,22 @@ void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 
 uint8_t SerialCom::is_leak()
 {
-	return 1;
+
+	if (serial_read() < 0)
+	{
+		std::cout << "Error reading: "
+		<< strerror(errno)
+		<< std::endl;
+	}
+	else
+	{
+		std::cout << "Received over UART: " << m_read_buffer << std::endl;
+
+		if(strcmp(m_read_buffer, "LEAK") == 0) return 1;
+	}
+
+	clear_read_buffer();
+	return 0;
 }
 
 uint16_t SerialCom::crc_checksum(char *input, uint8_t num)

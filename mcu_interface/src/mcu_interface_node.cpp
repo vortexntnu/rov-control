@@ -1,0 +1,50 @@
+#include "ros/ros.h"
+#include "McuInterface.h"
+
+int main(int argc, char **argv)
+{
+	const char device[] = "/dev/ttySAC0";
+
+	McuInterface mcu_interface(device);
+
+	ros::init(argc, argv, "mcu_interface");
+
+	ros::NodeHandle nh_mcu;
+
+	ros::Subscriber thruster_pwm_sub = nh_mcu.subscribe("/pwm", 1000, &McuInterface::thruster_pwm_callback, &mcu_interface);
+	ros::Subscriber heartbeat_sub = nh_mcu.subscribe("/mcu_heartbeat", 1000, &McuInterface::heartbeat_callback, &mcu_interface);
+	ros::Subscriber arming_sub = nh_mcu.subscribe("/mcu_arm", 1000, &McuInterface::arming_callback, &mcu_interface);
+	ros::Subscriber light_pwm_sub = nh_mcu.subscribe("/mcu_light", 1000, &McuInterface::light_pwm_callback, &mcu_interface);
+
+	ros::Publisher is_leak_pub = nh_mcu.advertise<std_msgs::UInt8>("/mcu_read_leak_sensor", 1000);
+
+	ros::Rate loop_rate(1);
+
+	std_msgs::UInt8 msg;
+	msg.data = 0;
+
+	while (ros::ok())
+	{		
+		
+	
+		if(mcu_interface.read_leak_sensor())
+		{
+			msg.data = 1;
+		}
+		else
+		{
+			msg.data = 0;
+		}
+
+		is_leak_pub.publish(msg);
+			
+
+		ros::spinOnce();
+
+		loop_rate.sleep();
+	}
+
+	//ros::spin();
+
+	return 0;
+}

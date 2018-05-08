@@ -21,8 +21,8 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}_node
-	src/serial_rw.cpp
-	src/SerialCom.cpp
+	src/mcu_interface_node.cpp
+	src/McuInterface.cpp
 	src/crc.c
 )
 

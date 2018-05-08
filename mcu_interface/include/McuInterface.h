@@ -51,7 +51,7 @@ typedef enum msg_type
 #define MSG_CRC_BYTE_INDEX      18
 #define MAGIC_STOP_BYTE_INDEX   20
 
-class SerialCom
+class McuInterface
 {
         private:
                 int m_dev = 0;
@@ -66,13 +66,13 @@ class SerialCom
                 void heartbeat_callback(const std_msgs::String::ConstPtr& msg);
                 void arming_callback(const std_msgs::String::ConstPtr& msg);
                 void light_pwm_callback(const std_msgs::Int16::ConstPtr& msg);
-                uint8_t is_leak();
+                uint8_t read_leak_sensor();
                 int serial_write(char* cmd, int cmd_size);
                 uint16_t crc_checksum(char* input, uint8_t num);
                 int serial_read();
                 void clear_read_buffer();
-                SerialCom();
-                ~SerialCom();
+                McuInterface(const char device[]);
+                ~McuInterface();
 };
 
 #endif // SERIAL_DEVICE_H

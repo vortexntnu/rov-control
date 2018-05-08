@@ -1,10 +1,8 @@
-#include "SerialCom.h"
+#include "McuInterface.h"
 
-SerialCom::SerialCom()
+McuInterface::McuInterface(const char device[])
 {
 	// Open File Descriptor 
-	const char device[] = "/dev/ttySAC0";
-
 	m_dev = open(device, O_RDWR| O_NONBLOCK);
 
 	while (m_dev < 0)
@@ -26,8 +24,8 @@ SerialCom::SerialCom()
 	if (tcgetattr (m_dev, &tty) != 0 )
 	{
 		std::cout << "Error " << errno 
-		     	  << " from tcgetattr: " 
-		     	  << strerror(errno) << std::endl;
+				  << " from tcgetattr: " 
+				  << strerror(errno) << std::endl;
 	}
 
 	// Set Baud Rate 
@@ -73,26 +71,26 @@ SerialCom::SerialCom()
 	m_arming_cmd[MSG_ARMING_SIZE-1] = MAGIC_STOP_BYTE;
 	m_arming_cmd[MSG_TYPE_INDEX] = MSG_TYPE_ARM;
 
-    m_light_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
-    m_light_cmd[MSG_LIGHT_SIZE-1] = MAGIC_STOP_BYTE;
-    m_light_cmd[MSG_TYPE_INDEX] = MSG_TYPE_LIGHT;
+	m_light_cmd[MAGIC_START_BYTE_INDEX] = MAGIC_START_BYTE;
+	m_light_cmd[MSG_LIGHT_SIZE-1] = MAGIC_STOP_BYTE;
+	m_light_cmd[MSG_TYPE_INDEX] = MSG_TYPE_LIGHT;
 
 }
 
 
-int SerialCom::serial_write(char* cmd, int cmd_size)
+int McuInterface::serial_write(char* cmd, int cmd_size)
 {
 	return write(m_dev, cmd, cmd_size);
 }
 
 
-int SerialCom::serial_read()
+int McuInterface::serial_read()
 {
 	return read(m_dev, &m_read_buffer, sizeof(m_read_buffer));
 }
 
 
-void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
+void McuInterface::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 {
 	int i;
 	ROS_INFO("I heard: ");
@@ -136,7 +134,7 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 }
 
 
-void SerialCom::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
+void McuInterface::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 {
 
 	ROS_INFO("I heard: [%s]", msg->data.c_str());
@@ -160,23 +158,10 @@ void SerialCom::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 		<< std::endl;
 	}
 	
-	/*
-	if (serial_read() < 0)
-        {
-                std::cout << "Error reading: "
-                << strerror(errno)
-                << std::endl;
-        }
-        else
-        {
-                printf("MCU: [ %s ]", m_read_buffer);
-	}
-
-	clear_read_buffer();*/
 }
 
 
-void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
+void McuInterface::arming_callback(const std_msgs::String::ConstPtr& msg)
 {
 
 	ROS_INFO("I heard: [%s]", msg->data.c_str());
@@ -209,7 +194,7 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 	}
 }
 
-void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
+void McuInterface::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 {
 	ROS_INFO("I heard: [%d]", msg->data);
 
@@ -243,7 +228,7 @@ void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 	}
 }
 
-uint8_t SerialCom::is_leak()
+uint8_t McuInterface::read_leak_sensor()
 {
 	char leak_detection_msg[] = "LEAK DETECTED";
 
@@ -280,18 +265,18 @@ uint8_t SerialCom::is_leak()
 	return 0;
 }
 
-uint16_t SerialCom::crc_checksum(char *input, uint8_t num)
+uint16_t McuInterface::crc_checksum(char *input, uint8_t num)
 {
 	return crc_16((const unsigned char*)input, (unsigned long)num);
 }
 
-void SerialCom::clear_read_buffer()
+void McuInterface::clear_read_buffer()
 {
 	std::fill(std::begin(m_read_buffer), std::end(m_read_buffer), 0);
 	tcflush(m_dev, TCIFLUSH );
 }
 
-SerialCom::~SerialCom()
+McuInterface::~McuInterface()
 {
 	close(m_dev);
 }

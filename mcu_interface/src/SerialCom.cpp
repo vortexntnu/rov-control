@@ -133,19 +133,6 @@ void SerialCom::thruster_pwm_callback(const vortex_msgs::Pwm& msg)
 	              << strerror(errno) 
 	              << std::endl;
 	}
-
-	if (serial_read() < 0)
-	{
-	    std::cout << "Error reading: " 
-	              << strerror(errno) 
-	              << std::endl;
-	}
-	else
-	{
-		std::cout << "Received over UART: " << m_read_buffer << std::endl;
-		clear_read_buffer();
-	}
-
 }
 
 
@@ -172,20 +159,22 @@ void SerialCom::heartbeat_callback(const std_msgs::String::ConstPtr& msg)
 		<< strerror(errno) 
 		<< std::endl;
 	}
-
+	
+	/*
 	if (serial_read() < 0)
-	{
-		std::cout << "Error reading: "
-					<< strerror(errno)
-					<< std::endl;
-	}
-	else
-	{
-		std::cout << "Received over UART: " << m_read_buffer << std::endl;
-		clear_read_buffer();
+        {
+                std::cout << "Error reading: "
+                << strerror(errno)
+                << std::endl;
+        }
+        else
+        {
+                printf("MCU: [ %s ]", m_read_buffer);
 	}
 
+	clear_read_buffer();*/
 }
+
 
 void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 {
@@ -217,18 +206,6 @@ void SerialCom::arming_callback(const std_msgs::String::ConstPtr& msg)
 		std::cout << "Error writing: " 
 		<< strerror(errno) 
 		<< std::endl;
-	}
-
-	if (serial_read() < 0)
-	{
-		std::cout << "Error reading: "
-		<< strerror(errno)
-		<< std::endl;
-	}
-	else
-	{
-		std::cout << "Received over UART: " << m_read_buffer << std::endl;
-		clear_read_buffer();
 	}
 }
 
@@ -264,22 +241,11 @@ void SerialCom::light_pwm_callback(const std_msgs::Int16::ConstPtr& msg)
 		<< strerror(errno) 
 		<< std::endl;
 	}
-
-	if (serial_read() < 0)
-	{
-		std::cout << "Error reading: "
-		<< strerror(errno)
-		<< std::endl;
-	}
-	else
-	{
-		std::cout << "Received over UART: " << m_read_buffer << std::endl;
-		clear_read_buffer();
-	}
 }
 
 uint8_t SerialCom::is_leak()
 {
+	char leak_detection_msg[] = "LEAK DETECTED";
 
 	if (serial_read() < 0)
 	{
@@ -289,9 +255,25 @@ uint8_t SerialCom::is_leak()
 	}
 	else
 	{
-		std::cout << "Received over UART: " << m_read_buffer << std::endl;
+		ROS_INFO("MCU: [ %s ]", m_read_buffer);
 
-		if(strcmp(m_read_buffer, "LEAK") == 0) return 1;
+		int i = 0;
+		bool match = false;
+		for (i = 0; i < sizeof(leak_detection_msg) - 1; i++)
+		{
+			if (m_read_buffer[i] == leak_detection_msg[i])
+			{
+				match = true;
+			}
+			else
+			{
+				match = false;
+			}
+		}
+
+		clear_read_buffer();
+		
+		if (match) return 1;
 	}
 
 	clear_read_buffer();

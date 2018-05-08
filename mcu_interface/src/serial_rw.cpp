@@ -16,13 +16,16 @@ int main(int argc, char **argv)
 
 	ros::Publisher is_leak_pub = nh_mcu.advertise<std_msgs::UInt8>("/mcu_is_leak", 1000);
 
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(1);
 
 	std_msgs::UInt8 msg;
+	msg.data = 0;
 
 	while (ros::ok())
-	{
-		if (uart.is_leak())
+	{		
+		
+	
+		if(uart.is_leak())
 		{
 			msg.data = 1;
 		}
@@ -32,11 +35,11 @@ int main(int argc, char **argv)
 		}
 
 		is_leak_pub.publish(msg);
+			
 
 		ros::spinOnce();
 
 		loop_rate.sleep();
-
 	}
 
 	//ros::spin();

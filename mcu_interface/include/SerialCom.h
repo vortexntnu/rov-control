@@ -32,7 +32,7 @@ typedef enum msg_type
     MSG_TYPE_DISARM     = 0x47,
 }msg_type;
 
-#define READ_BUFFERSIZE    50
+#define READ_BUFFERSIZE    256
 
 #define MAGIC_START_BYTE    0x24
 #define MAGIC_STOP_BYTE     0x40

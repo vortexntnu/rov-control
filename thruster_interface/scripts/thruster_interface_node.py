@@ -5,7 +5,6 @@ from numpy import interp
 import rospy
 
 from vortex_msgs.msg import ThrusterForces, Pwm
-from thruster_interface.srv import ThrustersEnable, ThrustersEnableResponse
 
 THRUST_RANGE_LIMIT = 100
 
@@ -13,7 +12,6 @@ NUM_THRUSTERS = rospy.get_param('/propulsion/thrusters/num')
 THRUST_OFFSET = rospy.get_param('/thrusters/offset')
 LOOKUP_THRUST = rospy.get_param('/thrusters/characteristics/thrust')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/thrusters/characteristics/pulse_width')
-THRUSTERS_CONNECTED = rospy.get_param('/thruster_interface/thrusters_connected')
 THRUSTER_PWM_PINS = rospy.get_param('/pwm/pins/thrusters')
 
 
@@ -38,9 +36,6 @@ class ThrusterInterface(object):
         rospy.init_node('thruster_interface', anonymous=False)
         self.pub_pwm = rospy.Publisher('pwm', Pwm, queue_size=10)
         self.sub = rospy.Subscriber('thruster_forces', ThrusterForces, self.callback)
-        self.srv = rospy.Service('/thruster_interface/thrusters_enable', ThrustersEnable, self.handle_thrusters_enable)
-
-        self.thrusters_enabled = True
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
@@ -48,12 +43,11 @@ class ThrusterInterface(object):
 
     def output_to_zero(self):
         neutral_pulse_width = thrust_to_microsecs(0)
-        if THRUSTERS_CONNECTED and self.thrusters_enabled:
-            pwm_msg = Pwm()
-            for i in range(NUM_THRUSTERS):
-                pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
-                pwm_msg.positive_width_us.append(neutral_pulse_width)
-            self.pub_pwm.publish(pwm_msg)
+        pwm_msg = Pwm()
+        for i in range(NUM_THRUSTERS):
+            pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
+            pwm_msg.positive_width_us.append(neutral_pulse_width)
+        self.pub_pwm.publish(pwm_msg)
 
     def callback(self, msg):
         if not healthy_message(msg):
@@ -67,18 +61,10 @@ class ThrusterInterface(object):
             microsecs[i] = thrust_to_microsecs(thrust[i] + THRUST_OFFSET[i])
             pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
             pwm_msg.positive_width_us.append(microsecs[i])
-        if THRUSTERS_CONNECTED and self.thrusters_enabled:
-            self.pub_pwm.publish(pwm_msg)
 
-    def handle_thrusters_enable(self, req):
-        if req.thrusters_enable:
-            rospy.loginfo('Enabling thrusters')
-            self.thrusters_enabled = True
-        else:
-            rospy.loginfo('Disabling thrusters')
-            self.output_to_zero()
-            self.thrusters_enabled = False
-        return ThrustersEnableResponse()
+        self.pub_pwm.publish(pwm_msg)
+
+
 
 
 if __name__ == '__main__':

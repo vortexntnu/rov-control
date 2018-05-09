@@ -13,7 +13,7 @@ THRUST_OFFSET = rospy.get_param('/thrusters/offset')
 LOOKUP_THRUST = rospy.get_param('/thrusters/characteristics/thrust')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/thrusters/characteristics/pulse_width')
 THRUSTER_MAPPING = rospy.get_param('/propulsion/thrusters/map')
-
+THRUSTER_DIRECTION = rospy.get_param('/propulsion/thrusters/direction')
 
 def thrust_to_microsecs(thrust):
     return interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
@@ -39,6 +39,11 @@ class ThrusterInterface(object):
 
         self.output_to_zero()
         rospy.on_shutdown(self.output_to_zero)
+        rospy.loginfo('Initialized with thruster direction:\n\t{0}.'.format(THRUSTER_DIRECTION))
+
+        for i in range(NUM_THRUSTERS):
+            THRUST_OFFSET[i] *= THRUSTER_DIRECTION[i]
+
         rospy.loginfo('Initialized with offset:\n\t{0}.'.format(THRUST_OFFSET))
 
     def output_to_zero(self):

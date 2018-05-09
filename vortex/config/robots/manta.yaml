@@ -53,6 +53,7 @@ propulsion:
       pitch: true
       yaw:   true
   thrusters:
+    map: [0, 1, 2, 3, 4, 5, 6, 7]
     num: 8
     configuration_matrix:
       [[ 0.70711,  0.00000,  0.00000, -0.70711, -0.70711,  0.00000,  0.00000, 0.70711], # Surge
@@ -75,26 +76,3 @@ controller:
   velocity_gain: 0.4
 
 computer: 'odroid'
-
-pwm:
-  pins:
-    # Map from thruster number (list index) to pwm pin (list value)
-    thrusters: [0, 1, 2, 3, 4, 5, 6, 7]
-    headlights: 8
-    claw_servo: 9
-  frequency:
-    set: 50.0
-    measured: 51.6
-  counter:
-    max: 4095
-
-light:
-  gpio_pins: {"bluetooth":"P8_16", "raman":"P8_17"}
-  pwm_pins: {"front":8}
-
-sensors:
-  bno055:
-    # https://github.com/adafruit/Adafruit_Python_BNO055
-    mode: 'IMU'
-    # mode: 'NDOF'
-

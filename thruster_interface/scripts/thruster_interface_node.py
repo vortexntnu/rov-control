@@ -12,7 +12,7 @@ NUM_THRUSTERS = rospy.get_param('/propulsion/thrusters/num')
 THRUST_OFFSET = rospy.get_param('/thrusters/offset')
 LOOKUP_THRUST = rospy.get_param('/thrusters/characteristics/thrust')
 LOOKUP_PULSE_WIDTH = rospy.get_param('/thrusters/characteristics/pulse_width')
-THRUSTER_PWM_PINS = rospy.get_param('/pwm/pins/thrusters')
+THRUSTER_MAPPING = rospy.get_param('/propulsion/thrusters/map')
 
 
 def thrust_to_microsecs(thrust):
@@ -45,7 +45,7 @@ class ThrusterInterface(object):
         neutral_pulse_width = thrust_to_microsecs(0)
         pwm_msg = Pwm()
         for i in range(NUM_THRUSTERS):
-            pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
+            pwm_msg.pins.append(THRUSTER_MAPPING[i])
             pwm_msg.positive_width_us.append(neutral_pulse_width)
         self.pub_pwm.publish(pwm_msg)
 
@@ -59,7 +59,7 @@ class ThrusterInterface(object):
 
         for i in range(NUM_THRUSTERS):
             microsecs[i] = thrust_to_microsecs(thrust[i] + THRUST_OFFSET[i])
-            pwm_msg.pins.append(THRUSTER_PWM_PINS[i])
+            pwm_msg.pins.append(THRUSTER_MAPPING[i])
             pwm_msg.positive_width_us.append(microsecs[i])
 
         self.pub_pwm.publish(pwm_msg)

@@ -7,7 +7,7 @@ McuInterface::McuInterface(const char device[])
 
 	while (m_dev < 0)
 	{
-		ROS_INFO("Error %d opening %s: %s. Could not connect to MCU, retrying", 
+		ROS_ERROR("Error %d opening %s: %s. Could not connect to MCU, retrying", 
 				 errno, device, strerror(errno));
 
 		usleep(2000*1000); 

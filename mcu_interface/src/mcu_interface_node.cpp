@@ -29,31 +29,31 @@ int main(int argc, char **argv)
 
 	ros::Publisher read_leak_sensor_pub = nh_mcu.advertise<std_msgs::UInt8>("/mcu_read_leak_sensor", 1000);
 
-	ros::Rate loop_rate(1);
 
 	std_msgs::UInt8 msg;
 	msg.data = 0;
+        double prev_time = ros::Time::now().toSec();
 
 	while (ros::ok())
-	{		
-		
-	
-		if(mcu_interface.read_leak_sensor())
-		{
-			msg.data = 1;
-		}
-		else
-		{
+	{
+                if ((ros::Time::now().toSec() - prev_time) > 1.0)
+                {
+		    if (mcu_interface.read_leak_sensor())
+		    {
+	                msg.data = 1;
+		    }
+		    else
+		    {
 			msg.data = 0;
-		}
+		    }
 
-		read_leak_sensor_pub.publish(msg);
-			
+		    read_leak_sensor_pub.publish(msg);
+                    prev_time = ros::Time::now().toSec();
+                }
 
 		ros::spinOnce();
-
-		loop_rate.sleep();
 	}
 
 	return 0;
 }
+

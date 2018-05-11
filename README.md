@@ -1,5 +1,29 @@
-# rov-control [![Build Status](https://travis-ci.org/vortexntnu/rov-control.svg?branch=master)](https://travis-ci.org/vortexntnu/rov-control)
+# rov-control [![Build Status](https://travis-ci.com/vortexntnu/rov-control.svg?branch=master)](https://travis-ci.com/vortexntnu/rov-control)
 The control system for Vortex NTNU's ROVs. The repository contains several ROS packages.
+
+## Building
+The easiest way to quickly get started building the project is to use the accompanying Docker container.
+By running `docker run -it -v $(pwd):/catkin_ws/src/ vortexntnu/rov-control:latest /bin/bash`, when the current
+directory is set to the root of this package, you will get a container all set up with ROS and the required
+dependencies. You can then run the following commands to build and test the package:
+
+``` shell
+source /opt/ros/kinetic/setup.bash
+source /catkin_ws/devel/setup.bash
+cd /catkin_ws
+
+# Build the packages
+catkin_make
+
+# Build the tests
+catkin_make tests
+
+# Run the tests
+catkin_make run_tests
+
+# Run roslint
+catkin_make roslint
+```
 
 ## Launching
 * `roslaunch vortex maelstrom.launch` to start the system for the Maelstrom ROV.

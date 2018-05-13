@@ -8,31 +8,31 @@
 #include "std_msgs/UInt8.h"
 
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <string.h>     // String function definitions
 #include <unistd.h>     // UNIX standard function definitions
 #include <fcntl.h>      // File control definitions
 #include <errno.h>      // Error number definitions
-#include <termios.h>    // POSIX terminal control definitions      
+#include <termios.h>    // POSIX terminal control definitions
 #include <iostream>
 
 extern "C" {
-  #include "crc.h"
+#include "crc.h"
 }
 
 typedef enum msg_type
 {
-    MSG_TYPE_NOTYPE,
-    MSG_TYPE_THRUSTER   = 0x41,
-    MSG_TYPE_LIGHT      = 0x42,
-    MSG_TYPE_HEARTBEAT  = 0x43,
-    MSG_TYPE_ACK        = 0x44,
-    MSG_TYPE_NOACK      = 0x45,
-    MSG_TYPE_ARM        = 0x46,
-    MSG_TYPE_DISARM     = 0x47,
+  MSG_TYPE_NOTYPE,
+  MSG_TYPE_THRUSTER   = 0x41,
+  MSG_TYPE_LIGHT      = 0x42,
+  MSG_TYPE_HEARTBEAT  = 0x43,
+  MSG_TYPE_ACK        = 0x44,
+  MSG_TYPE_NOACK      = 0x45,
+  MSG_TYPE_ARM        = 0x46,
+  MSG_TYPE_DISARM     = 0x47,
 }msg_type;
 
-#define READ_BUFFERSIZE    512
+#define READ_BUFFERSIZE     512
 
 #define MAGIC_START_BYTE    0x24
 #define MAGIC_STOP_BYTE     0x40
@@ -53,26 +53,26 @@ typedef enum msg_type
 
 class McuInterface
 {
-        private:
-                int m_dev = 0;
-                char m_read_buffer[READ_BUFFERSIZE];
-                char m_thruster_cmd[MAX_MSG_SIZE] = {0};
-                char m_heartbeat_cmd[MSG_HEARTBEAT_SIZE] = {5};
-                char m_arming_cmd[MSG_ARMING_SIZE] = {10};
-                char m_light_cmd[MSG_LIGHT_SIZE]  = {5};
+private:
+  int m_dev = 0;
+  char m_read_buffer[READ_BUFFERSIZE];
+  char m_thruster_cmd[MAX_MSG_SIZE] = {0};
+  char m_heartbeat_cmd[MSG_HEARTBEAT_SIZE] = {5};
+  char m_arming_cmd[MSG_ARMING_SIZE] = {10};
+  char m_light_cmd[MSG_LIGHT_SIZE]  = {5};
 
-        public:
-                void thruster_pwm_callback(const vortex_msgs::Pwm& msg);
-                void heartbeat_callback(const std_msgs::String::ConstPtr& msg);
-                void arming_callback(const std_msgs::String::ConstPtr& msg);
-                void light_pwm_callback(const std_msgs::Int16::ConstPtr& msg);
-                uint8_t read_leak_sensor();
-                int serial_write(char* cmd, int cmd_size);
-                uint16_t crc_checksum(char* input, uint8_t num);
-                int serial_read();
-                void clear_read_buffer();
-                McuInterface(const char device[]);
-                ~McuInterface();
+public:
+  void thruster_pwm_callback(const vortex_msgs::Pwm& msg);
+  void heartbeat_callback(const std_msgs::String::ConstPtr& msg);
+  void arming_callback(const std_msgs::String::ConstPtr& msg);
+  void light_pwm_callback(const std_msgs::Int16::ConstPtr& msg);
+  uint8_t read_leak_sensor();
+  int serial_write(char* cmd, int cmd_size);
+  uint16_t crc_checksum(char* input, uint8_t num);
+  int serial_read();
+  void clear_read_buffer();
+  McuInterface(const char device[]);
+  ~McuInterface();
 };
 
 #endif // SERIAL_DEVICE_H

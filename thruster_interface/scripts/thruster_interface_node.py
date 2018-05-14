@@ -15,6 +15,7 @@ LOOKUP_PULSE_WIDTH = rospy.get_param('/thrusters/characteristics/pulse_width')
 THRUSTER_MAPPING = rospy.get_param('/propulsion/thrusters/map')
 THRUSTER_DIRECTION = rospy.get_param('/propulsion/thrusters/direction')
 
+
 def thrust_to_microsecs(thrust):
     return interp(thrust, LOOKUP_THRUST, LOOKUP_PULSE_WIDTH)
 
@@ -68,8 +69,6 @@ class ThrusterInterface(object):
             pwm_msg.positive_width_us.append(microsecs[i])
 
         self.pub_pwm.publish(pwm_msg)
-
-
 
 
 if __name__ == '__main__':

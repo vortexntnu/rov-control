@@ -9,3 +9,6 @@ RUN apt-get -y update && \
     cmake . && \
     make && \
     cp libg* /usr/lib/
+
+WORKDIR /catkin_ws/src
+RUN bash -c "source /opt/ros/kinetic/setup.bash && catkin_init_workspace"

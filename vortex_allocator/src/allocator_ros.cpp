@@ -24,7 +24,7 @@ Allocator::Allocator(ros::NodeHandle nh)
     ROS_FATAL("Failed to read parameter number of thrusters.");
   if (!m_nh.getParam("/propulsion/dofs/which", m_active_degrees_of_freedom))
     ROS_FATAL("Failed to read parameter which dofs.");
-  if(!m_nh.getParam("/propulsion/thrusters/direction", m_direction))
+  if (!m_nh.getParam("/propulsion/thrusters/direction", m_direction))
   {
     ROS_WARN("Failed to read parameter thruster direction.");
     std::fill(m_direction.begin(), m_direction.begin() + m_num_thrusters, 1);

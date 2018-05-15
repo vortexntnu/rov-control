@@ -47,7 +47,7 @@ class JoystickInterfaceNode(object):
         motion_msg.motion = [
             axes['vertical_axis_left_stick'],     # Surge
             -axes['horizontal_axis_left_stick'],  # Sway
-            (axes['LT'] - axes['RT'])/2,          # Heave
+            (axes['RT'] - axes['LT'])/2,          # Heave
             (buttons['RB'] - buttons['LB']),      # Roll
             -axes['vertical_axis_right_stick'],   # Pitch
             -axes['horizontal_axis_right_stick']  # Yaw

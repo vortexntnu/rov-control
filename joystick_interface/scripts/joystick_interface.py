@@ -40,14 +40,14 @@ class JoystickInterfaceNode(object):
             axes[self.axes_map[j]] = msg.axes[j]
 
         manipulator_msg = Manipulator()
-        manipulator_msg.claw_direction = buttons['RB'] - buttons['LB']
+        manipulator_msg.claw_direction = axes['dpad_horizontal']
         manipulator_msg.vertical_stepper_direction = axes['dpad_vertical']
 
         motion_msg = PropulsionCommand()
         motion_msg.motion = [
             axes['vertical_axis_left_stick'],     # Surge
             -axes['horizontal_axis_left_stick'],  # Sway
-            (axes['LT'] - axes['RT'])/2,          # Heave
+            (axes['RT'] - axes['LT'])/2,          # Heave
             (buttons['RB'] - buttons['LB']),      # Roll
             -axes['vertical_axis_right_stick'],   # Pitch
             -axes['horizontal_axis_right_stick']  # Yaw

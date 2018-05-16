@@ -1,0 +1,5 @@
+<launch>
+  <env name="ROSCONSOLE_FORMAT" value="[${severity}]
+  [${time}] [${node}]: ${message}" /> 
+  <node name="liftbag" pkg="liftbag" type="liftbag.py" output="screen"/>
+</launch>

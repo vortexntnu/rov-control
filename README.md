@@ -40,12 +40,14 @@ but you can also lint manually with `catkin_make roslint`.
 The [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) C++ library
 
 `sudo apt install libeigen3-dev`
+
 ### Eigen conversions ROS package
 The [eigen_conversions](http://wiki.ros.org/eigen_conversions) ROS package
 
 `sudo apt install ros-kinetic-eigen-conversions`
+
 ### Gtest
-The gtest package in the Ubuntu repository is not precompiled, 
+The gtest package in the Ubuntu repository is not precompiled,
 so it needs to be built and put in place.
 ```
 sudo apt install libgtest-dev
@@ -59,6 +61,11 @@ sudo cp libg* /usr/lib/
 roslint is used for linting of the ROS C++/Python code.
 
 `sudo apt install ros-kinetic-roslint`
+
+### ROS-bridge-server
+Necessary for connecting the Web-based GUI to the ROV
+
+`sudo apt install ros-kinetic-rosbridge-server`
 
 ## Preferred workflow
 * Create a feature branch out of `master` for each new feature, solved issue, significant refactor, etc.

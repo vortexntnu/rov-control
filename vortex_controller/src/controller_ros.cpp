@@ -228,35 +228,40 @@ void Controller::resetSetpoints()
   m_setpoints->set(position, orientation);
 }
 
-void Controller::updatePositionSetpoint(PoseIndex axis)
+void Controller::updateSetpoint(PoseIndex axis)
 {
-  Eigen::Vector3d position_state;
-  Eigen::Vector3d position_setpoint;
+  Eigen::Vector3d state;
+  Eigen::Vector3d setpoint;
 
-  m_state->get(&position_state);
-  m_setpoints->get(&position_setpoint);
+  switch(axis)
+  {
+    case SURGE:
+    case SWAY:
+    case HEAVE:
 
-  position_setpoint[axis] = position_state[axis];
+      m_state->get(&state);
+      m_setpoints->get(&setpoint);
 
-  m_setpoints->set(position_setpoint);
-}
+      setpoint[axis] = state[axis];
+      m_setpoints->set(setpoint);
+      break;
 
-void Controller::updateOrientationSetpoint(EulerIndex axis)
-{
-  Eigen::Vector3d euler_state;
-  Eigen::Vector3d euler_setpoint;
+    case ROLL:
+    case PITCH:
+    case YAW:
 
-  m_state->getEuler(&euler_state);
-  m_setpoints->getEuler(&euler_setpoint);
+      m_state->getEuler(&state);
+      m_setpoints->getEuler(&setpoint);
 
-  euler_setpoint[axis] = euler_state[axis];
-  Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(euler_setpoint(0), Eigen::Vector3d::UnitZ())
-    * Eigen::AngleAxisd(euler_setpoint(1), Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(euler_setpoint(2), Eigen::Vector3d::UnitX());
-  Eigen::Quaterniond quaternion_setpoint(R);
-
-  m_setpoints->set(quaternion_setpoint);
+      setpoint[axis-3] = state[axis-3];
+      Eigen::Matrix3d R;
+      R = Eigen::AngleAxisd(setpoint(0), Eigen::Vector3d::UnitZ())
+        * Eigen::AngleAxisd(setpoint(1), Eigen::Vector3d::UnitY())
+        * Eigen::AngleAxisd(setpoint(2), Eigen::Vector3d::UnitX());
+      Eigen::Quaterniond quaternion_setpoint(R);
+      m_setpoints->set(quaternion_setpoint);
+      break;
+  }
 }
 
 void Controller::initPositionHoldController()
@@ -419,7 +424,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    updatePositionSetpoint(HEAVE);
+    updateSetpoint(HEAVE);
     tau.setZero();
   }
 
@@ -449,7 +454,7 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    updateOrientationSetpoint(EULER_YAW);
+    updateSetpoint(YAW);
     tau.setZero();
   }
 

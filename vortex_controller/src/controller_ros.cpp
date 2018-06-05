@@ -228,7 +228,7 @@ void Controller::updateSetpoint(PoseIndex axis)
   Eigen::Vector3d state;
   Eigen::Vector3d setpoint;
 
-  switch(axis)
+  switch (axis)
   {
     case SURGE:
     case SWAY:
@@ -250,9 +250,9 @@ void Controller::updateSetpoint(PoseIndex axis)
 
       setpoint[axis-3] = state[axis-3];
       Eigen::Matrix3d R;
-      R = Eigen::AngleAxisd(setpoint(0), Eigen::Vector3d::UnitZ())
+      R = Eigen::AngleAxisd(setpoint(2), Eigen::Vector3d::UnitZ())
         * Eigen::AngleAxisd(setpoint(1), Eigen::Vector3d::UnitY())
-        * Eigen::AngleAxisd(setpoint(2), Eigen::Vector3d::UnitX());
+        * Eigen::AngleAxisd(setpoint(0), Eigen::Vector3d::UnitX());
       Eigen::Quaterniond quaternion_setpoint(R);
       m_setpoints->set(quaternion_setpoint);
       break;

@@ -60,9 +60,9 @@ bool State::getEuler(Eigen::Vector3d *orientation)
 
   Eigen::Vector3d euler_orientation;
 
-  euler_orientation[2] = std::atan2(2*(w*x + y*z), 1 - 2*(x*x + y*y)); // ROLL
-  euler_orientation[1] = std::asin( 2*(w*y - x*z));                    // PITCH
-  euler_orientation[0] = std::atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z)); // YAW
+  euler_orientation[0] = std::atan2(2*(w*x + y*z), 1 - 2*(x*x + y*y));  // ROLL
+  euler_orientation[1] = std::asin(2*(w*y - x*z));                      // PITCH
+  euler_orientation[2] = std::atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z));  // YAW
 
   *orientation = euler_orientation;
 }

@@ -8,9 +8,8 @@ class Setpoints
 {
 public:
   Setpoints(const Eigen::Vector6d &wrench_scaling,
-            const Eigen::Vector6d &wrench_max,
-            const Eigen::Vector6d &pose_rate);
-  bool update(const double time, const Eigen::Vector6d &command);
+            const Eigen::Vector6d &wrench_max);
+  bool update(const Eigen::Vector6d &command);
   bool get(Eigen::Vector6d *wrench);
   bool get(Eigen::Vector3d    *position,
            Eigen::Quaterniond *orientation);
@@ -29,10 +28,7 @@ private:
 
   Eigen::Vector6d m_wrench_scaling;
   Eigen::Vector6d m_wrench_max;
-  Eigen::Vector6d m_pose_rate;
 
-  double m_time;
-  bool   m_time_is_valid;
   bool   m_wrench_is_valid;
   bool   m_pose_is_valid;
 };

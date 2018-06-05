@@ -58,11 +58,10 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   }
   publishControlMode();
 
-  double time = msg.header.stamp.toSec();
   Eigen::Vector6d command;
   for (int i = 0; i < 6; ++i)
     command(i) = msg.motion[i];
-  m_setpoints->update(time, command);
+  m_setpoints->update(command);
 }
 
 ControlMode Controller::getControlMode(const vortex_msgs::PropulsionCommand& msg) const
@@ -212,11 +211,7 @@ void Controller::initSetpoints()
     ROS_FATAL("Failed to read parameter scaling wrench command.");
   const Eigen::Vector6d wrench_command_scaling = Eigen::Vector6d::Map(v.data(), v.size());
 
-  if (!m_nh.getParam("/propulsion/command/pose/rate", v))
-    ROS_FATAL("Failed to read parameter pose command rate.");
-  const Eigen::Vector6d pose_command_rate = Eigen::Vector6d::Map(v.data(), v.size());
-
-  m_setpoints.reset(new Setpoints(wrench_command_scaling, wrench_command_max, pose_command_rate));
+  m_setpoints.reset(new Setpoints(wrench_command_scaling, wrench_command_max));
 }
 
 void Controller::resetSetpoints()

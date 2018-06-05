@@ -8,7 +8,8 @@ class JoystickInterfaceNode(object):
     def __init__(self):
         rospy.init_node('joystick_node')
 
-        self.sub = rospy.Subscriber('joy_throttle', Joy, self.callback, queue_size=1)
+        self.sub = rospy.Subscriber(
+            'joy_throttle', Joy, self.callback, queue_size=1)
         self.pub_motion = rospy.Publisher('propulsion_command',
                                           PropulsionCommand,
                                           queue_size=1)
@@ -27,10 +28,6 @@ class JoystickInterfaceNode(object):
                          'vertical_axis_right_stick', 'RT',
                          'dpad_horizontal', 'dpad_vertical']
 
-        self.agar_state = False
-        self.agar_msg_curr = False
-        self.agar_msg_prev = False
-
     def callback(self, msg):
         # Connect values to names in two dictionaries
         buttons = {}
@@ -43,24 +40,14 @@ class JoystickInterfaceNode(object):
             axes[self.axes_map[j]] = msg.axes[j]
 
         manipulator_msg = Manipulator()
-        manipulator_msg.claw_direction = -axes['dpad_vertical']
-        manipulator_msg.valve_direction = buttons['RB'] - buttons['LB']
-
-        # Toggle agar direction
-        if buttons['start'] + buttons['back']:
-            self.agar_msg_curr = True
-        else:
-            self.agar_msg_curr = False
-        if self.agar_msg_curr and not self.agar_msg_prev:
-            self.agar_state = not self.agar_state
-        manipulator_msg.agar_direction = self.agar_state
-        self.agar_msg_prev = self.agar_msg_curr
+        manipulator_msg.claw_direction = axes['dpad_horizontal']
+        manipulator_msg.vertical_stepper_direction = axes['dpad_vertical']
 
         motion_msg = PropulsionCommand()
         motion_msg.motion = [
             axes['vertical_axis_left_stick'],     # Surge
             -axes['horizontal_axis_left_stick'],  # Sway
-            (axes['LT'] - axes['RT'])/2,          # Heave
+            (axes['RT'] - axes['LT'])/2,          # Heave
             (buttons['RB'] - buttons['LB']),      # Roll
             -axes['vertical_axis_right_stick'],   # Pitch
             -axes['horizontal_axis_right_stick']  # Yaw

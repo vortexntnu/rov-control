@@ -1,13 +1,8 @@
-# Manipulator servo/stepper commands
+# Manipulator stepper commands
 
-# Claw position
+# Claw direction
 # -1 for CCW, 0 for stop, and 1 for CW.
 int8 claw_direction
-
-# Valve spinning
+# Vertical stepper direction
 # -1 for CCW, 0 for stop, and 1 for CW.
-int8 valve_direction
-
-# Agar screw
-# -1 for CCW, 0 for stop, and 1 for CW.
-int8 agar_direction
+int8 vertical_stepper_direction

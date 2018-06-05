@@ -3,8 +3,8 @@
 <package>
     <name>manipulator_interface</name>
     <version>0.0.0</version>
-    <description>This package provides an interface for the Terrapin ROV manipulators.</description>
-    <maintainer email="morten.fyhn.amundsen@gmail.com">Morten Fyhn Amundsen</maintainer>
+    <description>This package provides an interface for the Otterholm ROV manipulators.</description>
+    <maintainer email="aksel.lenes@gmail.com">Aksel Lenes</maintainer>
     <license>MIT</license>
     <url type="website">http://vortexntnu.no</url>
 

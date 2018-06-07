@@ -10,6 +10,7 @@
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/FluidPressure.h"
 #include "vortex_msgs/RovState.h"
+#include <Eigen/Dense>
 
 class SimpleEstimator
 {
@@ -29,6 +30,7 @@ class SimpleEstimator
     double m_gravitational_acceleration;
 
     const double c_pi = 3.141592653589793;
+    Eigen::Matrix3d c_R_enu2ned;
 
     vortex_msgs::RovState m_state;
 };

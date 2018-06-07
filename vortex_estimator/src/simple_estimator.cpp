@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include <eigen_conversions/eigen_msg.h>
-#include <Eigen/Dense>
+
 
 SimpleEstimator::SimpleEstimator()
 {
@@ -25,6 +25,9 @@ SimpleEstimator::SimpleEstimator()
   m_state.pose.orientation.y = 0.0;
   m_state.pose.orientation.z = 0.0;
 
+  R_enu2ned = Eigen::AngleAxisd(c_pi, Eigen::Vector3d::UnitX())
+              * Eigen::AngleAxisd(-c_pi/2, Eigen::Vector3d::UnitZ());
+
   ROS_INFO("Initialized.");
 }
 
@@ -36,7 +39,8 @@ void SimpleEstimator::imuCallback(const sensor_msgs::Imu &msg)
   Eigen::Vector3d euler_imu = quat_imu.toRotationMatrix().eulerAngles(2, 1, 0);
 
   // Alter IMU measurements to Z down, Y right, X forward
-  Eigen::Vector3d euler_ned(-euler_imu(0), euler_imu(2) + c_pi, euler_imu(1) + c_pi);
+
+  Eigen::Vector3d euler_ned = R_enu2ned*euler_imu;
 
   // Transform back to quaternion
   Eigen::Matrix3d R_ned;

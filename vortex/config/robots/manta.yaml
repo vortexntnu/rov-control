@@ -67,8 +67,6 @@ propulsion:
     wrench:
       max:     [33.9, 33.9, 48.0, 7.6, 3.2, 9.9]
       scaling: [ 0.4,  0.4,  0.6, 0.3, 0.7, 0.4]
-    pose:
-      rate: [0.20, 0.20, 0.20, 0.35, 0.35, 0.35] # Euler angle pose!
 
 controller:
   frequency: 10

@@ -58,11 +58,10 @@ void Controller::commandCallback(const vortex_msgs::PropulsionCommand& msg)
   }
   publishControlMode();
 
-  double time = msg.header.stamp.toSec();
   Eigen::Vector6d command;
   for (int i = 0; i < 6; ++i)
     command(i) = msg.motion[i];
-  m_setpoints->update(time, command);
+  m_setpoints->update(command);
 }
 
 ControlMode Controller::getControlMode(const vortex_msgs::PropulsionCommand& msg) const
@@ -212,11 +211,7 @@ void Controller::initSetpoints()
     ROS_FATAL("Failed to read parameter scaling wrench command.");
   const Eigen::Vector6d wrench_command_scaling = Eigen::Vector6d::Map(v.data(), v.size());
 
-  if (!m_nh.getParam("/propulsion/command/pose/rate", v))
-    ROS_FATAL("Failed to read parameter pose command rate.");
-  const Eigen::Vector6d pose_command_rate = Eigen::Vector6d::Map(v.data(), v.size());
-
-  m_setpoints.reset(new Setpoints(wrench_command_scaling, wrench_command_max, pose_command_rate));
+  m_setpoints.reset(new Setpoints(wrench_command_scaling, wrench_command_max));
 }
 
 void Controller::resetSetpoints()
@@ -226,6 +221,42 @@ void Controller::resetSetpoints()
   Eigen::Quaterniond orientation;
   m_state->get(&position, &orientation);
   m_setpoints->set(position, orientation);
+}
+
+void Controller::updateSetpoint(PoseIndex axis)
+{
+  Eigen::Vector3d state;
+  Eigen::Vector3d setpoint;
+
+  switch (axis)
+  {
+    case SURGE:
+    case SWAY:
+    case HEAVE:
+
+      m_state->get(&state);
+      m_setpoints->get(&setpoint);
+
+      setpoint[axis] = state[axis];
+      m_setpoints->set(setpoint);
+      break;
+
+    case ROLL:
+    case PITCH:
+    case YAW:
+
+      m_state->getEuler(&state);
+      m_setpoints->getEuler(&setpoint);
+
+      setpoint[axis-3] = state[axis-3];
+      Eigen::Matrix3d R;
+      R = Eigen::AngleAxisd(setpoint(2), Eigen::Vector3d::UnitZ())
+        * Eigen::AngleAxisd(setpoint(1), Eigen::Vector3d::UnitY())
+        * Eigen::AngleAxisd(setpoint(0), Eigen::Vector3d::UnitX());
+      Eigen::Quaterniond quaternion_setpoint(R);
+      m_setpoints->set(quaternion_setpoint);
+      break;
+  }
 }
 
 void Controller::initPositionHoldController()
@@ -327,13 +358,13 @@ void Controller::publishDebugMsg(const Eigen::Vector3d    &position_state,
   Eigen::Vector3d dbg_setpoint_orientation =
       orientation_setpoint.toRotationMatrix().eulerAngles(2, 1, 0);
 
-  dbg_msg.state_roll = dbg_state_orientation[0];
+  dbg_msg.state_yaw = dbg_state_orientation[0];
   dbg_msg.state_pitch = dbg_state_orientation[1];
-  dbg_msg.state_yaw = dbg_state_orientation[2];
+  dbg_msg.state_roll = dbg_state_orientation[2];
 
-  dbg_msg.setpoint_roll = dbg_setpoint_orientation[0];
+  dbg_msg.setpoint_yaw = dbg_setpoint_orientation[0];
   dbg_msg.setpoint_pitch = dbg_setpoint_orientation[1];
-  dbg_msg.setpoint_yaw = dbg_setpoint_orientation[2];
+  dbg_msg.setpoint_roll = dbg_setpoint_orientation[2];
 
   m_debug_pub.publish(dbg_msg);
 }
@@ -388,7 +419,7 @@ Eigen::Vector6d Controller::depthHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    resetSetpoints();
+    updateSetpoint(HEAVE);
     tau.setZero();
   }
 
@@ -418,7 +449,7 @@ Eigen::Vector6d Controller::headingHold(const Eigen::Vector6d &tau_openloop,
   }
   else
   {
-    resetSetpoints();
+    updateSetpoint(YAW);
     tau.setZero();
   }
 

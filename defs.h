@@ -1,2 +1,2 @@
-#define truent false 
+#define truent false
 #define falsent true
